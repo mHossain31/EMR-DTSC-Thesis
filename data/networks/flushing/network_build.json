@@ -20,16 +20,18 @@
     "passenger",
     "--keep-edges.components",
     "1",
+    "--junctions.join-dist",
+    "20",
     "--keep-edges.in-geo-boundary",
     "-73.845000,40.745000,-73.805000,40.775000",
     "--output-file",
     "scenarios/flushing/flushing.net.xml.gz"
   ],
   "sumo_version": "1.28.0",
-  "seconds": 0.96,
+  "seconds": 1.57,
   "net_file": "scenarios/flushing/flushing.net.xml.gz",
-  "net_sha256": "386ecec0994e9458f82c5dc4cd8d781da2fe68b5b56af67f68d06971f9d6a553",
-  "warnings_count": 93,
+  "net_sha256": "1c6a057c9557a8583847fc25e53c179cc2e0e8177dc3ec0e1f3b3b856dbb6f29",
+  "warnings_count": 99,
   "warnings_sample": [
     "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.residential' (first occurrence for edge '5699934').",
     "Warning: Discarding unknown compound 'route.bicycle' in type 'highway.residential|route.bicycle' (first occurrence for edge '5702497').",
@@ -77,6 +79,10 @@
   "extra_options": [
     "--keep-edges.components",
     "1"
+  ],
+  "repair_options": [
+    "--junctions.join-dist",
+    "20"
   ],
   "clip_option": [
     "--keep-edges.in-geo-boundary",

@@ -30,6 +30,7 @@ class Protocol(Strict):
     depart_end_s: int
     cap_s: int
     time_to_teleport_s: int = Field(gt=0)
+    ignore_junction_blocker_s: int = Field(ge=-1)
     collision_action: str
     control_tick_s: int = Field(gt=0)
     feature_window_s: int = Field(gt=0)

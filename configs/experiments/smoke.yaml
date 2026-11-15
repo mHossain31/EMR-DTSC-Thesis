@@ -1,0 +1,16 @@
+# Smoke profile (docs/SPECIFICATION.md 8): the 3x3 netgenerate grid, 2 seeds, every Tier-1 controller, a few minutes.
+# The smoke grid is not calibrated; its density is fixed here.
+name: smoke
+scenario: smoke
+levels: [smoke]
+level_densities: {smoke: 60.0}
+seeds: [1, 2]
+reconcile: true
+conditions:
+  - {controller: static}
+  - {controller: tt_adaptive}
+  - {controller: random_reroute, params: {eta: 0.3}}
+  - {controller: eco_reactive, params: {alpha: 0.5}, dataset: true}
+  - {controller: eco_reactive, params: {alpha: 0.0}, label: eco_reactive_a0}
+  - {controller: eco_ml, params: {alpha: 0.5, model_id: toy}}
+  - {controller: legacy_ml, params: {threshold_mg_s: 1.0, model_id: toy}}

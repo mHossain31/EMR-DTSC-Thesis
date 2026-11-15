@@ -7,7 +7,7 @@
     },
     "edge_count": {
       "ok": true,
-      "detail": "2365 non-internal edges (allowed 1500-20000)"
+      "detail": "2316 non-internal edges (allowed 1500-20000)"
     },
     "traffic_lights": {
       "ok": true,
@@ -15,7 +15,7 @@
     },
     "strong_connectivity": {
       "ok": true,
-      "detail": "largest strongly connected component holds 96.3% of edges (80 components; minimum 90%)"
+      "detail": "largest strongly connected component holds 96.2% of edges (80 components; minimum 90%)"
     },
     "dead_end_share": {
       "ok": true,
@@ -27,49 +27,49 @@
     }
   },
   "stats": {
-    "lane_km_inside_bbox_share": 0.9252,
-    "edges": 2365,
-    "nodes": 933,
-    "lane_km": 300.71,
+    "lane_km_inside_bbox_share": 0.9249,
+    "edges": 2316,
+    "nodes": 907,
+    "lane_km": 299.72,
     "traffic_lights": 176,
-    "largest_scc_edges": 2277,
-    "largest_scc_share": 0.9628,
+    "largest_scc_edges": 2228,
+    "largest_scc_share": 0.962,
     "scc_count": 80,
     "weak_components": 1,
     "dead_end_edges": 15,
-    "dead_end_share": 0.0063,
+    "dead_end_share": 0.0065,
     "source_edges": 16,
     "speed_limits_kmh": {
       "24": 1,
       "40": 130,
-      "48": 44,
-      "50": 1483,
+      "48": 42,
+      "50": 1460,
       "64": 1,
-      "80": 432,
-      "100": 271,
+      "80": 417,
+      "100": 262,
       "142": 3
     },
     "road_class_edges": {
-      "primary/secondary": 368,
-      "residential/service": 1554,
-      "tertiary": 392,
+      "primary/secondary": 354,
+      "residential/service": 1531,
+      "tertiary": 380,
       "motorway/trunk": 51
     },
     "road_class_lane_km": {
-      "primary/secondary": 53.36,
-      "residential/service": 170.34,
-      "tertiary": 36.21,
+      "primary/secondary": 52.79,
+      "residential/service": 170.04,
+      "tertiary": 36.09,
       "motorway/trunk": 40.81
     },
     "edge_types": {
-      "highway.residential": 1459,
-      "highway.tertiary": 392,
-      "highway.secondary": 242,
-      "highway.primary": 112,
+      "highway.residential": 1436,
+      "highway.tertiary": 380,
+      "highway.secondary": 233,
+      "highway.primary": 110,
       "highway.unclassified": 95,
       "highway.motorway": 26,
       "highway.motorway_link": 25,
-      "highway.secondary_link": 9,
+      "highway.secondary_link": 6,
       "highway.primary_link": 5
     }
   }

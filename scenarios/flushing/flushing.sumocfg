@@ -5,6 +5,7 @@
     <input>
         <net-file value="flushing.net.xml.gz"/>
         <route-files value="flushing.default.rou.xml.gz"/>
+        <additional-files value="vtypes.add.xml"/>
     </input>
     <time>
         <begin value="0"/>
@@ -14,6 +15,7 @@
         <time-to-teleport value="300"/>
         <collision.action value="warn"/>
         <tls.actuated.jam-threshold value="30"/>
+        <ignore-junction-blocker value="30"/>
     </processing>
     <random_number>
         <seed value="42"/>

@@ -1,0 +1,42 @@
+{
+  "vehicles": 4797,
+  "mean_route_length_m": 2233.1,
+  "fringe_start_share": 0.1697,
+  "types": {
+    "LCV_diesel_N1-III_Euro-5": 193,
+    "LCV_diesel_N1-III_Euro-6ab": 182,
+    "LCV_petrol_N1-III_Euro-6ab": 105,
+    "PC_diesel_Euro-5": 202,
+    "PC_diesel_Euro-6ab": 185,
+    "PC_petrol_Euro-4": 1014,
+    "PC_petrol_Euro-5": 1009,
+    "PC_petrol_Euro-6ab": 1058,
+    "PC_petrol_Euro-6d": 609,
+    "RT_gt7_5-12t_Euro-VI_A-C": 125,
+    "RT_gt7_5-12t_Euro-V_SCR": 115
+  },
+  "scenario": "flushing",
+  "level": "moderate",
+  "seed": 9000,
+  "density_per_h_km": 16.0,
+  "depart_end_s": 3600,
+  "groups": {
+    "cars": {
+      "vehicles": 4077,
+      "trips_written": 4077,
+      "unroutable": 0
+    },
+    "trucks": {
+      "vehicles": 240,
+      "trips_written": 240,
+      "unroutable": 0
+    },
+    "vans": {
+      "vehicles": 480,
+      "trips_written": 480,
+      "unroutable": 0
+    }
+  },
+  "route_file": "scenarios/flushing/flushing.default.rou.xml.gz",
+  "sha256": "c96f13be94f3e4223c0fbd18279cca6e941bdb92211fa1060223b3aadf395515"
+}

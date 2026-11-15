@@ -51,4 +51,20 @@ recorded below as each contract test passes.
 
 ## Behaviour verified by contract tests
 
-(Filled as the M3 tests pass.)
+All in `tests/integration/test_api_contract.py` on the smoke grid, SUMO 1.28.0, libsumo (2026-11-15).
+
+| Behaviour | Result | Test |
+|---|---|---|
+| `edge.getEffort` of an edge never set | returns -1 | `test_effort_unset_is_minus_one_and_set_overwrites` |
+| `edge.setEffort(e, v)` without begin/end | value valid at t = 1 s and t = 100,000 s; a second call overwrites (no accumulation) | same |
+| `vehicle.rerouteEffort` with a 1e9 effort on an edge of the remaining route | the new route avoids it | `test_reroute_effort_avoids_expensive_edge` |
+| `vehicle.rerouteEffort` on a vehicle with a rerouting device | also avoids it (15/15 in a probe): an explicit TraCI call uses the global efforts; the "devices ignore efforts" statement applies to the device's periodic rerouting | `test_device_vehicle_reroute_effort_behaviour`, `test_device_periodic_rerouting_is_travel_time_based` |
+| `vehicle.getNOxEmission` units | mg/s for the last step: sum of rate x 1 s over all vehicles and steps equals tripinfo `NOx_abs` (mg) within 0.1% (0.078% on the smoke grid); per vehicle the two differ by a few mg in both directions | `test_vehicle_emission_getters_are_mg_per_s` |
+| `edge.getTraveltime` | length / last-step mean speed on an occupied edge; length / lane max speed on an empty edge (not a smoothed or adapted value) | `test_edge_traveltime_semantics` |
+| `simulation.findRoute(from, to)` with defaults, no weights, no device | equals the duarouter (free-flow) route of the vehicle for 403/403 departing vehicles on the smoke grid (legacy defect D2) | `test_find_route_default_reproduces_static_route` |
+| tripinfo `<emissions>` child | carries `NOx_abs`, `CO2_abs`, `CO_abs`, `HC_abs`, `PMx_abs`, `fuel_abs` (mg) with the emissions device | `test_tripinfo_emission_attributes` |
+| -2^30 (unavailable) from emission getters | never added; counted per run (`recon_invalid_values`, `edge_logger_invalid_values`) | runner |
+| Arrived vehicles | not readable: with `--keep-after-arrival 1` the emission getters of an arrived vehicle return -2^30; the partial arrival step is therefore missing from per-step sums (about -0.16% of NOx on Flushing; DEVIATIONS #9) | probe 2026-11-15 |
+| A new vehicle subscription | reports from the step after `subscribe`; the departure step is read with direct getters | `VehicleEmissionLogger` |
+| Default emission class | `HBEFA4/PC_petrol_Euro-4` (not `HBEFA3/PC_G_EU4` as docs/SPECIFICATION.md Appendix C states for older versions) | `vehicletype.getEmissionClass("DEFAULT_VEHTYPE")`, 2026-11-15 |
+| sumo-gui scheme indices | lane scheme 11 = "by NOx emissions", vehicle scheme 8 = "by speed", inferred from the order of the scheme names in `sumo-gui.exe`; a snapshot showed NOx-scheme grey lanes on an empty grid; the legend-based visual check is pending an active display | `network/scenario_files.py` |

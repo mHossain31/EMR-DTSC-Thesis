@@ -1,0 +1,13 @@
+# Development timing check (not part of the study): one Flushing heavy run per controller type, pilot seed 9000.
+name: timing
+scenario: flushing
+levels: [heavy]
+seeds: [9000]
+reconcile: true
+conditions:
+  - {controller: static}
+  - {controller: tt_adaptive}
+  - {controller: random_reroute, params: {eta: 0.3}}
+  - {controller: eco_reactive, params: {alpha: 0.5}, dataset: true}
+  - {controller: eco_ml, params: {alpha: 0.5, model_id: toy}}
+  - {controller: legacy_ml, params: {threshold_mg_s: 1.88, model_id: toy}}

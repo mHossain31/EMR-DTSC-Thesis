@@ -8,6 +8,7 @@ protocol:
   depart_end_s: 3600
   cap_s: 14400                 # hard cap; runs otherwise continue until every vehicle has arrived
   time_to_teleport_s: 300      # SUMO's documented default, set explicitly
+  ignore_junction_blocker_s: 30  # vehicles ignore a junction blocker after 30 s (deadlock mitigation; DEVIATIONS #6)
   collision_action: warn
   control_tick_s: 60
   feature_window_s: 60

@@ -127,10 +127,73 @@ def calibrate_cmd(
 ) -> None:
     """Calibrate light/moderate/heavy demand on the pilot seeds; writes configs/demand_levels.yaml."""
     from nycemis.demand.calibrate import calibrate, clean_calibration_routes, default_workers, summary_table
+    from nycemis.network import scenario_files as sf
 
     entry = calibrate(scenario, workers or default_workers())
     clean_calibration_routes(scenario)
     typer.echo(summary_table(entry))
+    typer.echo(f"default demand: {sf.write_default_demand(scenario)['source']}")
+    sf.write_sumocfg(scenario)
+
+
+sim_app = typer.Typer(no_args_is_help=True, help="single simulation runs")
+app.add_typer(sim_app, name="sim")
+
+
+@sim_app.command("run")
+def sim_run(spec: str = typer.Option(..., help="path to a RunSpec JSON file")) -> None:
+    """Run one simulation from a RunSpec JSON file (used by the experiment executor, one process per run)."""
+    from pathlib import Path
+
+    from nycemis.sim.run_spec import RunSpec
+    from nycemis.sim.runner import execute, run_dir
+
+    rs = RunSpec.model_validate_json(Path(spec).read_text(encoding="utf-8"))
+    metrics = execute(rs)
+    typer.echo(json.dumps({"run_id": rs.run_id(), "dir": str(run_dir(rs)), "valid": metrics["valid"],
+                           "total_nox_g": metrics["total_nox_g"], "wall_s": metrics["wall_s"]}))
+
+
+exp_app = typer.Typer(no_args_is_help=True, help="plan, run, check and verify experiments")
+app.add_typer(exp_app, name="experiment")
+
+
+@exp_app.command("plan")
+def exp_plan(exp: str = typer.Option(..., "--exp")) -> None:
+    """Generate the demand and write results/runs/<exp>/plan.json."""
+    from nycemis.experiments.plan import plan
+
+    specs = plan(exp)
+    typer.echo(f"{exp}: {len(specs)} runs planned")
+
+
+@exp_app.command("run")
+def exp_run(exp: str = typer.Option(..., "--exp"), workers: int = typer.Option(0)) -> None:
+    """Run every planned run that is not DONE (resumable)."""
+    from nycemis.experiments.execute import run_experiment
+
+    typer.echo(json.dumps(run_experiment(exp, workers or None)))
+
+
+@exp_app.command("status")
+def exp_status(exp: str = typer.Option(..., "--exp")) -> None:
+    """Count DONE runs."""
+    from nycemis.experiments.plan import exp_dir, load_plan
+
+    doc = load_plan(exp)
+    done = sum((exp_dir(exp) / r["run_id"] / "DONE").is_file() for r in doc["runs"])
+    typer.echo(f"{exp}: {done}/{len(doc['runs'])} DONE")
+
+
+@exp_app.command("verify")
+def exp_verify(exp: str = typer.Option(..., "--exp")) -> None:
+    """Fail unless every planned run is DONE or documented-failed and pairing holds."""
+    from nycemis.experiments.verify import verify
+
+    res = verify(exp)
+    typer.echo(json.dumps(res, indent=2))
+    if not res["ok"]:
+        raise typer.Exit(code=1)
 
 
 @app.command("legacy-audit")

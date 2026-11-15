@@ -9,38 +9,47 @@ scenarios:
     - 9003
     - 9004
     response: speed_ratio = sum(duration - timeLoss) / sum(duration), finished trips
-      departing in [900, 3600] s, static runs, mean over pilot seeds
+      departing in [900, 3600] s, static runs, mean over pilot seeds; relative speed
+      ratio = speed_ratio / speed_ratio at the reference density
+    reference_density_per_h_km: 1.0
+    reference_speed_ratio: 0.5238
     levels:
       light:
-        density_per_h_km: 1.0
-        target_speed_ratio: 0.8
-        achieved_speed_ratio_mean: 0.5283
-        achieved_speed_ratio_sd: 0.0092
-        target_reached: false
-        max_teleport_frac: 0.0033
-        min_completion: 1.0
-        mean_vehicles: 303.0
-        max_last_arrival_s: 4095.0
-      moderate:
-        density_per_h_km: 1.0
-        target_speed_ratio: 0.6
-        achieved_speed_ratio_mean: 0.5283
-        achieved_speed_ratio_sd: 0.0092
-        target_reached: false
-        max_teleport_frac: 0.0033
-        min_completion: 1.0
-        mean_vehicles: 303.0
-        max_last_arrival_s: 4095.0
-      heavy:
         density_per_h_km: 10.0
-        target_speed_ratio: 0.45
-        achieved_speed_ratio_mean: 0.4562
-        achieved_speed_ratio_sd: 0.0179
-        target_reached: false
-        max_teleport_frac: 0.00465
+        target_relative_speed_ratio: 0.95
+        achieved_relative_speed_ratio: 0.947
+        target_speed_ratio: 0.4976
+        achieved_speed_ratio_mean: 0.496
+        achieved_speed_ratio_sd: 0.0041
+        target_reached: true
+        max_teleport_frac: 0.0
         min_completion: 1.0
-        mean_vehicles: 3009.0
-        max_last_arrival_s: 5517.0
+        mean_vehicles: 2998.0
+        max_last_arrival_s: 4208.0
+      moderate:
+        density_per_h_km: 16.0
+        target_relative_speed_ratio: 0.85
+        achieved_relative_speed_ratio: 0.8491
+        target_speed_ratio: 0.4452
+        achieved_speed_ratio_mean: 0.4447
+        achieved_speed_ratio_sd: 0.0148
+        target_reached: true
+        max_teleport_frac: 0.0
+        min_completion: 1.0
+        mean_vehicles: 4797.0
+        max_last_arrival_s: 4577.0
+      heavy:
+        density_per_h_km: 20.75
+        target_relative_speed_ratio: 0.72
+        achieved_relative_speed_ratio: 0.7193
+        target_speed_ratio: 0.3771
+        achieved_speed_ratio_mean: 0.3767
+        achieved_speed_ratio_sd: 0.021
+        target_reached: true
+        max_teleport_frac: 0.00064
+        min_completion: 1.0
+        mean_vehicles: 6220.0
+        max_last_arrival_s: 4753.0
     evidence:
     - results/calibration/flushing/calibration_by_density.csv
     - results/calibration/flushing/calibration_runs.csv

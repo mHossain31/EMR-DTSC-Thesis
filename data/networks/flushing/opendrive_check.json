@@ -8,8 +8,8 @@
       ],
       "ok": true,
       "exit_code": 0,
-      "bytes": 20814954,
-      "warnings_count": 35,
+      "bytes": 20580996,
+      "warnings_count": 37,
       "errors": [],
       "file": "data/networks/flushing/flushing.plain.xodr"
     },
@@ -22,8 +22,8 @@
       ],
       "ok": true,
       "exit_code": 0,
-      "bytes": 20806576,
-      "warnings_count": 42,
+      "bytes": 20566946,
+      "warnings_count": 45,
       "errors": [],
       "file": "data/networks/flushing/flushing.scurve.xodr"
     }

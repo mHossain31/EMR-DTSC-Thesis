@@ -32,6 +32,9 @@ WIZARD_TYPEMAP = "osmNetconvert.typ.xml"
 WIZARD_TLS_SNIPPET = ",--tls.default-type,actuated"
 WIZARD_VCLASS_MODE = "passenger"
 EXTRA_OPTIONS = ["--keep-edges.components", "1"]
+# Network repair (docs/DEVIATIONS.md #7): join junctions up to 20 m apart (netconvert default 10 m). The OSM import
+# otherwise leaves clusters of signalised nodes a few metres apart, joined by edges of 0.2 m, which deadlock.
+REPAIR_OPTIONS = ["--junctions.join-dist", "20"]
 
 
 def net_path(scenario: str) -> Path:
@@ -67,6 +70,7 @@ def wizard_netconvert_options() -> dict:
         "vehicle_class_mode": WIZARD_VCLASS_MODE,
         "vehicle_class_options": vclass,
         "extra_options": EXTRA_OPTIONS,
+        "repair_options": REPAIR_OPTIONS,
     }
 
 
@@ -103,6 +107,7 @@ def build_osm(cfg: ScenarioConfig) -> dict:
         "--osm-files", str(src),
         *opts["vehicle_class_options"],
         *opts["extra_options"],
+        *opts["repair_options"],
         # Clip to the scenario box (edges with any part inside are kept); see docs/DESIGN.md, network build.
         "--keep-edges.in-geo-boundary", ",".join(f"{v:.6f}" for v in cfg.bbox),
         "--output-file", str(out),

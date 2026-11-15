@@ -9,8 +9,8 @@
       "osm_base": "2026-11-15T05:40:50Z"
     },
     "scenarios/flushing/flushing.net.xml.gz": {
-      "sha256": "386ecec0994e9458f82c5dc4cd8d781da2fe68b5b56af67f68d06971f9d6a553",
-      "bytes": 982910,
+      "sha256": "1c6a057c9557a8583847fc25e53c179cc2e0e8177dc3ec0e1f3b3b856dbb6f29",
+      "bytes": 976700,
       "kind": "network",
       "scenario": "flushing",
       "sumo_version": "1.28.0"

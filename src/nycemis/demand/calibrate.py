@@ -31,8 +31,12 @@ from nycemis.sim.protocol import sumo_command
 
 log = logging.getLogger(__name__)
 
-TARGETS = {"light": 0.80, "moderate": 0.60, "heavy": 0.45}
-SWEEP_DENSITIES = (1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 12.0)
+# Targets are relative speed ratios: SR(density) / SR(REF_DENSITY), on the same seeds and network (DEVIATIONS #8).
+# The absolute speed ratio of a near-empty Flushing network is about 0.53, because signals and turns cost about half of
+# free-flow travel time, so docs/SPECIFICATION.md's example targets (0.8 / 0.6 / 0.45, absolute) cannot be reached by any density.
+TARGETS_RSR = {"light": 0.95, "moderate": 0.85, "heavy": 0.72}
+REF_DENSITY = 1.0
+SWEEP_DENSITIES = (1.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 18.0, 20.0, 22.0, 24.0)
 SR_TOLERANCE = 0.01
 MIN_BRACKET = 0.05  # vehicles per hour per km
 MAX_BISECTION_STEPS = 10
@@ -89,11 +93,16 @@ def calibrate(scenario: str, workers: int) -> dict:
         records.append(pd.DataFrame([f.result() for f in futures.values()]))
         sweep = _aggregate(pd.concat(records))
         log.info("sweep:\n%s", sweep.to_string())
+        ref = sweep[sweep.density == REF_DENSITY]
+        if ref.empty or not bool(ref.all_valid.iloc[0]):
+            raise RuntimeError(f"{scenario}: the reference density {REF_DENSITY} is missing or invalid")
+        sr_ref = float(ref.sr_mean.iloc[0])
         levels = {}
-        for name, target in TARGETS.items():
-            levels[name] = _bisect(pool, scenario, seeds, target, records)
+        for name, target_rsr in TARGETS_RSR.items():
+            levels[name] = _bisect(pool, scenario, seeds, target_rsr * sr_ref, records)
+            levels[name]["target_rsr"] = target_rsr
     allruns = pd.concat(records, ignore_index=True)
-    return _write(scenario, levels, allruns, seeds)
+    return _write(scenario, levels, allruns, seeds, sr_ref)
 
 
 def _bisect(pool: ProcessPoolExecutor, scenario: str, seeds: list[int], target: float,
@@ -140,11 +149,12 @@ def _bisect(pool: ProcessPoolExecutor, scenario: str, seeds: list[int], target: 
             "reached": abs(best[1] - target) <= SR_TOLERANCE, "steps": step}
 
 
-def _write(scenario: str, levels: dict, runs: pd.DataFrame, seeds: list[int]) -> dict:
+def _write(scenario: str, levels: dict, runs: pd.DataFrame, seeds: list[int], sr_ref: float) -> dict:
     outdir = results_dir() / "calibration" / scenario
     outdir.mkdir(parents=True, exist_ok=True)
     runs.to_csv(outdir / "calibration_runs.csv", index=False)
     agg = _aggregate(runs)
+    agg["rsr_mean"] = agg.sr_mean / sr_ref
     agg.to_csv(outdir / "calibration_by_density.csv", index=False)
     _plot(agg, levels, outdir / "speed_ratio_vs_density.png", scenario)
 
@@ -153,11 +163,15 @@ def _write(scenario: str, levels: dict, runs: pd.DataFrame, seeds: list[int]) ->
     doc = doc or {}
     doc.setdefault("scenarios", {})
     entry = {"pilot_seeds": seeds, "response": "speed_ratio = sum(duration - timeLoss) / sum(duration), "
-             "finished trips departing in [900, 3600] s, static runs, mean over pilot seeds", "levels": {}}
+             "finished trips departing in [900, 3600] s, static runs, mean over pilot seeds; relative speed ratio "
+             "= speed_ratio / speed_ratio at the reference density",
+             "reference_density_per_h_km": REF_DENSITY, "reference_speed_ratio": round(sr_ref, 4), "levels": {}}
     for name, lv in levels.items():
         row = agg[agg.density == lv["density"]].iloc[0]
         entry["levels"][name] = {
-            "density_per_h_km": float(lv["density"]), "target_speed_ratio": lv["target"],
+            "density_per_h_km": float(lv["density"]), "target_relative_speed_ratio": lv["target_rsr"],
+            "achieved_relative_speed_ratio": round(float(row.sr_mean) / sr_ref, 4),
+            "target_speed_ratio": round(lv["target"], 4),
             "achieved_speed_ratio_mean": round(float(row.sr_mean), 4), "achieved_speed_ratio_sd": round(float(row.sr_sd), 4),
             "target_reached": bool(lv["reached"]), "max_teleport_frac": round(float(row.teleport_frac_max), 5),
             "min_completion": round(float(row.completion_min), 5), "mean_vehicles": round(float(row.vehicles_mean), 1),
@@ -204,9 +218,11 @@ def clean_calibration_routes(scenario: str) -> None:
 
 
 def summary_table(entry: dict) -> str:
-    rows = ["level     density  target  achieved(sd)   max_tele  min_compl"]
+    rows = [f"reference speed ratio {entry['reference_speed_ratio']:.4f} at {entry['reference_density_per_h_km']:g}",
+            "level     density  target_rsr  achieved_rsr  sr(sd)          max_tele  min_compl"]
     for name, lv in entry["levels"].items():
-        rows.append(f"{name:<9} {lv['density_per_h_km']:>7.3f}  {lv['target_speed_ratio']:.2f}    "
+        rows.append(f"{name:<9} {lv['density_per_h_km']:>7.3f}  {lv['target_relative_speed_ratio']:.2f}        "
+                    f"{lv['achieved_relative_speed_ratio']:.3f}         "
                     f"{lv['achieved_speed_ratio_mean']:.3f}({lv['achieved_speed_ratio_sd']:.3f})  "
                     f"{lv['max_teleport_frac']:.4f}    {lv['min_completion']:.4f}")
     return "\n".join(rows)

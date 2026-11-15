@@ -15,18 +15,20 @@ from nycemis.network.scenario_files import TLS_ACTUATED_JAM_THRESHOLD
 
 
 def sumo_options(net: Path, routes: Path, vtypes: Path, seed: int, outdir: Path,
-                 extra: list[str] | None = None) -> list[str]:
+                 extra: list[str] | None = None, additional: list[Path] | None = None) -> list[str]:
     """Options (without the binary) for one run; outputs go to ``outdir``."""
     p = base_config().protocol
+    adds = ",".join(str(a) for a in [vtypes, *(additional or [])])
     return [
         "--net-file", str(net),
         "--route-files", str(routes),
-        "--additional-files", str(vtypes),
+        "--additional-files", adds,
         "--begin", str(p.depart_begin_s),
         "--end", str(p.cap_s),
         "--step-length", f"{p.step_length_s:g}",
         "--seed", str(seed),
         "--time-to-teleport", str(p.time_to_teleport_s),
+        "--ignore-junction-blocker", str(p.ignore_junction_blocker_s),
         "--collision.action", p.collision_action,
         "--tls.actuated.jam-threshold", str(TLS_ACTUATED_JAM_THRESHOLD),
         "--device.emissions.probability", "1",
@@ -40,6 +42,6 @@ def sumo_options(net: Path, routes: Path, vtypes: Path, seed: int, outdir: Path,
 
 
 def sumo_command(net: Path, routes: Path, vtypes: Path, seed: int, outdir: Path, gui: bool = False,
-                 extra: list[str] | None = None) -> list[str]:
+                 extra: list[str] | None = None, additional: list[Path] | None = None) -> list[str]:
     binary = env.sumo_binary("sumo-gui" if gui else "sumo")
-    return [str(binary), *sumo_options(net, routes, vtypes, seed, outdir, extra)]
+    return [str(binary), *sumo_options(net, routes, vtypes, seed, outdir, extra, additional)]
