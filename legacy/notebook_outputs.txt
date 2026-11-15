@@ -1,0 +1,317 @@
+# Text outputs of the legacy notebook (images omitted; long streams truncated).
+
+===== cell 4 stream =====
+Display a sample of the collected data (first 5 entries)
+
+===== cell 4 execute_result =====
+   Step Vehicle_ID  CO2_Emission      Speed   Position_X   Position_Y
+0     0       veh0   2416.072357  14.723400  1956.610000  1127.380000
+1     0       veh0      0.000000  14.266544  1943.223985  1122.452997
+2     0       veh0      0.000000  13.565089  1930.496902  1117.757917
+3     0       veh1   2267.083348  13.032987  1620.635589    38.062517
+4     0       veh0   5865.529934  14.484958  1916.909238  1112.737658
+
+===== cell 6 stream =====
+Original DataFrame:
+The DataFrame has 642472 rows.
+
+===== cell 6 execute_result =====
+   Time Vehicle_ID      CO2     CO   NOx    HC   PMx        X        Y
+0   0.0       veh0  2416.07   0.00  0.72  0.01  0.01  1956.61  1127.38
+1   1.0       veh0     0.00   0.00  0.00  0.00  0.00  1943.22  1122.45
+2   2.0       veh0     0.00   0.00  0.00  0.00  0.00  1930.50  1117.76
+3   2.0       veh1  2267.08   0.00  0.69  0.04  0.01  1620.64    38.06
+4   3.0       veh0  5865.53  63.13  2.35  0.43  0.10  1916.91  1112.74
+
+===== cell 8 stream =====
+
+Displaying the first 10 rows:
+
+===== cell 8 execute_result =====
+   Time Vehicle_ID CO2_Percentage  CO_Percentage NOx_Percentage  \
+0   0.0       veh0  0.0001027561%  0.0000000000%  0.0000722383%   
+1   1.0       veh0  0.0000000000%  0.0000000000%  0.0000000000%   
+2   2.0       veh0  0.0000000000%  0.0000000000%  0.0000000000%   
+3   2.0       veh1  0.0000964195%  0.0000000000%  0.0000692284%   
+4   3.0       veh0  0.0002494624%  0.0001021521%  0.0002357778%   
+5   3.0       veh1  0.0000000000%  0.0000000000%  0.0000000000%   
+6   3.0       veh2  0.0000999431%  0.0000000000%  0.0000712350%   
+7   4.0       veh0  0.0000000000%  0.0000000000%  0.0000000000%   
+8   4.0       veh1  0.0000680514%  0.0000000000%  0.0000401324%   
+9   4.0       veh2  0.0000000000%  0.0000000000%  0.0000000000%   
+
+   HC_Percentage PMx_Percentage  
+0  0.0000029755%  0.0000204087%  
+1  0.0000000000%  0.0000000000%  
+2  0.0000000000%  0.0000000000%  
+3  0.0000119020%  0.0000204087%  
+4  0.0001279465%  0.0002040870%  
+5  0.0000000000%  0.0000000000%  
+6  0.0000059510%  0.0000204087%  
+7  0.0000000000%  0.0000000000%  
+8  0.0000000000%  0.0000000000%  
+9  0.0000000000%  0.0000000000%
+
+===== cell 10 stream =====
+Summary of Empty Cells and Entropy:
+
+===== cell 10 execute_result =====
+            Column  Empty Cells    Entropy
+0             Time            0   8.237050
+1       Vehicle_ID            0   7.905896
+2              CO2            0   7.923208
+3               CO            0   6.013017
+4              NOx            0   4.198969
+5               HC            0   3.307868
+6              PMx            0   2.554618
+7                X            0  10.945234
+8                Y            0  10.612559
+9   CO2_Percentage            0   7.923208
+10   CO_Percentage            0   6.013017
+11  NOx_Percentage            0   4.198969
+12   HC_Percentage            0   3.307868
+13  PMx_Percentage            0   2.554618
+
+===== cell 12 stream =====
+
+Normalized DataFrame:
+
+===== cell 12 execute_result =====
+       Time Vehicle_ID       CO2        CO       NOx        HC       PMx  \
+0  0.000000       veh0  0.085246  0.000000  0.057371  0.003040  0.013889   
+1  0.000242       veh0  0.000000  0.000000  0.000000  0.000000  0.000000   
+2  0.000484       veh0  0.000000  0.000000  0.000000  0.000000  0.000000   
+3  0.000484       veh1  0.079989  0.000000  0.054980  0.012158  0.013889   
+4  0.000726       veh0  0.206953  0.111232  0.187251  0.130699  0.138889   
+
+          X         Y CO2_Percentage  CO_Percentage NOx_Percentage  \
+0  0.967821  0.938141  0.0001027561%  0.0000000000%  0.0000722383%   
+1  0.961211  0.934038  0.0000000000%  0.0000000000%  0.0000000000%   
+2  0.954931  0.930135  0.0000000000%  0.0000000000%  0.0000000000%   
+3  0.801955  0.031591  0.0000964195%  0.0000000000%  0.0000692284%   
+4  0.948221  0.925958  0.0002494624%  0.0001021521%  0.0002357778%   
+
+   HC_Percentage PMx_Percentage  
+0  0.0000029755%  0.0000204087%  
+1  0.0000000000%  0.0000000000%  
+2  0.0000000000%  0.0000000000%  
+3  0.0000119020%  0.0000204087%  
+4  0.0001279465%  0.0002040870%
+
+===== cell 14 display_data =====
+<Figure size 1000x600 with 1 Axes>
+
+===== cell 16 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 16 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 16 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 16 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 16 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 18 stream =====
+
+All Models - Training and Testing MSE:
+                 Model  Training MSE  Testing MSE
+0        Random Forest      0.000015     0.000105
+1              XGBoost      0.000487     0.000533
+2    Gradient Boosting      0.001308     0.001296
+3    Linear Regression      0.003218     0.003143
+4     Ridge Regression      0.003219     0.003144
+5  K-Nearest Neighbors      0.000712     0.001118
+6          Elastic Net      0.007772     0.007688
+7       Neural Network      0.016472     0.016439
+
+Best Two Models Based on Testing MSE:
+
+===== cell 18 execute_result =====
+           Model  Testing MSE
+0  Random Forest     0.000105
+1        XGBoost     0.000533
+
+===== cell 20 display_data =====
+<Figure size 1000x600 with 1 Axes>
+
+===== cell 22 display_data =====
+<Figure size 1000x600 with 1 Axes>
+
+===== cell 24 display_data =====
+[non-text output: ['text/html']]
+
+===== cell 24 display_data =====
+[non-text output: ['application/vnd.plotly.v1+json', 'text/html']]
+
+===== cell 26 display_data =====
+[non-text output: ['application/vnd.plotly.v1+json', 'text/html']]
+
+===== cell 28 display_data =====
+<Figure size 1000x600 with 2 Axes>
+
+===== cell 30 stream =====
+Model Mean Squared Error: 0.00020601436241201654
+
+===== cell 32 display_data =====
+<Figure size 600x400 with 1 Axes>
+
+===== cell 34 display_data =====
+<Figure size 1000x600 with 1 Axes>
+
+===== cell 34 display_data =====
+<Figure size 1000x600 with 1 Axes>
+
+===== cell 37 stream =====
+ Retrying in 1 seconds
+High pollution detected for veh0 on edge 275281192#1. Rerouting...
+Vehicle veh0 rerouted to reduce pollution. New route: ('275281192#1', '49175637#5', '49175637#7', '49175637#9', '49175637#12', '49175637#14', '49175637#15', '663513503#2', '25745903#0', '25745903#2', '25745903#5', '25745903#7', '25745903#9', '25745903#11')
+High pollution detected for veh3 on edge :42873533_3. Rerouting...
+Vehicle veh3 rerouted to reduce pollution. New route: (':42873533_3', '5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh1 on edge -5707650#7. Rerouting...
+Vehicle veh1 rerouted to reduce pollution. New route: ('-5707650#7', '5707235#12', '5707744#0', '5707744#2', '5707744#4', '25745903#11', '-5710187#1')
+High pollution detected for veh3 on edge 5705230#2. Rerouting...
+Vehicle veh3 rerouted to reduce pollution. New route: ('5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh3 on edge 5705230#2. Rerouting...
+Vehicle veh3 rerouted to reduce pollution. New route: ('5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh3 on edge 5705230#2. Rerouting...
+Vehicle veh3 rerouted to reduce pollution. New route: ('5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-
+... [truncated: 11757497 chars, 77621 lines in total] ...
+911 rerouted to reduce pollution. New route: ('49175637#7', '49175637#9', '49175637#12', '49175637#14', '49175637#15', '-663513503#1', '-573719951#0')
+High pollution detected for veh913 on edge -833984612#5. Rerouting...
+Vehicle veh913 rerouted to reduce pollution. New route: ('-833984612#5', '-833984612#3', '-833984612#2', '833984613#1')
+High pollution detected for veh920 on edge 1057530404. Rerouting...
+Vehicle veh920 rerouted to reduce pollution. New route: ('1057530404', '1057530405#0', '481970591#0', '1296004915#0', '562329375#0', '562329372#0', '562329372#4', '1301675430#0', '68537830#0', '216925314#0', '5708606#0', '216926034#0', '561998048#0', '561998048#3', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '5704723#6', '662489540#0', '662489540#2', '662489540#5', '586820542', '220470253#0', '220470253#2', '220470253#3', '220470253#4', '-663513503#3', '-49175637#16', '5709880#0')
+High pollution detected for veh922 on edge 5704723#0. Rerouting...
+Vehicle veh922 rerouted to reduce pollution. New route: ('5704723#0', '5704723#2', '5704723#5', '5704723#6', '662489540#0', '662489540#2', '662489540#5', '586820542', '220470253#0', '220470253#2', '220470253#3', '220470253#4', '-663513503#3', '-663513503#1', '-573719951#0')
+High pollution detected for veh925 on edge -524506740#5. Rerouting...
+Vehicle veh925 rerouted to reduce pollution. New route: ('-524506740#5', '49175637#9', '49175637#12', '49175637#14', '49175637#15', '-663513503#1', '573719951#1', '573719951#3', '573719951#4', '573719951#6', '5707744#8')
+High pollution detected for veh927 on edge -541400502#8. Rerouting...
+Vehicle veh927 rerouted to reduce pollution. New route: ('-541400502#8', '-541400502#5', '-541400502#1', '-864226825#8', '-864226825#6', '-864226825#3', '133805206#0', '133805206#3', '133805206#6', '220470233#0', '220470233#2', '220470233#3', '275076872#0', '275076884#0', '524506740#0', '-49175637#8', '-49175637#6', '-49175637#4', '-49175637#1', '5705441#0')
+
+===== cell 39 display_data =====
+                                   Position
+0                        (1956.61, 1127.38)
+1  (1943.2239846816394, 1122.4529965790514)
+2  (1930.4969020296994, 1117.7579174302896)
+3  (1620.6355889145495, 38.062517321016166)
+4  (1916.9092380531476, 1112.7376579923157)
+
+===== cell 40 execute_result =====
+             X            Y
+0  1956.610000  1127.380000
+1  1943.223985  1122.452997
+2  1930.496902  1117.757917
+3  1620.635589    38.062517
+4  1916.909238  1112.737658
+
+===== cell 41 display_data =====
+<Figure size 1000x800 with 2 Axes>
+
+===== cell 42 error =====
+RuntimeError: No mappable was found to use for colorbar creation. First define a mappable such as an image (with imshow) or a contour set (with contourf).
+
+===== cell 42 display_data =====
+<Figure size 1000x1000 with 1 Axes>
+
+===== cell 45 stream =====
+XGBoost Model Mean Squared Error: 0.0005326630575119464
+
+===== cell 46 stream =====
+High pollution detected for veh0 on edge 275281192#1. Rerouting...
+Vehicle veh0 rerouted. New route: ('275281192#1', '49175637#5', '49175637#7', '49175637#9', '49175637#12', '49175637#14', '49175637#15', '663513503#2', '25745903#0', '25745903#2', '25745903#5', '25745903#7', '25745903#9', '25745903#11')
+High pollution detected for veh3 on edge :42873533_3. Rerouting...
+Vehicle veh3 rerouted. New route: (':42873533_3', '5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh1 on edge -5707650#7. Rerouting...
+Vehicle veh1 rerouted. New route: ('-5707650#7', '5707235#12', '5707744#0', '5707744#2', '5707744#4', '25745903#11', '-5710187#1')
+High pollution detected for veh3 on edge 5705230#2. Rerouting...
+Vehicle veh3 rerouted. New route: ('5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh3 on edge 5705230#2. Rerouting...
+Vehicle veh3 rerouted. New route: ('5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh3 on edge 5705230#2. Rerouting...
+Vehicle veh3 rerouted. New route: ('5705230#2', '5706595#1', '663513505#1', '663513505#4', '663513505#7', '822071223#0', '-220470240#4', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '-5702732#13', '-5702732#9', '-5702732#6', '-49175636#1')
+High pollution detected for veh1 on edge 5707235#12. Rerouting...
+Vehicle veh1 rerouted. New route: ('
+... [truncated: 11615147 chars, 82646 lines in total] ...
+805206#6', '220470233#0', '220470233#2', '220470233#3', '586820542', '5707990#0', '5707990#3')
+High pollution detected for veh903 on edge -663513503#1. Rerouting...
+Vehicle veh903 rerouted. New route: ('-663513503#1', '573719951#1', '573719951#3', '573719951#4', '833984612#14')
+High pollution detected for veh904 on edge 822071224#0. Rerouting...
+Vehicle veh904 rerouted. New route: ('822071224#0', '822071407#0', '822071407#3', '541400950#0', '531084723#0', '5702498#0', '5702498#3', '833984606#0', '833984606#3', '833984606#4')
+High pollution detected for veh914 on edge :42806560_12. Rerouting...
+Vehicle veh914 rerouted. New route: (':42806560_12', '216925314#0', '5708606#0', '216926034#0', '561998048#0', '561998048#3', '219624524#0', '219624524#4', '-219969534#3', '5704723#0', '5704723#2', '5704723#5', '5704723#6', '662489540#0', '662489540#2', '662489540#5', '586820542', '220470253#0', '220470253#2', '220470253#3', '220470253#4', '-663513503#3', '-49175637#16', '5709880#0')
+High pollution detected for veh921 on edge 5701347#0. Rerouting...
+Vehicle veh921 rerouted. New route: ('5701347#0', '-864226825#3', '133805206#0', '133805206#3', '133805206#6', '220470233#0', '220470233#2', '220470233#3', '275076872#0', '275076884#0', '524506740#0', '-49175637#8', '-49175637#6', '-49175637#4', '-49175637#1', '5705441#0')
+High pollution detected for veh922 on edge 5704723#2. Rerouting...
+Vehicle veh922 rerouted. New route: ('5704723#2', '5704723#5', '5704723#6', '662489540#0', '662489540#2', '662489540#5', '586820542', '220470253#0', '220470253#2', '220470253#3', '220470253#4', '-663513503#3', '-663513503#1', '-573719951#0')
+High pollution detected for veh932 on edge 216926034#0. Rerouting...
+Vehicle veh932 rerouted. New route: ('216926034#0', '561998048#0', '561998048#3', '220470240#0', '220470240#5', '834038811#0', '834038811#4', '834038811#7', '834038811#13', '541400501#0', '864226825#0', '864226825#4', '864226825#7', '541400502#0', '541400502#2', '541400502#6', '541400502#9')
+
+===== cell 47 stream =====
+Rerouting with XGBoost Model
+
+===== cell 47 execute_result =====
+   Time Vehicle_ID  Predicted_NOx                                  Position
+0  1000       veh0       0.720686                        (1956.61, 1127.38)
+1  2000       veh0       0.006321  (1943.2239846816394, 1122.4529965790514)
+2  3000       veh0       0.005024  (1930.4969020296994, 1117.7579174302896)
+3  3000       veh1       0.679175  (1620.6355889145495, 38.062517321016166)
+4  4000       veh0       2.350527  (1916.9092380531476, 1112.7376579923157)
+
+===== cell 48 error =====
+ValueError: Length of values (174518) does not match length of index (195640)
+
+===== cell 48 display_data =====
+<Figure size 1000x1000 with 1 Axes>
+
+===== cell 50 execute_result =====
+<pandas.io.formats.style.Styler at 0x224a82479b0>
+
+===== cell 52 display_data =====
+<Figure size 1000x800 with 1 Axes>
+
+===== cell 52 display_data =====
+<Figure size 1000x800 with 1 Axes>
+
+===== cell 52 display_data =====
+<Figure size 1000x800 with 1 Axes>
+
+===== cell 52 display_data =====
+<Figure size 1000x800 with 1 Axes>
+
+===== cell 52 display_data =====
+<Figure size 1000x800 with 1 Axes>
+
+===== cell 53 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 53 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 53 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 53 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 53 display_data =====
+<Figure size 800x600 with 1 Axes>
+
+===== cell 55 display_data =====
+<Figure size 1200x600 with 1 Axes>
+
+===== cell 55 execute_result =====
+   Original NOx  RF NOx  XGBoost NOx
+0          0.72    0.72         0.72
+1          0.00    0.00         0.00
+2          0.00    0.00         0.00
+3          0.69    0.69         0.69
+4          2.35    2.35         2.35
+
+===== cell 57 execute_result =====
+<folium.folium.Map at 0x224a7807fb0>
+

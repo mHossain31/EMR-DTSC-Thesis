@@ -1,0 +1,305 @@
+{
+  "files": {
+    "ML_SUMO_ProjectReport.pdf": {
+      "path": "legacy/ML_SUMO_ProjectReport.pdf",
+      "sha256": "c9ced40cdf10b14c12694d060d5458a96d6ba3b6d2c413782a8ca732665ff798",
+      "bytes": 4227086
+    },
+    "SUMO_ML_Project.pdf": {
+      "path": "legacy/SUMO_ML_Project.pdf",
+      "sha256": "cb9261f8768ec8bea073e87198b2ab4eb21bd6fa9feef11a4d6b9dd230591b1f",
+      "bytes": 5738419
+    },
+    "pynb_file.zip": {
+      "path": "legacy/pynb_file.zip",
+      "sha256": "e0ac66252fb67bc019b6239664a335787c4d1b82b1fec914fe66ba959ddf7c2c",
+      "bytes": 5311468
+    }
+  },
+  "pages": {
+    "ML_SUMO_ProjectReport.pdf": 48,
+    "SUMO_ML_Project.pdf": 31
+  },
+  "notebook": {
+    "cells": 59,
+    "nbformat": 4
+  },
+  "d1_horizon": {
+    "baseline_rows_notebook": 642472,
+    "baseline_rows_report": 638367,
+    "baseline_t_max_bounds_s": [
+      4129.387474191329,
+      4135.079255685734
+    ],
+    "baseline_t_max_mid_s": 4132.233364938531,
+    "controlled_step_bound": 1000,
+    "rf_controlled_rows": 195640,
+    "xgb_controlled_rows": 174518,
+    "rf_row_ratio": 0.3045113250071598,
+    "xgb_row_ratio": 0.2716351841014083,
+    "rf_rowcount_implied_drop_pct": 69.54886749928401,
+    "xgb_rowcount_implied_drop_pct": 72.83648158985918,
+    "horizon_implied_drop_pct": 75.80001147842057,
+    "reported_drops_pct": {
+      "RF": {
+        "CO2": 72.0,
+        "CO": 63.99,
+        "NOx": 71.53,
+        "HC": 65.31,
+        "PMx": 70.39
+      },
+      "XGBoost": {
+        "CO2": 73.65,
+        "CO": 70.15,
+        "NOx": 73.41,
+        "HC": 70.72,
+        "PMx": 72.84
+      }
+    }
+  },
+  "d2_reroutes": {
+    "rf": {
+      "detections": 38810,
+      "reroute_calls": 38810,
+      "vehicles": 832,
+      "repeat_calls": 37978,
+      "repeat_unchanged": 37978,
+      "repeat_changed": 0,
+      "repeat_unchanged_share": 1.0
+    },
+    "xgb": {
+      "detections": 41323,
+      "reroute_calls": 41323,
+      "vehicles": 829,
+      "repeat_calls": 40494,
+      "repeat_unchanged": 40494,
+      "repeat_changed": 0,
+      "repeat_unchanged_share": 1.0
+    },
+    "first_route_identical_rf_vs_xgb": [
+      687,
+      827
+    ]
+  },
+  "d4_models": {
+    "model_compare_cell_18": {
+      "Random Forest": {
+        "train_mse": 1.5e-05,
+        "test_mse": 0.000105
+      },
+      "XGBoost": {
+        "train_mse": 0.000487,
+        "test_mse": 0.000533
+      },
+      "Gradient Boosting": {
+        "train_mse": 0.001308,
+        "test_mse": 0.001296
+      },
+      "Linear Regression": {
+        "train_mse": 0.003218,
+        "test_mse": 0.003143
+      },
+      "Ridge Regression": {
+        "train_mse": 0.003219,
+        "test_mse": 0.003144
+      },
+      "K-Nearest Neighbors": {
+        "train_mse": 0.000712,
+        "test_mse": 0.001118
+      },
+      "Elastic Net": {
+        "train_mse": 0.007772,
+        "test_mse": 0.007688
+      },
+      "Neural Network": {
+        "train_mse": 0.016472,
+        "test_mse": 0.016439
+      }
+    },
+    "model_compare_features": "CO2, CO, HC, PMx, X, Y",
+    "rf_reroute_model_cell_30_test_mse": 0.00020601436241201654,
+    "rf_reroute_model_features": "CO2, CO, HC, PMx",
+    "xgb_reroute_model_cell_45_test_mse": 0.0005326630575119464,
+    "xgb_reroute_model_features": "CO2, CO, HC, PMx, X, Y",
+    "normalized_df_used_after_cell_12": [],
+    "split": "train_test_split(test_size=0.2, random_state=42) on rows"
+  },
+  "d5_runs": {
+    "multiple_runs_claim_pages": [
+      30
+    ],
+    "emission_files_parsed": [
+      "emissions_data.xml",
+      "emissions_data_rf.xml",
+      "emissions_data_xgb.xml"
+    ]
+  },
+  "d6_threshold": {
+    "notebook_lines": [
+      {
+        "cell": 32,
+        "line": 5,
+        "text": "threshold = 1.88  # 1.88 bpm for NYC"
+      },
+      {
+        "cell": 37,
+        "line": 13,
+        "text": "pollution_threshold = 1.88 #######################################"
+      },
+      {
+        "cell": 46,
+        "line": 10,
+        "text": "pollution_threshold = 1.88  # Set threshold based on NOx in ppm (1.88 for New York City)"
+      }
+    ],
+    "report_g_per_mile_pages": [
+      16,
+      17
+    ],
+    "slides_g_per_mile_pages": [
+      17
+    ],
+    "colorbar_concentration_labels": [
+      {
+        "cell": 41,
+        "line": 24,
+        "text": "plt.colorbar(scatter_plot.collections[0], label='Predicted NOx (\u00b5g/m\u00b3)')"
+      },
+      {
+        "cell": 42,
+        "line": 48,
+        "text": "plt.colorbar(label='Predicted NOx (\u00b5g/m\u00b3)')"
+      },
+      {
+        "cell": 48,
+        "line": 41,
+        "text": "cbar.set_label('Predicted NOx (\u00b5g/m\u00b3)')"
+      }
+    ]
+  },
+  "d7_hardcoded": {
+    "replace_with_actual": [
+      {
+        "cell": 24,
+        "line": 8,
+        "text": "# Random Forest MSE values for each timestep (replace with actual MSE values)"
+      },
+      {
+        "cell": 24,
+        "line": 11,
+        "text": "# XGBoost MSE values for each timestep (replace with actual MSE values)"
+      },
+      {
+        "cell": 26,
+        "line": 5,
+        "text": "mse_values = [0.0001, 0.0005]  # Replace with actual MSE values"
+      },
+      {
+        "cell": 57,
+        "line": 10,
+        "text": "'Percentage Drop': [0, 15, 25]  # Example percentage drops, replace with actual values"
+      }
+    ],
+    "example_values": [
+      {
+        "cell": 57,
+        "line": 8,
+        "text": "'NOx_Emissions': [1.5, 2.3, 1.9],  # Sample NOx emissions values"
+      },
+      {
+        "cell": 57,
+        "line": 10,
+        "text": "'Percentage Drop': [0, 15, 25]  # Example percentage drops, replace with actual values"
+      }
+    ],
+    "hardcoded_drive_paths": [
+      {
+        "cell": 2,
+        "line": 6,
+        "text": "sumoConfig = r\"D:\\CodeBox\\Data_Science\\Air_Pollution\\Project_Air_Pollution_Analysis_From_Car_Emission\\flushing.sumocfg\""
+      },
+      {
+        "cell": 6,
+        "line": 6,
+        "text": "emissions_file = r'D:\\CodeBox\\Data_Science\\Air_Pollution\\Project_Air_Pollution_Analysis_From_Car_Emission\\emissions_data.xml'"
+      },
+      {
+        "cell": 37,
+        "line": 9,
+        "text": "sumoConfig = r\"D:\\CodeBox\\Data_Science\\Air_Pollution\\Project_Air_Pollution_Analysis_From_Car_Emission\\flushing.sumocfg\""
+      },
+      {
+        "cell": 42,
+        "line": 8,
+        "text": "net = sumolib.net.readNet(r'D:\\CodeBox\\Data_Science\\Air_Pollution\\Project_Air_Pollution_Analysis_From_Car_Emission\\osm.view.xml')  # Update path to your .net.xml"
+      },
+      {
+        "cell": 46,
+        "line": 6,
+        "text": "sumoConfig = r\"D:\\CodeBox\\Data_Science\\Air_Pollution\\Project_Air_Pollution_Analysis_From_Car_Emission\\flushing.sumocfg\""
+      },
+      {
+        "cell": 48,
+        "line": 6,
+        "text": "net = sumolib.net.readNet('D:\\CodeBox\\Data_Science\\Air_Pollution\\Project_Air_Pollution_Analysis_From_Car_Emission\\osm.view.xml')  # Update path"
+      }
+    ],
+    "collect_loop": {
+      "step_bound": "simulation_time",
+      "increments_step": false
+    },
+    "sample_cell_4_steps": [
+      0.0
+    ],
+    "sample_cell_4_rows": {
+      "0": [
+        0.0,
+        "veh0",
+        "2416.072357  14.723400  1956.610000  1127.380000"
+      ],
+      "1": [
+        0.0,
+        "veh0",
+        "0.000000  14.266544  1943.223985  1122.452997"
+      ],
+      "2": [
+        0.0,
+        "veh0",
+        "0.000000  13.565089  1930.496902  1117.757917"
+      ],
+      "3": [
+        0.0,
+        "veh1",
+        "2267.083348  13.032987  1620.635589    38.062517"
+      ],
+      "4": [
+        0.0,
+        "veh0",
+        "5865.529934  14.484958  1916.909238  1112.737658"
+      ]
+    },
+    "slides_template_text_pages": [
+      25
+    ],
+    "errors": {
+      "42": [
+        "RuntimeError: No mappable was found to use for colorbar creation. First define a mappable such as an image (with imshow) or a contour set (with contourf)."
+      ],
+      "48": [
+        "ValueError: Length of values (174518) does not match length of index (195640)"
+      ]
+    },
+    "nox_compare_head_cell_55": "   Original NOx  RF NOx  XGBoost NOx\n0          0.72    0.72         0.72\n1          0.00    0.00         0.00\n2          0.00    0.00         0.00\n3          0.69    0.69         0.69\n4          2.35    2.35         2.35"
+  },
+  "d8_references": {
+    "report_reference_page": [
+      48
+    ],
+    "slides_citation_pages": [
+      7
+    ],
+    "source_tags_in_text_pages": [
+      7
+    ]
+  }
+}

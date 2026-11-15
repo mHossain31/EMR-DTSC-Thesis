@@ -1,0 +1,44 @@
+# Matched simulation protocol and analysis constants (docs/SPECIFICATION.md 4.4-4.7, Appendix A).
+# Change a value only with a recorded reason in docs/DEVIATIONS.md.
+protocol_version: 1
+
+protocol:
+  step_length_s: 1.0
+  depart_begin_s: 0
+  depart_end_s: 3600
+  cap_s: 14400                 # hard cap; runs otherwise continue until every vehicle has arrived
+  time_to_teleport_s: 300      # SUMO's documented default, set explicitly
+  collision_action: warn
+  control_tick_s: 60
+  feature_window_s: 60
+  horizon_s: 60
+  reroute_period_s: 60
+  v_min_mps: 1.0
+  validity:
+    completion_min: 0.995      # arrived / route-file vehicles
+    teleport_max_frac: 0.005   # teleports / trips
+
+seeds:
+  pilot: [9000, 9004]          # inclusive ranges
+  train: [0, 23]
+  validation: [100, 111]
+  test_start: 200
+  test_n_min: 30
+  test_n_max: 60
+  tier2_start: 300
+  demo: [9100, 9199]
+
+analysis:
+  sesoi_pct: 2.0
+  familywise_alpha: 0.05
+  n_confirmatory_tests: 12
+  bootstrap_resamples: 10000
+  bootstrap_seed: 20261115
+  alpha_grid: [0.0, 0.25, 0.5, 0.75, 1.0]
+  alpha_star_tt_budget_pct: 5.0
+
+execution:
+  workers: null                # null = cores - 1
+  run_timeout_min_floor: 10
+  max_retries: 2
+  disk_max_frac_of_free: 0.5

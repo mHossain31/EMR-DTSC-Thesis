@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv-carla/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Tools fetched locally (tectonic binary, caches)
+tools/
+
+# Legacy: the extracted 34 MB notebook (the zip is committed)
+legacy/extracted/
+
+# Data: large files are reproducible from scripts; hashes live in data/MANIFEST.json
+data/osm/*.osm.xml.gz
+data/networks/**/*.net.xml.gz
+data/demand/
+data/cache/
+
+# Results: raw per-run outputs are gitignored; summaries are committed
+results/runs/
+results/**/raw/
+results/datasets/
+*.xml.tmp
+
+# Frames, scratch, OS
+.DS_Store
+Thumbs.db
+*.log
+!docs/*.log
+
+# LaTeX build products
+paper/build/
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.out
+paper/*.toc

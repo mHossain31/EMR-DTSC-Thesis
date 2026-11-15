@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nycemis"
+version = "0.1.0"
+description = "SUMO + ML study of forecast-driven emission-aware rerouting in New York City (rebuild of an NYIT DTSC 870 project)"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11,<3.13"
+authors = [{ name = "nyc-emissions-sumo contributors" }]
+dependencies = [
+  "eclipse-sumo",
+  "libsumo",
+  "traci",
+  "sumolib",
+  "numpy",
+  "pandas",
+  "pyarrow",
+  "scipy",
+  "scikit-learn",
+  "lightgbm",
+  "statsmodels",
+  "matplotlib",
+  "networkx",
+  "pyyaml",
+  "pydantic>=2",
+  "typer",
+  "tqdm",
+  "joblib",
+  "lxml",
+  "nbformat",
+  "pypdf",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "ruff"]
+
+[project.scripts]
+nycemis = "nycemis.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+nycemis = ["templates/*.md", "templates/*.xml"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+src = ["src", "tests"]
+extend-exclude = ["legacy", "notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "BLE"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+  "sumo: needs the SUMO binaries and libsumo",
+  "slow: takes more than about 30 s",
+  "flushing: needs the built Flushing scenario",
+]
