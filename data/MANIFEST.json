@@ -1,0 +1,26 @@
+{
+  "files": {
+    "data/osm/flushing.osm.xml.gz": {
+      "sha256": "40ee78f3e515fbcda3ebbaa2b9d2fa9769e2498b04bb34d38725c061c11020c1",
+      "bytes": 209648,
+      "kind": "osm_extract",
+      "scenario": "flushing",
+      "endpoint": "https://overpass-api.de/api/interpreter",
+      "osm_base": "2026-11-15T05:40:50Z"
+    },
+    "scenarios/flushing/flushing.net.xml.gz": {
+      "sha256": "386ecec0994e9458f82c5dc4cd8d781da2fe68b5b56af67f68d06971f9d6a553",
+      "bytes": 982910,
+      "kind": "network",
+      "scenario": "flushing",
+      "sumo_version": "1.28.0"
+    },
+    "scenarios/smoke/smoke.net.xml.gz": {
+      "sha256": "311a497b719336b036dbfd1ac7b784eb5611ecde6d98c7b25cd6ba628c6a352e",
+      "bytes": 13087,
+      "kind": "network",
+      "scenario": "smoke",
+      "sumo_version": "1.28.0"
+    }
+  }
+}

@@ -33,3 +33,29 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
 - The hygiene scan (the marker list in `tests/unit/test_hygiene.py`) exempts
   `legacy/`, `docs/SPECIFICATION.md`, `docs/LEGACY_AUDIT.md`, `src/nycemis/legacy/audit.py`, `src/nycemis/legacy/report.py` and
   `results/legacy_audit/`, because those quote the legacy material or the specification. Everything else is scanned.
+
+## Networks (M1)
+
+- **Download.** `osmGet.py` with the Web Wizard's "Highway" road-type category (`--road-types`, the list in
+  `src/nycemis/network/osm_fetch.py`), no polygons. osmGet then returns those ways, their nodes and the relations
+  they belong to (turn restrictions included). The full, unfiltered bbox query timed out (HTTP 504) on every
+  Overpass mirror on 2026-11-15; the filtered query is also what the Web Wizard sends when only roads are wanted.
+  Extracts are frozen in `data/osm/` with SHA-256 in `data/MANIFEST.json` and `<scenario>.download_meta.json`.
+- **netconvert options** are read at build time from the installed `osmBuild.py` (`DEFAULT_NETCONVERT_OPTS`,
+  `vclassRemove["passenger"]`) and checked against the installed `osmWebWizard.py` (typemap
+  `osmNetconvert.typ.xml`, `--tls.default-type actuated`, the car-only network choice). The exact command is in
+  `data/networks/<s>/network_build.json`.
+- **Added to the Web Wizard's options** (docs/SPECIFICATION.md 6.2 requirements): `--keep-edges.components 1` (largest
+  weakly connected component) and `--keep-edges.in-geo-boundary <bbox>` (clip to the scenario box; an edge with
+  any part inside is kept, so some long fringe edges reach outside).
+- **Bounding-box match** is measured as: the network covers the box shrunk by 5% on each side, and at least 90%
+  of lane-km (segment midpoints) lies inside the box. Raw extents are reported too.
+- **Strong connectivity** is gated at 90% of edges in the largest strongly connected component; the rest are
+  reported. Demand generation (`randomTrips.py --validate`) only keeps routable trips.
+- **Scenario folders** (`scenarios/<s>/`): net, `gui-settings.xml`, a default route file and `<s>.sumocfg`, all with
+  relative paths. The default demand is the Web Wizard's default car demand (12 vehicles per hour per km, fringe
+  factor 5, its common randomTrips options, seed 42) until M2 replaces it with the calibrated moderate level.
+  The sumocfg also carries the Web Wizard's `--tls.actuated.jam-threshold 30`.
+- **GUI colour schemes.** `gui-settings.xml` sets lane scheme 11 ("by NOx emissions") and vehicle scheme 8
+  ("by speed") and shows the colour legends. The indices were read from the order of the scheme names in
+  `sumo-gui.exe` 1.28; the visual check with a sumo-gui snapshot is in `docs/SUMO_API_NOTES.md`.

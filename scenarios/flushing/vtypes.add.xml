@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated from configs/fleet.yaml by nycemis; one vType per emission class. -->
+<additional>
+    <!-- cars: share 0.85, vClass passenger -->
+    <vType id="PC_petrol_Euro-4" vClass="passenger" emissionClass="HBEFA4/PC_petrol_Euro-4"/>
+    <vType id="PC_petrol_Euro-5" vClass="passenger" emissionClass="HBEFA4/PC_petrol_Euro-5"/>
+    <vType id="PC_petrol_Euro-6ab" vClass="passenger" emissionClass="HBEFA4/PC_petrol_Euro-6ab"/>
+    <vType id="PC_petrol_Euro-6d" vClass="passenger" emissionClass="HBEFA4/PC_petrol_Euro-6d"/>
+    <vType id="PC_diesel_Euro-5" vClass="passenger" emissionClass="HBEFA4/PC_diesel_Euro-5"/>
+    <vType id="PC_diesel_Euro-6ab" vClass="passenger" emissionClass="HBEFA4/PC_diesel_Euro-6ab"/>
+    <!-- vans: share 0.1, vClass delivery -->
+    <vType id="LCV_diesel_N1-III_Euro-5" vClass="delivery" emissionClass="HBEFA4/LCV_diesel_N1-III_Euro-5"/>
+    <vType id="LCV_diesel_N1-III_Euro-6ab" vClass="delivery" emissionClass="HBEFA4/LCV_diesel_N1-III_Euro-6ab"/>
+    <vType id="LCV_petrol_N1-III_Euro-6ab" vClass="delivery" emissionClass="HBEFA4/LCV_petrol_N1-III_Euro-6ab"/>
+    <!-- trucks: share 0.05, vClass truck -->
+    <vType id="RT_gt7_5-12t_Euro-V_SCR" vClass="truck" emissionClass="HBEFA4/RT_gt7_5-12t_Euro-V_SCR"/>
+    <vType id="RT_gt7_5-12t_Euro-VI_A-C" vClass="truck" emissionClass="HBEFA4/RT_gt7_5-12t_Euro-VI_A-C"/>
+</additional>

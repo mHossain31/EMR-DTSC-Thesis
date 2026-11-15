@@ -132,6 +132,50 @@ class BaseConfig(Strict):
     execution: Execution
 
 
+class GridSpec(Strict):
+    number: int = Field(ge=2)
+    length_m: float = Field(gt=0)
+    attach_length_m: float = Field(ge=0)
+    lanes: int = Field(ge=1)
+    speed_mps: float = Field(gt=0)
+
+
+class ScenarioConfig(Strict):
+    id: str
+    name: str
+    role: str
+    source: str
+    bbox: tuple[float, float, float, float] | None = None  # west, south, east, north
+    grid: GridSpec | None = None
+
+    @model_validator(mode="after")
+    def _source(self) -> ScenarioConfig:
+        if self.role not in {"primary", "tier2", "smoke"}:
+            raise ValueError(f"unknown role {self.role!r}")
+        if self.source == "osm":
+            if self.bbox is None:
+                raise ValueError("an OSM scenario needs a bbox")
+            w, s, e, n = self.bbox
+            if not (w < e and s < n):
+                raise ValueError("bbox must be west < east and south < north")
+        elif self.source == "netgenerate":
+            if self.grid is None:
+                raise ValueError("a netgenerate scenario needs a grid spec")
+        else:
+            raise ValueError(f"unknown source {self.source!r}")
+        return self
+
+
+def scenario_config(scenario: str) -> ScenarioConfig:
+    path = configs_dir() / "scenarios" / f"{scenario}.yaml"
+    if not path.is_file():
+        raise FileNotFoundError(f"no scenario config {path}")
+    cfg = ScenarioConfig.model_validate(load_yaml(path))
+    if cfg.id != scenario:
+        raise ValueError(f"{path} has id {cfg.id!r}")
+    return cfg
+
+
 def load_yaml(path: Path) -> dict:
     with Path(path).open("r", encoding="utf-8") as fh:
         data = yaml.safe_load(fh)

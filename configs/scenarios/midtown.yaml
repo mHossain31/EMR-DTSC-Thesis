@@ -1,0 +1,6 @@
+# Midtown Manhattan (dense one-way grid). Tier 2. docs/SPECIFICATION.md 6.3.
+id: midtown
+name: Midtown Manhattan
+role: tier2
+source: osm
+bbox: [-73.995, 40.745, -73.965, 40.765]

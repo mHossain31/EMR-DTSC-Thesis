@@ -1,0 +1,32 @@
+{
+  "scenario": "flushing",
+  "variants": [
+    {
+      "variant": "plain",
+      "options": [
+        "--output.original-names"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 20814954,
+      "warnings_count": 35,
+      "errors": [],
+      "file": "data/networks/flushing/flushing.plain.xodr"
+    },
+    {
+      "variant": "scurve",
+      "options": [
+        "--output.original-names",
+        "--junctions.scurve-stretch",
+        "1.0"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 20806576,
+      "warnings_count": 42,
+      "errors": [],
+      "file": "data/networks/flushing/flushing.scurve.xodr"
+    }
+  ],
+  "ok": true
+}

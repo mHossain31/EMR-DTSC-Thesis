@@ -1,0 +1,50 @@
+{
+  "ok": true,
+  "checks": {
+    "edge_count": {
+      "ok": true,
+      "detail": "48 non-internal edges (smoke grid)"
+    },
+    "traffic_lights": {
+      "ok": true,
+      "detail": "21 signalised junctions"
+    },
+    "strong_connectivity": {
+      "ok": true,
+      "detail": "largest strongly connected component holds 100.0% of edges (1 components; minimum 90%)"
+    },
+    "dead_end_share": {
+      "ok": true,
+      "detail": "0 edges without a successor (0.0%); reported, not gated"
+    },
+    "no_zero_length_edges": {
+      "ok": true,
+      "detail": "0 edges shorter than 0.1 m"
+    }
+  },
+  "stats": {
+    "edges": 48,
+    "nodes": 21,
+    "lane_km": 6.68,
+    "traffic_lights": 21,
+    "largest_scc_edges": 48,
+    "largest_scc_share": 1.0,
+    "scc_count": 1,
+    "weak_components": 1,
+    "dead_end_edges": 0,
+    "dead_end_share": 0.0,
+    "source_edges": 0,
+    "speed_limits_kmh": {
+      "50": 48
+    },
+    "road_class_edges": {
+      "other": 48
+    },
+    "road_class_lane_km": {
+      "other": 6.68
+    },
+    "edge_types": {
+      "": 48
+    }
+  }
+}

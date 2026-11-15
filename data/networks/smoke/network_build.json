@@ -1,0 +1,36 @@
+{
+  "scenario": "smoke",
+  "command": [
+    "${SUMO_HOME}/bin/netgenerate.exe",
+    "--grid",
+    "--grid.number",
+    "3",
+    "--grid.length",
+    "200",
+    "--grid.attach-length",
+    "100",
+    "--default.lanenumber",
+    "1",
+    "--default.speed",
+    "13.89",
+    "--default-junction-type",
+    "traffic_light",
+    "--tls.default-type",
+    "actuated",
+    "--output-file",
+    "scenarios/smoke/smoke.net.xml.gz"
+  ],
+  "sumo_version": "1.28.0",
+  "seconds": 0.5,
+  "net_file": "scenarios/smoke/smoke.net.xml.gz",
+  "net_sha256": "311a497b719336b036dbfd1ac7b784eb5611ecde6d98c7b25cd6ba628c6a352e",
+  "warnings_count": 0,
+  "warnings_sample": [],
+  "grid": {
+    "number": 3,
+    "length_m": 200.0,
+    "attach_length_m": 100.0,
+    "lanes": 1,
+    "speed_mps": 13.89
+  }
+}

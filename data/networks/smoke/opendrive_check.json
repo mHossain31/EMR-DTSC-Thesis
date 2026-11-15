@@ -1,0 +1,32 @@
+{
+  "scenario": "smoke",
+  "variants": [
+    {
+      "variant": "plain",
+      "options": [
+        "--output.original-names"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 426722,
+      "warnings_count": 0,
+      "errors": [],
+      "file": "data/networks/smoke/smoke.plain.xodr"
+    },
+    {
+      "variant": "scurve",
+      "options": [
+        "--output.original-names",
+        "--junctions.scurve-stretch",
+        "1.0"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 426816,
+      "warnings_count": 0,
+      "errors": [],
+      "file": "data/networks/smoke/smoke.scurve.xodr"
+    }
+  ],
+  "ok": true
+}

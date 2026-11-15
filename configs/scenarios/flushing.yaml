@@ -1,0 +1,6 @@
+# Downtown Flushing, Queens (primary scenario; continuity with the legacy project). docs/SPECIFICATION.md 6.3.
+id: flushing
+name: Downtown Flushing, Queens
+role: primary
+source: osm
+bbox: [-73.845, 40.745, -73.805, 40.775]   # west, south, east, north (initial; adjust only per validation, recorded)

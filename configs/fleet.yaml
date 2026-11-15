@@ -1,0 +1,40 @@
+# Fleet and emission classes (docs/SPECIFICATION.md 6.4). Emission model family: HBEFA 4.2 ("HBEFA4/"), the default family of the
+# installed SUMO 1.28 (DEFAULT_VEHTYPE = HBEFA4/PC_petrol_Euro-4, checked 2026-11-15). Class names were taken from
+# the installed binary and each is confirmed by a probe run (`python -m nycemis demand probe-classes`).
+#
+# The shares are a modelling assumption, not calibrated to New York registration data (docs/LIMITATIONS.md):
+# a predominantly petrol passenger fleet of Euro-4 to Euro-6 vintages, diesel light commercial vans, and rigid
+# urban delivery trucks. HBEFA factors describe European vehicles and test cycles.
+#
+# Each vehicle's emission class is drawn once per (scenario, level, seed) with a seeded generator and written into
+# the route file as an explicit type, so every controller sees the same fleet (docs/SPECIFICATION.md P2).
+groups:
+  cars:
+    share: 0.85
+    vclass: passenger
+    prefix: car
+    min_distance_m: 300          # osmWebWizard.py vehicleParameters["passenger"]
+    classes:
+      HBEFA4/PC_petrol_Euro-4: 0.25
+      HBEFA4/PC_petrol_Euro-5: 0.25
+      HBEFA4/PC_petrol_Euro-6ab: 0.25
+      HBEFA4/PC_petrol_Euro-6d: 0.15
+      HBEFA4/PC_diesel_Euro-5: 0.05
+      HBEFA4/PC_diesel_Euro-6ab: 0.05
+  vans:
+    share: 0.10
+    vclass: delivery
+    prefix: van
+    min_distance_m: 300
+    classes:
+      HBEFA4/LCV_diesel_N1-III_Euro-5: 0.40
+      HBEFA4/LCV_diesel_N1-III_Euro-6ab: 0.40
+      HBEFA4/LCV_petrol_N1-III_Euro-6ab: 0.20
+  trucks:
+    share: 0.05
+    vclass: truck
+    prefix: truck
+    min_distance_m: 600          # osmWebWizard.py vehicleParameters["truck"]
+    classes:
+      HBEFA4/RT_gt7_5-12t_Euro-V_SCR: 0.50
+      HBEFA4/RT_gt7_5-12t_Euro-VI_A-C: 0.50

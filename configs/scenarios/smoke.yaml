@@ -1,0 +1,11 @@
+# Smoke scenario: a 3x3 signalised grid from netgenerate (docs/SPECIFICATION.md 8). Used by tests and verify-all.
+id: smoke
+name: Smoke grid (netgenerate 3x3)
+role: smoke
+source: netgenerate
+grid:
+  number: 3
+  length_m: 200
+  attach_length_m: 100
+  lanes: 1
+  speed_mps: 13.89

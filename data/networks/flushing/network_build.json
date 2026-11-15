@@ -1,0 +1,85 @@
+{
+  "scenario": "flushing",
+  "command": [
+    "${SUMO_HOME}/bin/netconvert.exe",
+    "--type-files",
+    "${SUMO_HOME}/data/typemap/osmNetconvert.typ.xml",
+    "--geometry.remove",
+    "--ramps.guess",
+    "--junctions.join",
+    "--tls.guess-signals",
+    "--tls.discard-simple",
+    "--tls.join",
+    "--output.original-names",
+    "--output.street-names",
+    "--tls.default-type",
+    "actuated",
+    "--osm-files",
+    "data/osm/flushing.osm.xml.gz",
+    "--keep-edges.by-vclass",
+    "passenger",
+    "--keep-edges.components",
+    "1",
+    "--keep-edges.in-geo-boundary",
+    "-73.845000,40.745000,-73.805000,40.775000",
+    "--output-file",
+    "scenarios/flushing/flushing.net.xml.gz"
+  ],
+  "sumo_version": "1.28.0",
+  "seconds": 0.96,
+  "net_file": "scenarios/flushing/flushing.net.xml.gz",
+  "net_sha256": "386ecec0994e9458f82c5dc4cd8d781da2fe68b5b56af67f68d06971f9d6a553",
+  "warnings_count": 93,
+  "warnings_sample": [
+    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.residential' (first occurrence for edge '5699934').",
+    "Warning: Discarding unknown compound 'route.bicycle' in type 'highway.residential|route.bicycle' (first occurrence for edge '5702497').",
+    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.tertiary' (first occurrence for edge '5703616').",
+    "Warning: Discarding unknown compound 'cycleway.track' in type 'cycleway.track|highway.residential' (first occurrence for edge '5705419').",
+    "Warning: Discarding unknown compound 'route.bicycle' in type 'highway.tertiary|route.bicycle' (first occurrence for edge '5710062').",
+    "Warning: Discarding unusable type 'railway.platform' (first occurrence for edge '373573110').",
+    "Warning: Removing pt stop '5418333551' on non existing edge '1518712502#1'.",
+    "Warning: Ignoring restriction relation '8222626' with unknown type.",
+    "Warning: Ignoring restriction relation '8548834' with unknown to-way.",
+    "Warning: No way found for reference '672253072' in relation '9347601'",
+    "Warning: Ignoring restriction relation '9347601' with unknown to-way.",
+    "Warning: Ignoring restriction relation '11263003' with unknown type.",
+    "Warning: to-edge '557025551' of restriction relation could not be determined",
+    "Warning: Ignoring restriction relation '11592040'.",
+    "Warning: Ignoring restriction relation '12211456' with unknown type.",
+    "Warning: Ignoring restriction relation '12211457' with unknown type.",
+    "Warning: Ignoring restriction relation '12211460' with unknown type.",
+    "Warning: to-edge '865684678' of restriction relation could not be determined",
+    "Warning: Ignoring restriction relation '12359377'.",
+    "Warning: to-edge '865684678' of restriction relation could not be determined"
+  ],
+  "osm_extract": "data/osm/flushing.osm.xml.gz",
+  "osm_sha256": "40ee78f3e515fbcda3ebbaa2b9d2fa9769e2498b04bb34d38725c061c11020c1",
+  "typemap": "osmNetconvert.typ.xml",
+  "osmBuild_DEFAULT_NETCONVERT_OPTS": [
+    "--geometry.remove",
+    "--ramps.guess",
+    "--junctions.join",
+    "--tls.guess-signals",
+    "--tls.discard-simple",
+    "--tls.join",
+    "--output.original-names",
+    "--output.street-names"
+  ],
+  "wizard_additions": [
+    "--tls.default-type",
+    "actuated"
+  ],
+  "vehicle_class_mode": "passenger",
+  "vehicle_class_options": [
+    "--keep-edges.by-vclass",
+    "passenger"
+  ],
+  "extra_options": [
+    "--keep-edges.components",
+    "1"
+  ],
+  "clip_option": [
+    "--keep-edges.in-geo-boundary",
+    "bbox of the scenario config"
+  ]
+}

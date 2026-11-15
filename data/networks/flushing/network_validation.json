@@ -1,0 +1,76 @@
+{
+  "ok": true,
+  "checks": {
+    "bbox_match": {
+      "ok": true,
+      "detail": "net covers the box shrunk by 5%: True; 92.5% of lane-km inside the box (minimum 90%); net lon/lat extent (-73.8509, 40.7399, -73.8023, 40.7889); box (-73.845, 40.745, -73.805, 40.775)"
+    },
+    "edge_count": {
+      "ok": true,
+      "detail": "2365 non-internal edges (allowed 1500-20000)"
+    },
+    "traffic_lights": {
+      "ok": true,
+      "detail": "176 signalised junctions"
+    },
+    "strong_connectivity": {
+      "ok": true,
+      "detail": "largest strongly connected component holds 96.3% of edges (80 components; minimum 90%)"
+    },
+    "dead_end_share": {
+      "ok": true,
+      "detail": "15 edges without a successor (0.6%); reported, not gated"
+    },
+    "no_zero_length_edges": {
+      "ok": true,
+      "detail": "0 edges shorter than 0.1 m"
+    }
+  },
+  "stats": {
+    "lane_km_inside_bbox_share": 0.9252,
+    "edges": 2365,
+    "nodes": 933,
+    "lane_km": 300.71,
+    "traffic_lights": 176,
+    "largest_scc_edges": 2277,
+    "largest_scc_share": 0.9628,
+    "scc_count": 80,
+    "weak_components": 1,
+    "dead_end_edges": 15,
+    "dead_end_share": 0.0063,
+    "source_edges": 16,
+    "speed_limits_kmh": {
+      "24": 1,
+      "40": 130,
+      "48": 44,
+      "50": 1483,
+      "64": 1,
+      "80": 432,
+      "100": 271,
+      "142": 3
+    },
+    "road_class_edges": {
+      "primary/secondary": 368,
+      "residential/service": 1554,
+      "tertiary": 392,
+      "motorway/trunk": 51
+    },
+    "road_class_lane_km": {
+      "primary/secondary": 53.36,
+      "residential/service": 170.34,
+      "tertiary": 36.21,
+      "motorway/trunk": 40.81
+    },
+    "edge_types": {
+      "highway.residential": 1459,
+      "highway.tertiary": 392,
+      "highway.secondary": 242,
+      "highway.primary": 112,
+      "highway.unclassified": 95,
+      "highway.motorway": 26,
+      "highway.motorway_link": 25,
+      "highway.secondary_link": 9,
+      "highway.primary_link": 5
+    }
+  }
+}

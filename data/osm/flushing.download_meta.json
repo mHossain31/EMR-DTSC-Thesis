@@ -1,0 +1,42 @@
+{
+  "scenario": "flushing",
+  "bbox_wsen": [
+    -73.845,
+    40.745,
+    -73.805,
+    40.775
+  ],
+  "endpoint": "https://overpass-api.de/api/interpreter",
+  "downloaded_utc": "2026-11-15T05:41:44+00:00",
+  "osm_base": "2026-11-15T05:40:50Z",
+  "counts": {
+    "nodes": 9352,
+    "ways": 1794,
+    "relations": 104
+  },
+  "shapes": false,
+  "road_types": {
+    "Highway": [
+      "motorway",
+      "motorway_link",
+      "trunk",
+      "trunk_link",
+      "primary",
+      "primary_link",
+      "secondary",
+      "secondary_link",
+      "tertiary",
+      "tertiary_link",
+      "unclassified",
+      "residential",
+      "living_street",
+      "unsurfaced",
+      "service",
+      "raceway",
+      "bus_guideway"
+    ]
+  },
+  "tool": "osmGet.py (SUMO tools)",
+  "sumo_version": "1.28.0",
+  "failed_attempts_before_success": 0
+}

@@ -73,6 +73,10 @@ def sumo_binary(name: str) -> Path:
     return path
 
 
+def sumo_tools_dir() -> Path:
+    return sumo_home() / "tools"
+
+
 def sumo_tool(relpath: str) -> Path:
     """Path of a SUMO Python tool, e.g. ``osmGet.py`` or ``randomTrips.py``."""
     path = sumo_home() / "tools" / relpath
