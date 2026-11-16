@@ -245,6 +245,35 @@ def prereg_cmd() -> None:
                           indent=2))
 
 
+@app.command("paper")
+def paper_cmd(pdf: bool = typer.Option(True, "--pdf/--no-pdf")) -> None:
+    """Regenerate paper/macros.tex and the interview FAQ from results files; compile the PDF if a TeX engine exists."""
+    from nycemis.analysis.documents import render_faq
+    from nycemis.analysis.paper import build_pdf, write_macros
+
+    typer.echo(f"wrote {write_macros()}")
+    typer.echo(f"wrote {render_faq()}")
+    if pdf:
+        out = build_pdf()
+        if out is None:
+            logging.getLogger(__name__).warning("no TeX engine (tools/tectonic.exe, tectonic or latexmk on PATH): "
+                                                "the paper stays as .tex (docs/OPEN_ITEMS.md)")
+        else:
+            typer.echo(f"wrote {out}")
+
+
+@app.command("verify-all")
+def verify_all_cmd(only: str = typer.Option("", help="comma-separated subset of checks")) -> None:
+    """Every automated check of docs/SPECIFICATION.md section 9; exits 1 if any fails."""
+    from nycemis.verify_all import verify_all
+
+    res = verify_all([s.strip() for s in only.split(",") if s.strip()] or None)
+    for name, r in res["checks"].items():
+        typer.echo(f"[{'ok' if r['ok'] else 'FAIL'}] {name}\n    " + r["detail"].replace("\n", "\n    "))
+    if not res["ok"]:
+        raise typer.Exit(code=1)
+
+
 @app.command("analyze")
 def analyze_cmd(exp: str = typer.Option("confirmatory", "--exp"), scenario: str = typer.Option("flushing"),
                 model_id: str = typer.Option("gbm_v1")) -> None:

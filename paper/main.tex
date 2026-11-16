@@ -25,7 +25,7 @@ that the comparison set a run of about \LegacyBaselineHorizon~s against runs sto
 matched, preregistered protocol in SUMO: the same network, demand, fleet and seed in every condition, runs to
 completion, paired seeds, a travel-time rerouting baseline and a random-rerouting placebo. Replicating the legacy
 rule under this protocol, the legacy metric still reports a large drop while the matched metric does not. We then
-test emission-aware rerouting driven by a 60-second traffic-state forecast against preregistered comparisons at
+test emission-aware rerouting driven by a \HorizonS-second traffic-state forecast against preregistered comparisons at
 three demand levels; the results are stated with their confidence intervals in Section~\ref{sec:results}. All
 quantities are simulated tailpipe emissions, not air quality or exposure.
 \end{abstract}
@@ -52,7 +52,7 @@ use the Wilcoxon signed-rank test \citep{wilcoxon1945}, two one-sided tests for 
 \section{Methods}
 \subsection{Scenario, demand and fleet}
 The network is built from OpenStreetMap for downtown Flushing with the options of SUMO's OSM Web Wizard, clipped to
-the study box, with two documented repairs (a 20~m junction-join distance and SUMO's junction-blocker option) that
+the study box, with two documented repairs (a \JunctionJoinM~m junction-join distance and SUMO's junction-blocker option at \JunctionBlockerS~s) that
 remove deadlocks at one junction cluster. Demand is generated per vehicle class with the Web Wizard's trip
 options and routed explicitly; three levels are calibrated on pilot seeds to a relative speed ratio (ideal over
 actual travel time, relative to a near-empty network) of \RsrLight, \RsrModerate\ and \RsrHeavy\ (light,
@@ -62,19 +62,19 @@ conditions share the fleet.
 
 \subsection{Matched protocol}
 Every condition of a seed shares the network, the byte-identical route file, the SUMO seed and options; runs
-continue until every vehicle has arrived. A run is valid if at least 99.5\% of vehicles complete and at most
-0.5\% teleport. The primary outcome is total NOx from SUMO's per-trip emissions.
+continue until every vehicle has arrived. A run is valid if at least \ValidCompletionPct\% of vehicles complete and at most
+\ValidTeleportPct\% teleport. The primary outcome is total NOx from SUMO's per-trip emissions.
 
 \subsection{Controllers}
 C0 keeps the free-flow routes. C1 is SUMO's travel-time rerouting device. C2--C4 set a routing weight on every
-edge each minute, $e = (1-\alpha)\,\tau + \alpha\,\bar\tau\,m/\bar m$, where $\tau$ is the edge length over the
-time-mean edge speed of the last three minutes (floored at free-flow time, as C1's device averages its speeds) and
-$m$ the per-vehicle NOx cost of traversing the edge, and reroute each vehicle once a minute with SUMO's travel-time
+edge every \ReroutePeriodS~s, $e = (1-\alpha)\,\tau + \alpha\,\bar\tau\,m/\bar m$, where $\tau$ is the edge length over the
+time-mean edge speed of the last \TauAvgS~s (floored at free-flow time, as C1's device averages its speeds) and
+$m$ the per-vehicle NOx cost of traversing the edge, and reroute each vehicle every \ReroutePeriodS~s with SUMO's travel-time
 router on these weights, so that at $\alpha = 0$ they reduce to travel-time rerouting. C2 (placebo) replaces the
 emission term with random noise matched to C4's route-change rate ($\eta = \EtaStar$); C3 measures $m$ from the
 last minute ($\alpha^* = \AlphaStarReactive$); C4 forecasts it for the next minute from traffic-state features only
 ($\alpha^* = \AlphaStarML$). C5 replicates the legacy rule. $\alpha^*$ was chosen on validation seeds as the value
-minimising NOx with mean travel time at most 5\% above C1's.
+minimising NOx with mean travel time at most \AlphaTTBudgetPct\% above C1's.
 
 \subsection{Forecaster}
 Gradient-boosted trees forecast each edge's NOx per vehicle-second and mean speed for the next minute from
@@ -86,7 +86,7 @@ per-vehicle NOx rate is \ModelMAER\ (persistence: \PersistMAER) and for speed \M
 \subsection{Statistics}
 For each seed we compute the percent change of total NOx against the reference. PC2 (C4 vs C0) and PC3 (C4 vs C1)
 are two-sided Wilcoxon tests; PC1 (C5 vs C0) and PC4 (C4 vs C3) are TOST equivalence tests with a margin of
-$\pm$\SESOI\%. The \TestsInFamily\ tests (four comparisons times three levels) form one Holm family at 0.05. The
+$\pm$\SESOI\%. The \TestsInFamily\ tests (four comparisons times three levels) form one Holm family at \FamilywiseAlpha. The
 pilot SD of paired changes (\PilotSD\%) gave $n = \ConfirmatoryN$ test seeds per condition and level.
 
 \section{Results}\label{sec:results}

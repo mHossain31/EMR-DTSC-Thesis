@@ -13,6 +13,7 @@ import subprocess
 
 from nycemis.analysis.claims import confirmatory_sentence
 from nycemis.config import base_config, load_yaml
+from nycemis.network.build import REPAIR_OPTIONS
 from nycemis.paths import configs_dir, models_dir, rel, repo_root, results_dir
 
 PAPER = repo_root() / "paper"
@@ -97,6 +98,19 @@ def macros() -> dict[str, str]:
     cfg = base_config()
     m["SESOI"] = f"{cfg.analysis.sesoi_pct:g}"
     m["TestsInFamily"] = f"{cfg.analysis.n_confirmatory_tests}"
+    m["FamilywiseAlpha"] = f"{cfg.analysis.familywise_alpha:g}"
+    m["AlphaTTBudgetPct"] = f"{cfg.analysis.alpha_star_tt_budget_pct:g}"
+    m["ValidCompletionPct"] = f"{100 * cfg.protocol.validity.completion_min:g}"
+    m["ValidTeleportPct"] = f"{100 * cfg.protocol.validity.teleport_max_frac:g}"
+    m["HorizonS"] = f"{cfg.protocol.horizon_s}"
+    m["ReroutePeriodS"] = f"{cfg.protocol.reroute_period_s}"
+    m["JunctionBlockerS"] = f"{cfg.protocol.ignore_junction_blocker_s}"
+    m["JunctionJoinM"] = REPAIR_OPTIONS[REPAIR_OPTIONS.index("--junctions.join-dist") + 1]
+    val = load_yaml(configs_dir() / "experiments" / "validation.yaml")
+    tau = {c["params"]["tau_avg_s"] for c in val["conditions"] if "tau_avg_s" in c.get("params", {})}
+    if len(tau) != 1:
+        raise ValueError(f"validation conditions disagree on tau_avg_s: {sorted(tau)}")
+    m["TauAvgS"] = f"{tau.pop()}"
     return m
 
 
