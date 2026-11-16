@@ -23,39 +23,39 @@
     "--junctions.join-dist",
     "20",
     "--keep-edges.in-geo-boundary",
-    "-73.995000,40.745000,-73.965000,40.765000",
+    "-74.000000,40.740000,-73.960000,40.770000",
     "--output-file",
     "scenarios/midtown/midtown.net.xml.gz"
   ],
   "sumo_version": "1.28.0",
-  "seconds": 1.67,
+  "seconds": 1.46,
   "net_file": "scenarios/midtown/midtown.net.xml.gz",
-  "net_sha256": "a8d1ed279895948be217241cf447d363a05bff663d0a63a9236a515a8c1a15bb",
-  "warnings_count": 139,
+  "net_sha256": "693bf065b494421c26d347a18d1f7f77f2ae1f06edee0da5e3ab914782fae9bb",
+  "warnings_count": 174,
   "warnings_sample": [
     "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '5673063'.",
     "Warning: Using default width for edge '5673511' as value '32'0\"' could not be parsed.",
     "Warning: Using default width for edge '23048548' as value '11'' could not be parsed.",
+    "Warning: Unknown lane use specifier '' ignored for way '195743211'",
     "Warning: Unknown lane use specifier '' ignored for way '226041033'",
     "Warning: Unknown lane use specifier '' ignored for way '226041033'",
-    "Warning: Unknown lane use specifier '' ignored for way '324118553'",
     "Warning: Unknown lane use specifier '' ignored for way '324118553'",
     "Warning: Unknown lane use specifier '' ignored for way '324118553'",
     "Warning: Using default width for edge '460585328' as value '69'6\"' could not be parsed.",
-    "Warning: Using default width for edge '965833822' as value '33'4\"' could not be parsed.",
+    "Warning: Using default width for edge '601733867' as value '60'' could not be parsed.",
+    "Warning: Using default width for edge '808190579' as value '60'' could not be parsed.",
     "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '988977545'.",
     "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '1106482765'.",
-    "Warning: Using default width for edge '1308875366' as value '69'6\"' could not be parsed.",
     "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '1531454920'.",
-    "Warning: Discarding unknown compound 'bus' in type 'bus|highway.service' (first occurrence for edge '5669332').",
+    "Warning: Discarding unknown compound 'bus' in type 'bus|highway.service' (first occurrence for edge '5669228').",
+    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.residential' (first occurrence for edge '5669841').",
     "Warning: Discarding unknown compound 'cycleway.track' in type 'cycleway.track|highway.residential' (first occurrence for edge '5670197').",
-    "Warning: Discarding unknown compound 'cycleway.track' in type 'cycleway.track|highway.primary' (first occurrence for edge '5671276').",
-    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.tertiary' (first occurrence for edge '5671317').",
-    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.residential' (first occurrence for edge '5671629').",
-    "Warning: New value for oneway found: reversible"
+    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.secondary' (first occurrence for edge '5670348').",
+    "Warning: Discarding unknown compound 'cycleway.track' in type 'cycleway.track|highway.secondary' (first occurrence for edge '5670836').",
+    "Warning: Discarding unusable type 'aerialway.station' (first occurrence for edge '32946753')."
   ],
   "osm_extract": "data/osm/midtown.osm.xml.gz",
-  "osm_sha256": "7c6a4d680c30422bb221fe129400bc5ce670e6702a2acd5c99fae03d4b6ae5ba",
+  "osm_sha256": "ad94e05da8bd7b4ab8bae44bc87ed9f5bfe4e3297acb6a580ceef4b9ac457b48",
   "typemap": "osmNetconvert.typ.xml",
   "osmBuild_DEFAULT_NETCONVERT_OPTS": [
     "--geometry.remove",
@@ -87,5 +87,18 @@
   "clip_option": [
     "--keep-edges.in-geo-boundary",
     "bbox of the scenario config"
-  ]
+  ],
+  "scc_pass": {
+    "command": [
+      "${SUMO_HOME}/bin/netconvert.exe",
+      "--sumo-net-file",
+      "scenarios/midtown/midtown.full.net.xml.gz",
+      "--keep-edges.input-file",
+      "data/networks/midtown/largest_scc_edges.txt",
+      "--output-file",
+      "scenarios/midtown/midtown.net.xml.gz"
+    ],
+    "edges_before": 1933,
+    "edges_kept": 1656
+  }
 }

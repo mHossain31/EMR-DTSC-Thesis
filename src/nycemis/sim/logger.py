@@ -33,6 +33,14 @@ class Window:
     waiting_sum_s: np.ndarray  # sum over steps of the summed waiting time of vehicles on the edge
     nox_mg: np.ndarray
     co2_mg: np.ndarray
+    speed_time_sum: np.ndarray | None = None  # sum over steps of the edge mean speed (the limit when empty), m/s
+
+    def time_mean_speed_mps(self) -> np.ndarray:
+        """Edge mean speed averaged over time (the speed limit while the edge is empty), as SUMO's rerouting
+        device samples it."""
+        if self.speed_time_sum is None or self.steps == 0:
+            raise ValueError("window has no time-mean speed")
+        return self.speed_time_sum / self.steps
 
     def mean_speed_mps(self, limit_mps: np.ndarray) -> np.ndarray:
         """Vehicle-second weighted mean speed; the speed limit where the edge was empty."""
@@ -75,6 +83,7 @@ class EdgeStateLogger:
         self._wait = np.zeros(n)
         self._nox = np.zeros(n)
         self._co2 = np.zeros(n)
+        self._spd_t = np.zeros(n)
         self._steps = 0
 
     def on_step(self) -> None:
@@ -101,12 +110,13 @@ class EdgeStateLogger:
         self._wait += wait * dt
         self._nox += nox * dt
         self._co2 += co2 * dt
+        self._spd_t += spd
         self._steps += 1
 
     def close_window(self, t_end_s: float) -> Window:
         w = Window(k=self._k, t_end_s=t_end_s, steps=self._steps, veh_s=self._veh_s, speed_x_veh_s=self._spd,
                    max_count=self._max, halting_s=self._halt, waiting_sum_s=self._wait, nox_mg=self._nox,
-                   co2_mg=self._co2)
+                   co2_mg=self._co2, speed_time_sum=self._spd_t)
         self.cum_nox_mg += w.nox_mg
         self.cum_co2_mg += w.co2_mg
         self.cum_veh_s += w.veh_s

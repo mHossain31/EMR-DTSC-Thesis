@@ -7,5 +7,5 @@ seed_roles: [train, validation]
 conditions:
   - {controller: static, dataset: true}
   - {controller: tt_adaptive, dataset: true}
-  - {controller: random_reroute, params: {eta: 0.3}, dataset: true}
-  - {controller: eco_reactive, params: {alpha: draw_from_grid}, dataset: true}
+  - {controller: random_reroute, params: {eta: 0.3, tau_avg_s: 180}, dataset: true}
+  - {controller: eco_reactive, params: {alpha: draw_from_grid, tau_avg_s: 180}, dataset: true}

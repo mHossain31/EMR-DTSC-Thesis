@@ -1,18 +1,18 @@
 {
   "scenario": "midtown",
   "bbox_wsen": [
-    -73.995,
-    40.745,
-    -73.965,
-    40.765
+    -74.0,
+    40.74,
+    -73.96,
+    40.77
   ],
   "endpoint": "https://overpass-api.de/api/interpreter",
-  "downloaded_utc": "2026-11-16T01:09:56+00:00",
-  "osm_base": "2026-11-16T01:07:49Z",
+  "downloaded_utc": "2026-11-16T01:12:06+00:00",
+  "osm_base": "2026-11-16T01:11:13Z",
   "counts": {
-    "nodes": 6324,
-    "ways": 1497,
-    "relations": 510
+    "nodes": 11083,
+    "ways": 2717,
+    "relations": 892
   },
   "shapes": false,
   "road_types": {
@@ -38,5 +38,5 @@
   },
   "tool": "osmGet.py (SUMO tools)",
   "sumo_version": "1.28.0",
-  "failed_attempts_before_success": 12
+  "failed_attempts_before_success": 0
 }

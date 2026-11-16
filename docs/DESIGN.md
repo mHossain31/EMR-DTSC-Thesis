@@ -116,3 +116,7 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
 - **alpha* rule** (fixed before test seeds; `src/nycemis/experiments/select.py`): feasible if mean travel time is
   at most 5% above tt_adaptive's at every level; among feasible alphas, minimise the mean over levels of total NOx
   relative to tt_adaptive. The eta rule matches eco_ml's route-change rate at alpha*_ml.
+- **Travel time in C2-C4** (DEVIATIONS #12): tau = L / max(v, v_min), floored at free-flow time, where v is the
+  edge's time-mean speed (SUMO's last-step mean speed, which is the limit while the edge is empty) averaged over the
+  last `tau_avg_s` = 180 s, as SUMO's rerouting device does (adaptation interval 10 s x 18 steps). The emission cost
+  m = r L / max(v, v_min) keeps the vehicle-weighted speed (C3 measured and smoothed; C4 forecast).

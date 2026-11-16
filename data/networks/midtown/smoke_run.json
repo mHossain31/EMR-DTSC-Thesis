@@ -3,9 +3,20 @@
   "exit_code": 0,
   "errors": 0,
   "errors_sample": [],
-  "warnings_count": 0,
-  "warnings_sample": [],
-  "vehicles_inserted": 217,
-  "wall_s": 0.56,
+  "warnings_count": 70,
+  "warnings_sample": [
+    "Warning: At actuated tlLogic '1241742627', actuated phase 0 has no controlling detector.",
+    "Warning: At actuated tlLogic '1775201764', actuated phase 0 has no controlling detector.",
+    "Warning: At actuated tlLogic '42423752', actuated phase 0 has no controlling detector.",
+    "Warning: Unused states in tlLogic '42423885', program '0' in phase 0 after tl-index 6",
+    "Warning: At actuated tlLogic '42424789', actuated phase 0 has no controlling detector.",
+    "Warning: Unused states in tlLogic '42427374', program '0' in phase 0 after tl-index 3",
+    "Warning: At actuated tlLogic '42427374', actuated phase 2 has no controlling detector.",
+    "Warning: Unused states in tlLogic '42429661', program '0' in phase 0 after tl-index 3",
+    "Warning: At actuated tlLogic '42429661', actuated phase 2 has no controlling detector.",
+    "Warning: At actuated tlLogic '42429986', actuated phase 0 has no controlling detector."
+  ],
+  "vehicles_inserted": 317,
+  "wall_s": 0.83,
   "gui_command": "sumo-gui -c scenarios/midtown/midtown.sumocfg   (or: python -m nycemis gui --scenario midtown)"
 }

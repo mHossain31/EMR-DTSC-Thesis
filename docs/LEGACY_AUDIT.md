@@ -28,8 +28,8 @@ horizon of each emissions XML cannot be read directly.
 | # | Legacy claim or suspected defect | Evidence | Status | How the new design addresses it |
 |---|---|---|---|---|
 | 1 | Rerouting reduced emissions by RF 72 / 63.99 / 71.53 / 65.31 / 70.39 % and XGBoost 73.65 / 70.15 / 73.41 / 70.72 / 72.84 % (CO2 / CO / NOx / HC / PMx) | Slides p. 23; report pp. 35-36; computed in cell 50 by summing all rows of three emission files | unverifiable as an effect; explained by rows 2-3 | Matched protocol (P2), paired seeds, C0 reference, C5 replication |
-| 2 | D1 unmatched horizon | Baseline spans 4,129-4,135 s; controlled runs stop at step 1000; row ratios 30.5% (RF), 27.2% (XGB) | supported-indirect | Run to completion with the same stopping rule for every condition (4.4) |
-| 3 | D2 rerouting is a no-op | 37,978 of 37,978 repeat calls (RF) and 40,494 of 40,494 (XGB) returned the unchanged route | supported-indirect | Efforts set on every edge, `rerouteEffort`, measured `route_change_rate` (4.3, 4.5) |
+| 2 | D1 unmatched horizon | Baseline spans 4,129-4,135 s; controlled runs stop at step 1000; row ratios 30.5% (RF), 27.2% (XGB) | confirmed by the replication (section 5) | Run to completion with the same stopping rule for every condition (4.4) |
+| 3 | D2 rerouting is a no-op | 37,978 of 37,978 repeat calls (RF) and 40,494 of 40,494 (XGB) returned the unchanged route | replication: 13.9% of the legacy calls changed the route (section 5) | Efforts set on every edge, `rerouteEffort`, measured `route_change_rate` (4.3, 4.5) |
 | 4 | D3 no baselines or controls | Only `emissions_data.xml` plus one file per model are compared (cells 50-55) | confirmed | C0 static, C1 travel-time rerouting, C2 random-reroute placebo |
 | 5 | D4 circular, leaky prediction task | NOx predicted from CO2, CO, HC, PMx of the same vehicle-step; random row split (cells 18, 30, 45) | confirmed | Traffic-only features forecasting the next 60 s, split by run (7.1-7.3) |
 | 6 | D5 "multiple simulation runs" averaged (report p. 30) | One baseline and one run per model; no seeds, no averaging code | unverifiable (no evidence in the notebook) | 30-60 paired seeds per condition with CIs (4.6-4.7) |
@@ -144,4 +144,28 @@ No legacy reference is reused.
 
 ## 5. Legacy-protocol replication (M4)
 
-Pending. Condition C5 (`legacy_ml`, docs/SPECIFICATION.md 7.4) runs in the M4 pilot under the matched protocol. It reports the legacy metric (sum of all records with unmatched horizons) next to the matched metric on the same seeds, the route-change rate of the legacy rule, and the triviality and leakage tests of the legacy prediction task. Rendering this document again after M4 fills this section from `results/legacy_audit/replication.json`.
+Condition C5 (`legacy_ml`) reproduces the legacy rule under the matched protocol on the five pilot seeds at three demand levels (Flushing). Numbers come from `results/legacy_audit/replication.json` and `results/legacy_audit/legacy_rf_eval.json`.
+
+### The legacy predictor (7.4 i)
+
+- RF (RandomForestRegressor(n_estimators=100, random_state=42)) on 642,472 per-vehicle-step records from static runs on train seeds [0, 1], random 80/20 row split: R2 0.9996, MSE 0.05396 (mg/s)^2.
+- Split by run (train seed 0, test seed 1): R2 0.9992. The score does not depend on the row split: the task is nearly deterministic because the inputs and the target are outputs of the same emission model at the same instant.
+- Single-feature monotone baseline (isotonic NOx on CO2 alone): R2 0.3038. With a mixed fleet one pollutant is not enough; the four pollutants together identify the emission class.
+- Threshold: the legacy run flagged 19.84% of vehicle-steps; the matching training-NOx quantile is 2.641 mg/s (primary C5). The literal 1.88 mg/s is the 74.8th percentile (variant `legacy_ml_literal`).
+
+### Legacy metric vs matched metric (horizon 1000 s)
+
+The legacy metric sums the static run's NOx over its whole duration and the C5 run's NOx over the first 1000 s, as the legacy notebook did. The matched metric compares complete runs.
+
+| Condition / level | Seeds | Legacy metric: drop % (min to max) | Matched metric: drop % (min to max) | Route-change rate | Flagged vehicle-steps |
+|---|---|---|---|---|---|
+| legacy_ml/heavy | 5 | 79.8 (78.6 to 80.6) | -0.61 (-4.97 to 6.99) | 0.125 | 19.7% |
+| legacy_ml/light | 5 | 76.4 (73.8 to 77.6) | -0.31 (-0.88 to 0.31) | 0.150 | 21.0% |
+| legacy_ml/moderate | 5 | 76.9 (76.0 to 77.5) | 0.20 (-0.90 to 1.30) | 0.144 | 20.0% |
+| legacy_ml_literal/heavy | 5 | 79.7 (78.6 to 80.5) | 0.50 (-5.42 to 7.06) | 0.132 | 24.7% |
+| legacy_ml_literal/light | 5 | 76.3 (73.9 to 77.7) | -0.09 (-0.73 to 0.85) | 0.151 | 26.8% |
+| legacy_ml_literal/moderate | 5 | 76.9 (76.2 to 77.5) | -0.36 (-1.45 to 0.53) | 0.145 | 25.4% |
+
+- D1 (unmatched horizon): reproduced: the legacy metric reports a large drop on every seed and level while the matched metric does not.
+- D2 (no-op intervention): across levels, 13.9% of the legacy rule's findRoute/setRoute calls changed the vehicle's remaining route (C5 at the quantile threshold). Calls that change a route are those where the free-flow shortest path differs from the route the vehicle already has (for example trips generated through via-edges).
+- PC1 (C5 vs C0, equivalence within 2%) is tested on the confirmatory seeds; the pilot numbers here are interim and not confirmatory.

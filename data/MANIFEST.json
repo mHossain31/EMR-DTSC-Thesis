@@ -9,12 +9,12 @@
       "osm_base": "2026-11-15T05:40:50Z"
     },
     "data/osm/midtown.osm.xml.gz": {
-      "sha256": "7c6a4d680c30422bb221fe129400bc5ce670e6702a2acd5c99fae03d4b6ae5ba",
-      "bytes": 263294,
+      "sha256": "ad94e05da8bd7b4ab8bae44bc87ed9f5bfe4e3297acb6a580ceef4b9ac457b48",
+      "bytes": 517854,
       "kind": "osm_extract",
       "scenario": "midtown",
       "endpoint": "https://overpass-api.de/api/interpreter",
-      "osm_base": "2026-11-16T01:07:49Z"
+      "osm_base": "2026-11-16T01:11:13Z"
     },
     "scenarios/flushing/flushing.net.xml.gz": {
       "sha256": "1c6a057c9557a8583847fc25e53c179cc2e0e8177dc3ec0e1f3b3b856dbb6f29",
@@ -24,8 +24,8 @@
       "sumo_version": "1.28.0"
     },
     "scenarios/midtown/midtown.net.xml.gz": {
-      "sha256": "a8d1ed279895948be217241cf447d363a05bff663d0a63a9236a515a8c1a15bb",
-      "bytes": 527321,
+      "sha256": "693bf065b494421c26d347a18d1f7f77f2ae1f06edee0da5e3ab914782fae9bb",
+      "bytes": 838061,
       "kind": "network",
       "scenario": "midtown",
       "sumo_version": "1.28.0"

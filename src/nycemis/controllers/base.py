@@ -3,6 +3,7 @@
 A controller never reads files during a run; models and priors are loaded before the simulation starts. Stochastic
 choices use a ``numpy.random.Generator`` seeded from (run seed, controller name).
 
+Travel time per edge is the device-equivalent estimate (time-mean edge speed over ``tau_avg_s``; DEVIATIONS #12).
 Effort routing: at every control tick the controller computes one effort per non-internal edge and sets it with
 ``edge.setEffort`` without begin/end (valid for the whole simulation; repeated calls overwrite). After every update
 it checks ``edge.getEffort >= 0`` on all edges (-1 means unset, and an unset edge would look free). Vehicles are
@@ -14,6 +15,7 @@ rerouting device is attached to these vehicles: device vehicles ignore efforts.
 from __future__ import annotations
 
 import time
+from collections import deque
 from dataclasses import dataclass, field
 
 import numpy as np
@@ -108,6 +110,10 @@ class EffortController(Controller):
             raise ValueError(f"alpha must lie in [0, 1], got {self.alpha}")
         self.period = int(self.params.get("reroute_period_s", 60))
         self.compliance = float(self.params.get("compliance", 1.0))
+        if "tau_avg_s" not in self.params:
+            raise ValueError(f"{self.name} needs params.tau_avg_s (travel-time averaging horizon)")
+        self.tau_avg_s = int(self.params["tau_avg_s"])
+        self._speed_hist: deque[np.ndarray] = deque()
         self.efforts_set = False
         self.buckets: dict[int, set[str]] = {k: set() for k in range(self.period)}
         self.offset: dict[str, int] = {}
@@ -158,9 +164,14 @@ class EffortController(Controller):
         raise NotImplementedError
 
     def travel_time(self, window: Window, ctx: SimContext) -> np.ndarray:
-        """Window-mean travel time L / max(v, v_min), floored at free-flow time L / v_limit."""
+        """Travel time L / max(v, v_min), floored at free-flow time L / v_limit, where v is the edge's time-mean
+        speed (the limit while empty) averaged over the last ``tau_avg_s`` seconds: the estimate SUMO's rerouting
+        device uses (C1: adaptation interval 10 s x 18 steps = 180 s). DEVIATIONS #12."""
         info = ctx.info
-        v = window.mean_speed_mps(info.speed_limit_mps)
+        self._speed_hist.append(window.time_mean_speed_mps())
+        while len(self._speed_hist) > max(1, self.tau_avg_s // ctx.tick_s):
+            self._speed_hist.popleft()
+        v = np.mean(np.vstack(self._speed_hist), axis=0)
         tau = info.length_m / np.maximum(v, ctx.v_min_mps)
         return np.maximum(tau, info.freeflow_tt_s)
 

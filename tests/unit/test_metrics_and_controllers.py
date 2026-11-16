@@ -62,7 +62,7 @@ class _Fixed(EffortController):
 
 @pytest.mark.parametrize("alpha", [0.0, 0.5, 1.0])
 def test_effort_formula(alpha) -> None:
-    c = _Fixed({"alpha": alpha})
+    c = _Fixed({"alpha": alpha, "tau_avg_s": 180})
     tau = np.array([10.0, 20.0, 30.0])
     m = np.array([1.0, 0.0, 5.0])
     eff = c.efforts(tau, m)
@@ -73,13 +73,13 @@ def test_effort_formula(alpha) -> None:
 
 
 def test_effort_without_emission_information_is_travel_time() -> None:
-    c = _Fixed({"alpha": 0.7})
+    c = _Fixed({"alpha": 0.7, "tau_avg_s": 180})
     np.testing.assert_allclose(c.efforts(np.array([1.0, 2.0]), np.zeros(2)), [1.0, 2.0])
 
 
 def test_alpha_out_of_range_rejected() -> None:
     with pytest.raises(ValueError):
-        _Fixed({"alpha": 1.5})
+        _Fixed({"alpha": 1.5, "tau_avg_s": 180})
 
 
 def test_compliance_is_deterministic_and_nested_by_vehicle() -> None:

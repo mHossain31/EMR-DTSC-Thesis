@@ -22,7 +22,7 @@ def _same(a: dict, b: dict) -> None:
 
 
 def test_determinism_same_spec_twice(tmp_path) -> None:
-    spec = smoke_spec("eco_reactive", params={"alpha": 0.5})
+    spec = smoke_spec("eco_reactive", params={"alpha": 0.5, "tau_avg_s": 180})
     a = execute(spec, tmp_path / "a")
     b = execute(spec, tmp_path / "b")
     _same(a, b)
@@ -31,7 +31,7 @@ def test_determinism_same_spec_twice(tmp_path) -> None:
     pd.testing.assert_frame_equal(ta, tb)
 
 
-@pytest.mark.parametrize("controller,params", [("static", {}), ("eco_reactive", {"alpha": 0.5})])
+@pytest.mark.parametrize("controller,params", [("static", {}), ("eco_reactive", {"alpha": 0.5, "tau_avg_s": 180})])
 def test_libsumo_and_traci_agree(tmp_path, controller, params) -> None:
     a = execute(smoke_spec(controller, params=params, backend="libsumo"), tmp_path / "libsumo")
     b = execute(smoke_spec(controller, params=params, backend="traci"), tmp_path / "traci")
@@ -63,7 +63,7 @@ def test_edge_tables_are_consistent(tmp_path) -> None:
 
 
 def test_shadow_mode_features_equal_dataset_features(tmp_path) -> None:
-    spec = smoke_spec("eco_ml", params={"alpha": 0.5, "model_id": "toy", "shadow": True}, dataset=True)
+    spec = smoke_spec("eco_ml", params={"alpha": 0.5, "model_id": "toy", "shadow": True, "tau_avg_s": 180}, dataset=True)
     execute(spec, tmp_path / "s")
     shadow = pd.read_parquet(tmp_path / "s" / "shadow_features.parquet")
     data = pd.read_parquet(tmp_path / "s" / "edge_window.parquet")
@@ -77,7 +77,7 @@ def test_shadow_mode_features_equal_dataset_features(tmp_path) -> None:
 
 def test_shadow_mode_applies_nothing(tmp_path) -> None:
     static = execute(smoke_spec("static"), tmp_path / "static")
-    shadow = execute(smoke_spec("eco_ml", params={"alpha": 0.5, "model_id": "toy", "shadow": True}),
+    shadow = execute(smoke_spec("eco_ml", params={"alpha": 0.5, "model_id": "toy", "shadow": True, "tau_avg_s": 180}),
                      tmp_path / "shadow")
     _same(static, shadow)
     assert shadow["n_reroutes"] == 0
@@ -87,7 +87,7 @@ def test_shadow_mode_applies_nothing(tmp_path) -> None:
 def test_alpha_zero_sanity(tmp_path) -> None:
     """eco_reactive with alpha = 0 (pure travel time) reproduces tt_adaptive's mean travel time within 5%."""
     for seed in (1, 2):
-        a0 = execute(smoke_spec("eco_reactive", seed=seed, params={"alpha": 0.0}), tmp_path / f"a0_{seed}")
+        a0 = execute(smoke_spec("eco_reactive", seed=seed, params={"alpha": 0.0, "tau_avg_s": 180}), tmp_path / f"a0_{seed}")
         tt = execute(smoke_spec("tt_adaptive", seed=seed), tmp_path / f"tt_{seed}")
         assert abs(a0["mean_tt_s"] - tt["mean_tt_s"]) / tt["mean_tt_s"] < 0.05
 

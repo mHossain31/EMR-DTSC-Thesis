@@ -8,8 +8,8 @@
       ],
       "ok": true,
       "exit_code": 0,
-      "bytes": 9783480,
-      "warnings_count": 34,
+      "bytes": 15392029,
+      "warnings_count": 33,
       "errors": [],
       "file": "data/networks/midtown/midtown.plain.xodr"
     },
@@ -22,8 +22,8 @@
       ],
       "ok": true,
       "exit_code": 0,
-      "bytes": 9783086,
-      "warnings_count": 34,
+      "bytes": 15394534,
+      "warnings_count": 36,
       "errors": [],
       "file": "data/networks/midtown/midtown.scurve.xodr"
     }
