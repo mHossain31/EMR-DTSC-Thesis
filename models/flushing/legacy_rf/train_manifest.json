@@ -1,0 +1,12 @@
+{
+  "experiment": "legacy_train",
+  "runs": [
+    "db9e94486333",
+    "200d989f82f5",
+    "212cff89c3ad",
+    "dbaae0d5c971",
+    "15c8e1fe30aa",
+    "41d2cd903df9"
+  ],
+  "model_file": "models/flushing/legacy_rf/model.joblib"
+}

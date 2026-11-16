@@ -1,0 +1,46 @@
+{
+  "model": "RandomForestRegressor(n_estimators=100, random_state=42)",
+  "features_mg_s": [
+    "co2_mg_s",
+    "co_mg_s",
+    "hc_mg_s",
+    "pmx_mg_s"
+  ],
+  "target_mg_s": "nox_mg_s",
+  "records_pooled": 8631297,
+  "rows_used": 642472,
+  "split": "random 80/20 by row, random_state=42",
+  "rf_random_split": {
+    "mse": 0.053962687818044135,
+    "mae": 0.02014102603444294,
+    "r2": 0.9996079312202195,
+    "n": 128495
+  },
+  "isotonic_co2_only_random_split": {
+    "mse": 95.81996154785156,
+    "mae": 3.9628026485443115,
+    "r2": 0.30381494760513306,
+    "n": 128495
+  },
+  "rf_split_by_run_seed0_to_seed1": {
+    "mse": 0.11557556000142781,
+    "mae": 0.02668493179727205,
+    "r2": 0.9992047189938493,
+    "n": 318118
+  },
+  "legacy_flag_share": 0.19837456552852178,
+  "threshold_quantile": 0.8016254344714782,
+  "threshold_quantile_mg_s": 2.6408631801605225,
+  "literal_threshold_mg_s": 1.88,
+  "literal_threshold_training_quantile": 0.7480879494607735,
+  "train_seeds": [
+    0,
+    1
+  ],
+  "levels": [
+    "heavy",
+    "light",
+    "moderate"
+  ],
+  "seconds": 34.6
+}

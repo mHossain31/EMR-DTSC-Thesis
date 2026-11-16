@@ -1,0 +1,8 @@
+# Training data for the legacy-protocol RF (docs/SPECIFICATION.md 7.4): per-vehicle-step emission records from static (baseline)
+# runs on train seeds 0-1 only, all three demand levels.
+name: legacy_train
+scenario: flushing
+levels: [light, moderate, heavy]
+seeds: [0, 1]
+conditions:
+  - {controller: static, log_vehicle_records: true}

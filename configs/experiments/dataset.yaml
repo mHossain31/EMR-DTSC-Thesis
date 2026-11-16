@@ -1,0 +1,11 @@
+# Forecaster training data (docs/SPECIFICATION.md 7.3): mixed behaviour policies on train and validation seeds, all logging
+# edge_window rows. eco_reactive draws its alpha per run from the alpha grid.
+name: dataset
+scenario: flushing
+levels: [light, moderate, heavy]
+seed_roles: [train, validation]
+conditions:
+  - {controller: static, dataset: true}
+  - {controller: tt_adaptive, dataset: true}
+  - {controller: random_reroute, params: {eta: 0.3}, dataset: true}
+  - {controller: eco_reactive, params: {alpha: draw_from_grid}, dataset: true}

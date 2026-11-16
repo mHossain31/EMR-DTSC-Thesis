@@ -59,6 +59,16 @@ def render_audit(n: dict) -> str:
     same_first, common = d2["first_route_identical_rf_vs_xgb"]
     files = n["files"]
     pages = n["pages"]
+    d1_status, d2_status = "supported-indirect", "supported-indirect"
+    rep_path = results_dir() / "legacy_audit" / "replication.json"
+    if rep_path.is_file():
+        from nycemis.legacy.replicate import d1_confirmed, mean_change_rate
+
+        rep = json.loads(rep_path.read_text(encoding="utf-8"))
+        d1_status = ("confirmed by the replication (section 5)" if d1_confirmed(rep)
+                     else "not reproduced by the replication (section 5)")
+        d2_status = (f"replication: {100 * mean_change_rate(rep):.1f}% of the legacy calls changed the route "
+                     "(section 5)")
 
     inventory = "\n".join(
         f"| `{v['path']}` | `{v['sha256'][:16]}...` | {_int(v['bytes'])} | {pages.get(k, '-')} |"
@@ -95,8 +105,8 @@ horizon of each emissions XML cannot be read directly.
 | # | Legacy claim or suspected defect | Evidence | Status | How the new design addresses it |
 |---|---|---|---|---|
 | 1 | Rerouting reduced emissions by RF {drop_rf} % and XGBoost {drop_xgb} % (CO2 / CO / NOx / HC / PMx) | Slides p. 23; report pp. 35-36; computed in cell {50} by summing all rows of three emission files | unverifiable as an effect; explained by rows 2-3 | Matched protocol (P2), paired seeds, C0 reference, C5 replication |
-| 2 | D1 unmatched horizon | Baseline spans {lo:,.0f}-{hi:,.0f} s; controlled runs stop at step {d1['controlled_step_bound']}; row ratios {_pct(100 * d1['rf_row_ratio'])} (RF), {_pct(100 * d1['xgb_row_ratio'])} (XGB) | supported-indirect | Run to completion with the same stopping rule for every condition (4.4) |
-| 3 | D2 rerouting is a no-op | {_int(rf['repeat_unchanged'])} of {_int(rf['repeat_calls'])} repeat calls (RF) and {_int(xgb['repeat_unchanged'])} of {_int(xgb['repeat_calls'])} (XGB) returned the unchanged route | supported-indirect | Efforts set on every edge, `rerouteEffort`, measured `route_change_rate` (4.3, 4.5) |
+| 2 | D1 unmatched horizon | Baseline spans {lo:,.0f}-{hi:,.0f} s; controlled runs stop at step {d1['controlled_step_bound']}; row ratios {_pct(100 * d1['rf_row_ratio'])} (RF), {_pct(100 * d1['xgb_row_ratio'])} (XGB) | {d1_status} | Run to completion with the same stopping rule for every condition (4.4) |
+| 3 | D2 rerouting is a no-op | {_int(rf['repeat_unchanged'])} of {_int(rf['repeat_calls'])} repeat calls (RF) and {_int(xgb['repeat_unchanged'])} of {_int(xgb['repeat_calls'])} (XGB) returned the unchanged route | {d2_status} | Efforts set on every edge, `rerouteEffort`, measured `route_change_rate` (4.3, 4.5) |
 | 4 | D3 no baselines or controls | Only `emissions_data.xml` plus one file per model are compared (cells 50-55) | confirmed | C0 static, C1 travel-time rerouting, C2 random-reroute placebo |
 | 5 | D4 circular, leaky prediction task | NOx predicted from CO2, CO, HC, PMx of the same vehicle-step; random row split (cells 18, 30, 45) | confirmed | Traffic-only features forecasting the next 60 s, split by run (7.1-7.3) |
 | 6 | D5 "multiple simulation runs" averaged (report p. {d5['multiple_runs_claim_pages'][0]}) | One baseline and one run per model; no seeds, no averaging code | unverifiable (no evidence in the notebook) | 30-60 paired seeds per condition with CIs (4.6-4.7) |

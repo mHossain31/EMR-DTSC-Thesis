@@ -1,0 +1,10 @@
+# Smoke check of the forecaster pipeline (not part of the study): dataset runs on the smoke grid, two train seeds and
+# two validation seeds.
+name: smoke_dataset
+scenario: smoke
+levels: [smoke]
+level_densities: {smoke: 60.0}
+seeds: [1, 2, 100, 101]
+conditions:
+  - {controller: static, dataset: true}
+  - {controller: eco_reactive, params: {alpha: draw_from_grid}, dataset: true}

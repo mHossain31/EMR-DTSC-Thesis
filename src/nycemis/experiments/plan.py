@@ -36,6 +36,7 @@ class ExperimentConfig(Strict):
     level_densities: dict[str, float] = Field(default_factory=dict)  # overrides (smoke only)
     seeds: list[int] | None = None
     seed_role: str | None = None  # pilot, train, validation, test
+    seed_roles: list[str] | None = None  # several roles, e.g. [train, validation]
     test_n: int | None = None
     conditions: list[Condition]
     reconcile: bool = False
@@ -45,6 +46,11 @@ class ExperimentConfig(Strict):
     def seed_list(self) -> list[int]:
         if self.seeds is not None:
             return list(self.seeds)
+        if self.seed_roles:
+            out: list[int] = []
+            for role in self.seed_roles:
+                out += self.model_copy(update={"seed_roles": None, "seed_role": role}).seed_list()
+            return out
         s = base_config().seeds
         if self.seed_role == "pilot":
             return s.pilot_seeds()
@@ -89,6 +95,26 @@ def _sampled(run_id: str, frac: float) -> bool:
     return frac > 0 and derived_seed(run_id, "reconcile-audit") / float(2**31 - 1) < frac
 
 
+def _resolve_params(scenario: str, c: Condition, level: str | None = None, seed: int | None = None) -> dict:
+    """Replace symbolic parameter values by frozen numbers (recorded in plan.json and in the run id).
+
+    ``alpha: draw_from_grid`` draws the run's alpha from the configured grid with a seed derived from (level, seed),
+    so dataset runs cover the controller-induced traffic states of every alpha (docs/SPECIFICATION.md 7.3).
+    """
+    params = dict(c.params)
+    if params.get("alpha") == "draw_from_grid":
+        from nycemis.demand.generate import derived_seed
+
+        grid = base_config().analysis.alpha_grid
+        params["alpha"] = float(grid[derived_seed(level, seed, "alpha-draw") % len(grid)])
+    if c.controller == "legacy_ml" and params.get("threshold_mg_s") == "legacy_quantile":
+        from nycemis.models.legacy import model_dir
+
+        metrics = json.loads((model_dir(scenario) / "metrics.json").read_text(encoding="utf-8"))
+        params["threshold_mg_s"] = metrics["threshold_quantile_mg_s"]
+    return params
+
+
 def plan(name: str, workers: int = 8) -> list[RunSpec]:
     cfg = load_experiment(name)
     seeds = cfg.seed_list()
@@ -102,7 +128,7 @@ def plan(name: str, workers: int = 8) -> list[RunSpec]:
     for lv, s, d in jobs:
         for c in cfg.conditions:
             spec = RunSpec(experiment=name, scenario=cfg.scenario, level=lv, seed=s, controller=c.controller,
-                           params=c.params, protocol_version=pv, density_per_h_km=d, route_sha256=hashes[(lv, s)],
+                           params=_resolve_params(cfg.scenario, c, lv, s), protocol_version=pv, density_per_h_km=d, route_sha256=hashes[(lv, s)],
                            dataset=c.dataset, log_vehicle_records=c.log_vehicle_records, backend=cfg.backend)
             rec = cfg.reconcile or _sampled(spec.run_id(), cfg.reconcile_sample_frac)
             specs.append(spec.model_copy(update={"reconcile": rec}))

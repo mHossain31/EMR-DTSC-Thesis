@@ -196,6 +196,31 @@ def exp_verify(exp: str = typer.Option(..., "--exp")) -> None:
         raise typer.Exit(code=1)
 
 
+@app.command("train-legacy")
+def train_legacy(scenario: str = typer.Option("flushing")) -> None:
+    """Train and test the legacy RF (C5) on the legacy_train records; writes models/<scenario>/legacy_rf/."""
+    from nycemis.models.legacy import train
+
+    typer.echo(json.dumps(train(scenario), indent=2))
+
+
+@app.command("analyze-pilot")
+def analyze_pilot(exp: str = typer.Option("pilot", "--exp")) -> None:
+    """Pilot analysis: variance, power, budget, alpha = 0 sanity, legacy replication; renders the documents."""
+    from nycemis.analysis.documents import render_interim_note, render_pilot_report, render_preregistration
+    from nycemis.analysis.pilot import analyze
+    from nycemis.legacy.audit import run_audit
+    from nycemis.legacy.report import render_audit
+
+    res = analyze(exp)
+    numbers, _ = run_audit()
+    for path in (render_audit(numbers), render_pilot_report(), render_interim_note(),
+                 render_preregistration("draft (M4)")):
+        typer.echo(f"wrote {path}")
+    typer.echo(json.dumps({"n_confirmatory": res["power"]["n_confirmatory"], "sd_used": res["power"]["sd_pct_used"],
+                           "wall_clock_hours": res["budget"]["wall_clock_hours"]}, indent=2))
+
+
 @app.command("legacy-audit")
 def legacy_audit() -> None:
     """Extract the legacy files, recompute the audit numbers and render docs/LEGACY_AUDIT.md."""
