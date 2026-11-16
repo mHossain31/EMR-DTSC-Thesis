@@ -66,9 +66,11 @@ continue until every vehicle has arrived. A run is valid if at least 99.5\% of v
 0.5\% teleport. The primary outcome is total NOx from SUMO's per-trip emissions.
 
 \subsection{Controllers}
-C0 keeps the free-flow routes. C1 is SUMO's travel-time rerouting device. C2--C4 set an effort on every edge each
-minute, $e = (1-\alpha)\,\tau + \alpha\,\bar\tau\,m/\bar m$, where $\tau$ is the edge travel time and $m$ the
-per-vehicle NOx cost of traversing it, and reroute each vehicle once a minute by effort. C2 (placebo) replaces the
+C0 keeps the free-flow routes. C1 is SUMO's travel-time rerouting device. C2--C4 set a routing weight on every
+edge each minute, $e = (1-\alpha)\,\tau + \alpha\,\bar\tau\,m/\bar m$, where $\tau$ is the edge length over the
+time-mean edge speed of the last three minutes (floored at free-flow time, as C1's device averages its speeds) and
+$m$ the per-vehicle NOx cost of traversing the edge, and reroute each vehicle once a minute with SUMO's travel-time
+router on these weights, so that at $\alpha = 0$ they reduce to travel-time rerouting. C2 (placebo) replaces the
 emission term with random noise matched to C4's route-change rate ($\eta = \EtaStar$); C3 measures $m$ from the
 last minute ($\alpha^* = \AlphaStarReactive$); C4 forecasts it for the next minute from traffic-state features only
 ($\alpha^* = \AlphaStarML$). C5 replicates the legacy rule. $\alpha^*$ was chosen on validation seeds as the value

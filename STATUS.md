@@ -3,9 +3,9 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** M4 (pilot) finishing; M5 dataset runs in progress. Code for M5-M7 and the paper skeleton
-  is written and tested on the smoke grid.
-- **Last updated:** 2026-11-15 19:45.
+- **Current milestone:** M5 (forecaster and alpha*). G4 passed (pilot complete, n = 60). The dataset experiment
+  is complete (432/432, verified); the forecaster `gbm_v1` is training.
+- **Last updated:** 2026-11-15 21:35.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -19,9 +19,8 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 
 | Job | Started | Log | Notes |
 |---|---|---|---|
-| pilot (105 runs) | 2026-11-15 19:26 | `results/logs/pilot.log` | 75/105 at 19:41; the 30 legacy_ml runs remain (at most 5 at a time, about 4 GB each) |
-| dataset (432 runs) | 2026-11-15 19:41 | `results/logs/dataset.log` | 6 workers while the pilot finishes |
-| net fetch midtown, dtbk | 2026-11-15 19:26 | `results/logs/fetch_<s>.log` | Overpass returns 502/504; retries for up to 240 min each |
+| train gbm_v1 | 2026-11-15 21:30 | `results/logs/train_gbm_v1.log` | `python -m nycemis train --model-id gbm_v1 --exp dataset`; 30 trials x 3 targets, about 1 h; not resumable (rerun from scratch) |
+| net fetch dtbk | 2026-11-15 19:26 | `results/logs/fetch_dtbk.log` | Overpass returns 502/504; retries for up to 240 min |
 
 Progress: `python -m nycemis experiment status --exp <EXP>`. A stopped executor resumes where it left off (runs
 with a `DONE` marker are skipped; partial run directories are removed and rerun).
@@ -37,27 +36,25 @@ with a `DONE` marker are skipped; partial run directories are removed and rerun)
 
 ## Next steps (in order)
 
-1. When the pilot is DONE: `python -m nycemis analyze-pilot` (variance, power, budget, alpha = 0 sanity, legacy
-   replication; renders the pilot report, the audit's section 5, the interim note and the preregistration draft).
-   Check G4, commit.
-2. When the dataset is DONE: `python -m nycemis train --model-id gbm_v1` (30-trial search; writes the model card).
-   Tag `model-freeze-v1`.
-3. `python -m nycemis experiment plan --exp validation` and run it; then `python -m nycemis select`
-   (alpha*_reactive, alpha*_ml, eta). G5.
-4. Write `configs/experiments/confirmatory.yaml` from the selection, finalise the preregistration, tag
-   `prereg-v1`, run the confirmatory seeds (n from the pilot), then `python -m nycemis analyze` (M7).
+1. When training ends: read `models/flushing/gbm_v1/model_card.md`, commit, tag `model-freeze-v1`.
+2. `python -m nycemis experiment run --exp validation` (planned: 612 runs), detached; then
+   `python -m nycemis select` (alpha*_reactive, alpha*_ml, eta). G5.
+3. `python -m nycemis prereg` (writes `configs/experiments/confirmatory.yaml` and the frozen
+   `docs/PREREGISTRATION.md`); commit, tag `prereg-v1`.
+4. `python -m nycemis experiment plan --exp confirmatory`, run detached, verify (G6); `python -m nycemis analyze` (M7).
 
 ## Gates
 
 | Gate | Status | Evidence |
 |---|---|---|
 | G0 | done except doctor's Overpass check (server-side, intermittent) | `docs/LEGACY_AUDIT.md`; `python -m nycemis doctor` |
-| G1 | Flushing and smoke done; midtown and dtbk wait for the Overpass API | `data/networks/<s>/network_report.md` |
+| G1 | Flushing, smoke and Midtown done; dtbk waits for the Overpass API | `data/networks/<s>/network_report.md` |
 | G2 | done | `configs/demand_levels.yaml`, `results/calibration/flushing/` |
-| G3 | done | 61 tests pass (`pytest`), including API contract, determinism, libsumo vs TraCI, reconciliation, shadow parity, alpha = 0 sanity on smoke, poison test, statistics |
-| G4 | pending pilot | `results/pilot/` |
+| G3 | done | 62 tests pass (`pytest`), including API contract, determinism, libsumo vs TraCI, reconciliation, shadow parity, alpha = 0 sanity on smoke, poison test, statistics |
+| G4 | done | `results/pilot/pilot_report.md`: alpha = 0 sanity passes at every level, all C2/C3 runs valid, n = 60 |
+| G5 | in progress | dataset verified (432 runs); forecaster training |
 
 ## Decisions so far
 
-`docs/DEVIATIONS.md` #1-#9. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
-20 m (#7), levels on the relative speed ratio (#8), reconciliation tolerance 0.5% for pilot runs (#9).
+`docs/DEVIATIONS.md` #1-#13. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
+20 m (#7), levels on the relative speed ratio (#8), reconciliation tolerance 0.5% for pilot runs (#9), device-equivalent travel time (#12) and the travel-time-weights router (#13) in the effort controllers.

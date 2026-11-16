@@ -67,3 +67,23 @@ def test_unknown_keys_rejected() -> None:
 def test_seeds_expand_rejects_empty() -> None:
     with pytest.raises(ValueError):
         Seeds.expand((5, 4))
+
+
+def test_no_model_manifest_reads_a_test_seed() -> None:
+    """docs/SPECIFICATION.md 9.6: test seeds are absent from every training and tuning artifact, checked via the manifests."""
+    import json
+
+    from nycemis.paths import models_dir
+
+    s = base_config().seeds
+    test = set(range(s.test_start, s.test_start + s.test_n_max))
+    for path in models_dir().glob("*/*/train_manifest.json"):
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        used = set(doc.get("train_seeds", [])) | set(doc.get("validation_seeds", []))
+        used |= {d["seed"] for d in doc.get("data", []) if "seed" in d}
+        if "runs" in doc:  # run ids of one experiment (legacy RF): resolve them through the experiment's plan
+            from nycemis.experiments.plan import load_plan
+
+            seeds = {r["run_id"]: r["spec"]["seed"] for r in load_plan(doc["experiment"])["runs"]}
+            used |= {seeds[rid] for rid in doc["runs"]}
+        assert not used & test, f"{path}: test seeds {sorted(used & test)}"

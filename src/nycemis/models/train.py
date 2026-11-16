@@ -10,6 +10,7 @@ The hotspot threshold is the 95th percentile of d_next over non-empty training e
 from __future__ import annotations
 
 import json
+import logging
 import time
 from pathlib import Path
 
@@ -24,6 +25,8 @@ from nycemis.manifest import sha256_file
 from nycemis.models.gbm import HAVE_LGB, GBMForecaster, fit_regressor
 from nycemis.paths import models_dir, rel
 from nycemis.sim.runner import git_state
+
+log = logging.getLogger(__name__)
 
 SEARCH_TRIALS = 30
 HOTSPOT_QUANTILE = 0.95
@@ -93,10 +96,14 @@ def search_and_fit(train: pd.DataFrame, val: pd.DataFrame, trials: int, seed: in
         x_tr, y_tr = target_arrays(train, target)
         x_va, y_va = target_arrays(val, target)
         best_loss = np.inf
+        log.info("target %s: %d training rows, %d validation rows", target, len(y_tr), len(y_va))
         for i, params in enumerate(candidates):
+            t0 = time.perf_counter()
             model = fit_regressor(params, seed + i, x_tr, y_tr, x_va, y_va)
             loss = _val_loss(model, x_va, y_va)
             n_iter = int(getattr(model, "best_iteration_", 0) or 0)
+            log.info("target %s trial %d/%d: val_mse %.5f, %d iterations, %.0f s", target, i + 1, len(candidates),
+                     loss, n_iter, time.perf_counter() - t0)
             history.append({"target": target, "trial": i, "val_mse": loss, "best_iteration": n_iter, **params})
             if loss < best_loss:
                 best_loss, best[target], models[target] = loss, {**params, "best_iteration": n_iter}, model
@@ -108,6 +115,7 @@ def freeze(scenario: str, model_id: str, experiments: list[str], sample_frac: fl
     t0 = time.perf_counter()
     s = base_config().seeds
     train = load_windows(experiments, set(s.train_seeds()), sample_frac, seed)
+    log.info("loaded %d training edge-windows", len(train))
     val = load_windows(experiments, set(s.validation_seeds()), sample_frac, seed + 1)
     best, models, history = search_and_fit(train, val, trials, seed, n_jobs)
     nonempty = train.veh_s_next.to_numpy() > 0

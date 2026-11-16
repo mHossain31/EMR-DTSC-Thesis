@@ -234,6 +234,17 @@ def select_cmd(exp: str = typer.Option("validation", "--exp")) -> None:
                            "alpha_ml": res["eco_ml"]["alpha_star"], "eta": res["random_reroute"]["eta_star"]}))
 
 
+@app.command("prereg")
+def prereg_cmd() -> None:
+    """Freeze the confirmatory design (M6): write confirmatory.yaml and the frozen PREREGISTRATION.md."""
+    from nycemis.experiments.prereg import freeze
+
+    out = freeze()
+    typer.echo(json.dumps({k: out[k] for k in ("alpha_reactive", "alpha_ml", "eta", "model_id", "n",
+                                               "analysis_code_sha256", "confirmatory_config", "preregistration")},
+                          indent=2))
+
+
 @app.command("analyze")
 def analyze_cmd(exp: str = typer.Option("confirmatory", "--exp"), scenario: str = typer.Option("flushing"),
                 model_id: str = typer.Option("gbm_v1")) -> None:
