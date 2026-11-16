@@ -12,7 +12,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
 Long batches are launched through WMI so they are not children of the interactive session:
 
 ```powershell
-$root = "E:\PROJECTS\EMR-DTSC-THESIS"
+$root = (Get-Location).Path   # run from the repository root
 $cmd = "cmd.exe /c `"cd /d $root && set PYTHONIOENCODING=utf-8 && .venv\Scripts\python.exe -m nycemis experiment run --exp <EXP> --workers <N> >> results\logs\<EXP>.log 2>&1`""
 Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $root }
 ```
