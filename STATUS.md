@@ -3,44 +3,61 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** M4 (pilot) starting. M0, M2, M3 done; M1 done for Flushing and smoke, Midtown and Downtown
-  Brooklyn waiting on the Overpass API (gateway errors 502/504).
-- **Last updated:** 2026-11-15.
-- **Running jobs:** `net fetch` for midtown then dtbk (background, retries up to 180 min each; log in
-  `results/logs/fetch_<s>.log`). Restart with the command below if it is not running.
+- **Current milestone:** M4 (pilot) finishing; M5 dataset runs in progress. Code for M5-M7 and the paper skeleton
+  is written and tested on the smoke grid.
+- **Last updated:** 2026-11-15 19:45.
 
-## Resume
+## Running jobs (detached; they survive a session restart)
 
-```bash
-.venv/Scripts/python.exe -m nycemis doctor
-.venv/Scripts/python.exe -m pytest -q
-.venv/Scripts/python.exe -m nycemis net fetch --scenario midtown --max-wait-min 180   # then: net build --scenario midtown
-.venv/Scripts/python.exe -m nycemis net fetch --scenario dtbk --max-wait-min 180      # then: net build --scenario dtbk
+Long batches are launched through WMI so they are not children of the interactive session:
+
+```powershell
+$root = "E:\PROJECTS\EMR-DTSC-THESIS"
+$cmd = "cmd.exe /c `"cd /d $root && set PYTHONIOENCODING=utf-8 && .venv\Scripts\python.exe -m nycemis experiment run --exp <EXP> --workers <N> >> results\logs\<EXP>.log 2>&1`""
+Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $root }
 ```
+
+| Job | Started | Log | Notes |
+|---|---|---|---|
+| pilot (105 runs) | 2026-11-15 19:26 | `results/logs/pilot.log` | 75/105 at 19:41; the 30 legacy_ml runs remain (at most 5 at a time, about 4 GB each) |
+| dataset (432 runs) | 2026-11-15 19:41 | `results/logs/dataset.log` | 6 workers while the pilot finishes |
+| net fetch midtown, dtbk | 2026-11-15 19:26 | `results/logs/fetch_<s>.log` | Overpass returns 502/504; retries for up to 240 min each |
+
+Progress: `python -m nycemis experiment status --exp <EXP>`. A stopped executor resumes where it left off (runs
+with a `DONE` marker are skipped; partial run directories are removed and rerun).
+
+## Machine facts that matter for scheduling
+
+- One simulation process commits about 1.1 GB; a legacy_ml process about 4.5 GB. The executor trims its pools to
+  the available commit memory and runs at most 5 legacy_ml at a time.
+- With the Windows "Balanced" power plan, 15 of 24 logical processors were parked under load (2026-11-15 19:38):
+  about 9 cores do the work, whatever the worker count. Switching Windows to the "Best performance" power mode would
+  likely unpark them; that is a Windows power setting.
+- E: is a spinning disk; I/O was not a bottleneck (under 1% busy).
+
+## Next steps (in order)
+
+1. When the pilot is DONE: `python -m nycemis analyze-pilot` (variance, power, budget, alpha = 0 sanity, legacy
+   replication; renders the pilot report, the audit's section 5, the interim note and the preregistration draft).
+   Check G4, commit.
+2. When the dataset is DONE: `python -m nycemis train --model-id gbm_v1` (30-trial search; writes the model card).
+   Tag `model-freeze-v1`.
+3. `python -m nycemis experiment plan --exp validation` and run it; then `python -m nycemis select`
+   (alpha*_reactive, alpha*_ml, eta). G5.
+4. Write `configs/experiments/confirmatory.yaml` from the selection, finalise the preregistration, tag
+   `prereg-v1`, run the confirmatory seeds (n from the pilot), then `python -m nycemis analyze` (M7).
 
 ## Gates
 
-| Gate | Requirement | Evidence | Done |
-|---|---|---|---|
-| G0 | doctor green | all required checks green except `overpass`, which is intermittent (server-side 502/504; Flushing downloaded at 00:42 on 2026-11-15) | partly |
-| G0 | `docs/LEGACY_AUDIT.md` complete | generated, 12 claims; replication section pending (M4) | yes |
-| G1 | `network_report.md` per scenario | `data/networks/flushing/network_report.md` PASS (2,316 edges, 176 signals, 96.2% in the largest SCC, 92.5% of lane-km inside the box); smoke PASS; midtown and dtbk pending download | partly |
-| G1 | headless run clean, GUI command documented | 300 s smoke runs: 0 errors; `sumo-gui -c scenarios/flushing/flushing.sumocfg`; the colour-scheme indices await a visual check with an active display | partly |
-| G2 | `configs/demand_levels.yaml` with evidence; unroutable trips = 0 | light 10.0, moderate 16.0, heavy 20.75 veh/h/km (relative speed ratio 0.947 / 0.849 / 0.719, all pilot seeds valid); `results/calibration/flushing/`; every route file reports 0 unroutable | yes |
-| G3 | tests green on smoke and one Flushing run; `SUMO_API_NOTES.md` complete | `pytest`: 53 passed (API contract, determinism, libsumo vs TraCI, logging neutrality, reconciliation, shadow-mode parity, alpha = 0 sanity on smoke, artifact demonstration, poison test); `results/runs/timing`: one Flushing heavy run per controller type, all valid | yes |
+| Gate | Status | Evidence |
+|---|---|---|
+| G0 | done except doctor's Overpass check (server-side, intermittent) | `docs/LEGACY_AUDIT.md`; `python -m nycemis doctor` |
+| G1 | Flushing and smoke done; midtown and dtbk wait for the Overpass API | `data/networks/<s>/network_report.md` |
+| G2 | done | `configs/demand_levels.yaml`, `results/calibration/flushing/` |
+| G3 | done | 61 tests pass (`pytest`), including API contract, determinism, libsumo vs TraCI, reconciliation, shadow parity, alpha = 0 sanity on smoke, poison test, statistics |
+| G4 | pending pilot | `results/pilot/` |
 
-## Key decisions so far (details in docs/DEVIATIONS.md)
+## Decisions so far
 
-1-3 environment; 4-5 OSM download filter and clip; 6 `--ignore-junction-blocker 30` in the protocol;
-7 junction join 20 m; 8 levels on the relative speed ratio; 9 reconciliation tolerance 0.5% for pilot runs
-(the partial arrival step is not observable through TraCI).
-
-## Measured costs (Flushing heavy, 1 run each, 2026-11-15)
-
-static 80 s; tt_adaptive 96 s; random_reroute, eco_reactive, eco_ml (toy model) about 110 s; legacy_ml 569 s (toy
-predictor; 1.6 million findRoute calls).
-
-## Next
-
-M4: legacy RF training data (static, train seeds 0-1), legacy RF and its triviality tests, the pilot (5 pilot seeds x
-3 levels), power analysis, budget, preregistration draft, interim note.
+`docs/DEVIATIONS.md` #1-#9. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
+20 m (#7), levels on the relative speed ratio (#8), reconciliation tolerance 0.5% for pilot runs (#9).
