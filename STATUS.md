@@ -6,7 +6,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
 - **Current milestone:** M5 (forecaster and alpha*). G4 passed (pilot complete, n = 60). The dataset experiment
   is complete (432/432, verified). The first gbm_v1 (r on log1p) was set aside before use (DEVIATIONS #14) and is
   being retrained; the validation runs that do not need it are running.
-- **Last updated:** 2026-11-15 23:22 (all jobs stopped for a PC shutdown; see below to resume).
+- **Last updated:** 2026-11-16 18:55 (jobs relaunched after a PC shutdown).
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -18,13 +18,15 @@ $cmd = "cmd.exe /c `"cd /d $root && set PYTHONIOENCODING=utf-8 && .venv\Scripts\
 Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $root }
 ```
 
-**No job is running.** All jobs were stopped on 2026-11-15 at 23:21 for a PC shutdown:
+Relaunched on 2026-11-16 at 18:51 after the PC shutdown (stopped 2026-11-15 23:21):
 
-| Job | State at stop | Log | Resume |
+| Job | Started | Log | Notes |
 |---|---|---|---|
-| train gbm_v1 (r on its own scale, DEVIATIONS #14) | target v, trial 10 of 30; nothing written (training writes only at the end) | `results/logs/train_gbm_v1_r_raw.log` | not resumable: rerun from scratch (about 1 h with all cores, 1.5 h with `--n-jobs 8`) |
-| validation, pass 1 (432 runs: static, tt_adaptive, eco_reactive, random_reroute) | 143 of 432 DONE | `results/logs/validation.log` | resumable: DONE runs are skipped, partial run directories are removed and rerun |
-| net fetch dtbk | still failing (Overpass 502/504) | `results/logs/fetch_dtbk.log` | rerun the fetch |
+| train gbm_v1 (r on its own scale, DEVIATIONS #14) | 2026-11-16 18:51 | `results/logs/train_gbm_v1_r_raw.log` | `--n-jobs 8`; from scratch (not resumable); about 1.5 h |
+| validation, pass 1 (static, tt_adaptive, eco_reactive, random_reroute) | 2026-11-16 18:51 | `results/logs/validation.log` | 143 of 432 were DONE; 289 to run on 10 workers (memory guard) |
+| net fetch dtbk | 2026-11-16 18:51 | `results/logs/fetch_dtbk.log` | Overpass 502/504 so far; retries for up to 240 min |
+
+If they are stopped again, resume with the commands below (DONE validation runs are skipped; training restarts).
 
 To resume, from the repository root in PowerShell (the same three jobs, detached):
 
