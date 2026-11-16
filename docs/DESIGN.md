@@ -112,7 +112,7 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
   is rebuilt deterministically by `python -m nycemis train-legacy` / `train` (fixed seeds).
 - **Legacy RF training data**: 642,472 rows (the legacy data frame's size) drawn at random (seed 42) from the
   per-vehicle-step records of static runs on train seeds 0-1, all three levels.
-- **Forecaster**: LightGBM per target (r and d on log1p, v raw), random search of 30 trials with early stopping
+- **Forecaster**: LightGBM per target (r and v on their own scale, so conditional means; d on log1p; DEVIATIONS #14), random search of 30 trials with early stopping
   on validation seeds; training rows subsampled uniformly per run (fraction in the manifest).
 - **alpha* rule** (fixed before test seeds; `src/nycemis/experiments/select.py`): feasible if mean travel time is
   at most 5% above tt_adaptive's at every level; among feasible alphas, minimise the mean over levels of total NOx

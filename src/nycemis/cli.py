@@ -168,11 +168,13 @@ def exp_plan(exp: str = typer.Option(..., "--exp")) -> None:
 
 
 @exp_app.command("run")
-def exp_run(exp: str = typer.Option(..., "--exp"), workers: int = typer.Option(0)) -> None:
+def exp_run(exp: str = typer.Option(..., "--exp"), workers: int = typer.Option(0),
+            controllers: str = typer.Option("", help="comma-separated controllers to run in this pass")) -> None:
     """Run every planned run that is not DONE (resumable)."""
     from nycemis.experiments.execute import run_experiment
 
-    typer.echo(json.dumps(run_experiment(exp, workers or None)))
+    only = {c.strip() for c in controllers.split(",") if c.strip()} or None
+    typer.echo(json.dumps(run_experiment(exp, workers or None, controllers=only)))
 
 
 @exp_app.command("status")

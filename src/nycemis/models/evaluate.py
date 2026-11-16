@@ -5,8 +5,9 @@ Baselines (all use only information available at decision time):
   historical mean when window k was empty; v from the window speed, the limit when empty),
 - EMA: weights 0.5, 0.3, 0.2 on windows k, k-1, k-2,
 - historical mean: the per-edge mean of the training rows,
-- Ridge: linear regression on F1 (standardised), fitted on the training rows.
-Metrics: MAE, RMSE, R2, Spearman per target; hotspot PR-AUC, F1 at the frozen threshold, precision at the top 1%
+- Ridge: linear regression on F1 (standardised), fitted on the training rows (r and v raw, d on log1p, as the model).
+Metrics: MAE, RMSE, R2, Spearman per target; calibration as the mean ratio (mean prediction / mean truth) and the
+calibration slope (least-squares slope of truth on prediction; 1 is calibrated, above 1 means too little spread); hotspot PR-AUC, F1 at the frozen threshold, precision at the top 1%
 and 5% of edges per tick. Intervals: cluster bootstrap over runs (1,000 resamples, fixed seed).
 """
 
@@ -50,10 +51,10 @@ def baseline_predictions(df: pd.DataFrame, train: pd.DataFrame) -> dict[str, dic
     ridge = {}
     for t, col in (("r", "r_next"), ("v", "v_next"), ("d", "d_next")):
         m = train[col].notna()
-        y = np.log1p(train.loc[m, col]) if t in ("r", "d") else train.loc[m, col]
+        y = np.log1p(train.loc[m, col]) if t == "d" else train.loc[m, col]
         model = make_pipeline(StandardScaler(), Ridge(alpha=1.0)).fit(train.loc[m, names].to_numpy(np.float32), y)
         pred = model.predict(df[names].to_numpy(np.float32))
-        ridge[t] = np.maximum(np.expm1(pred), 0) if t in ("r", "d") else pred
+        ridge[t] = np.maximum(np.expm1(pred), 0) if t == "d" else pred
     return {
         "persistence": {"r": r_pers, "v": v_lags[:, 0], "d": d_lags[:, 0]},
         "ema": {"r": r_ema, "v": v_lags @ w, "d": d_lags @ w},
@@ -65,8 +66,11 @@ def baseline_predictions(df: pd.DataFrame, train: pd.DataFrame) -> dict[str, dic
 def _reg_metrics(y: np.ndarray, p: np.ndarray) -> dict:
     err = p - y
     ss = float(((y - y.mean()) ** 2).sum())
+    var_p = float(((p - p.mean()) ** 2).sum())
     return {"mae": float(np.abs(err).mean()), "rmse": float(np.sqrt((err ** 2).mean())),
             "r2": float(1 - (err ** 2).sum() / ss) if ss > 0 else float("nan"),
+            "mean_ratio": float(p.mean() / y.mean()) if y.mean() != 0 else float("nan"),
+            "calib_slope": float(((p - p.mean()) * (y - y.mean())).sum() / var_p) if var_p > 0 else float("nan"),
             "spearman": float(stats.spearmanr(y, p).statistic) if len(y) > 2 else float("nan"), "n": int(len(y))}
 
 

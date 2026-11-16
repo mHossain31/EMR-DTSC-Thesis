@@ -97,7 +97,10 @@ def _memory_guard(general: int, limited: dict[str, int]) -> int:
     return general
 
 
-def run_experiment(name: str, workers: int | None = None, timeout_s: float | None = None) -> dict:
+def run_experiment(name: str, workers: int | None = None, timeout_s: float | None = None,
+                   controllers: set[str] | None = None) -> dict:
+    """Run every planned run that is not DONE; ``controllers`` restricts this pass to those controllers (the rest
+    stay planned for a later pass)."""
     cfg = base_config().execution
     workers = workers or cfg.workers or max(1, (os.cpu_count() or 2) - 1)
     timeout_s = timeout_s or 60.0 * max(cfg.run_timeout_min_floor, 60)
@@ -106,7 +109,7 @@ def run_experiment(name: str, workers: int | None = None, timeout_s: float | Non
     todo = []
     for r in doc["runs"]:
         rdir = d / r["run_id"]
-        if (rdir / "DONE").is_file():
+        if (rdir / "DONE").is_file() or (controllers and r["spec"]["controller"] not in controllers):
             continue
         if rdir.exists():  # a partial earlier attempt: start clean
             shutil.rmtree(rdir)

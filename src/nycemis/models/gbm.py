@@ -1,7 +1,8 @@
 """The forecaster served to C4 (docs/SPECIFICATION.md 7.3, 7.5): LightGBM regressors on F1 features.
 
-``r`` (NOx mg per vehicle-second in window k+1) and ``d`` (NOx mg per lane-metre in window k+1) are modelled on the
-log1p scale; ``v`` (mean speed, m/s) on its own scale. ``predict`` returns (r_hat, v_hat) for the controller;
+``r`` (NOx mg per vehicle-second in window k+1) and ``v`` (mean speed, m/s) are modelled on their own scale with
+squared error, so the forecasts estimate conditional means, which is what the controller's expected emission cost
+needs (DEVIATIONS #14); ``d`` (NOx mg per lane-metre in window k+1) is modelled on the log1p scale (docs/SPECIFICATION.md 7.1). ``predict`` returns (r_hat, v_hat) for the controller;
 ``predict_density`` returns d_hat for the hotspot evaluation. If LightGBM cannot be imported, scikit-learn's
 HistGradientBoostingRegressor is used and a WARNING is logged (docs/SPECIFICATION.md 7.3).
 """
@@ -31,6 +32,7 @@ class GBMForecaster:
     params: dict = field(default_factory=dict)
     backend: str = "lightgbm"
     hotspot_threshold: float | None = None  # d_next value (mg per lane-metre) above which an edge-window is a hotspot
+    r_scale: str = "raw"  # "raw" or "log1p" (models frozen before DEVIATIONS #14)
 
     def _x(self, x: np.ndarray) -> np.ndarray:
         x = np.asarray(x, dtype=np.float32)
@@ -40,7 +42,10 @@ class GBMForecaster:
 
     def predict(self, x: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         x = self._x(x)
-        r = np.expm1(self.models["r"].predict(x))
+        r = self.models["r"].predict(x)
+        # A pickle frozen before r_scale existed has no instance attribute (the class default would read "raw").
+        if self.__dict__.get("r_scale", "log1p") == "log1p":
+            r = np.expm1(r)
         v = self.models["v"].predict(x)
         return np.maximum(r, 0.0), np.maximum(v, 0.1)
 

@@ -3,7 +3,8 @@
 Data: ``edge_window`` rows of the dataset experiments (mixed behaviour policies), train seeds for fitting and
 validation seeds for early stopping and the random search; test seeds are never read here (asserted). Rows are
 subsampled uniformly per run with a fixed seed to bound memory; the fraction is recorded.
-Targets: r_next (masked below 10 vehicle-seconds), v_next (masked on empty windows), d_next (all rows; log1p).
+Targets: r_next (masked below 10 vehicle-seconds) and v_next (masked on empty windows) on their own scale, so the
+squared-error fit estimates conditional means (DEVIATIONS #14); d_next (all rows) on log1p (docs/SPECIFICATION.md 7.1).
 The hotspot threshold is the 95th percentile of d_next over non-empty training edge-windows.
 """
 
@@ -61,7 +62,7 @@ def target_arrays(df: pd.DataFrame, target: str) -> tuple[np.ndarray, np.ndarray
     names = feature_names("F1")
     if target == "r":
         m = df.r_next.notna().to_numpy()
-        return df.loc[m, names].to_numpy(np.float32), np.log1p(df.loc[m, "r_next"].to_numpy())
+        return df.loc[m, names].to_numpy(np.float32), df.loc[m, "r_next"].to_numpy()
     if target == "v":
         m = df.v_next.notna().to_numpy()
         return df.loc[m, names].to_numpy(np.float32), df.loc[m, "v_next"].to_numpy()
@@ -125,7 +126,8 @@ def freeze(scenario: str, model_id: str, experiments: list[str], sample_frac: fl
         if hasattr(m, "set_params"):
             m.set_params(n_jobs=1)  # serving: one core per simulation process
     fc = GBMForecaster(feature_set="F1", feature_names=names, models=models, params=best,
-                       backend="lightgbm" if HAVE_LGB else "sklearn-hgb", hotspot_threshold=threshold)
+                       backend="lightgbm" if HAVE_LGB else "sklearn-hgb", hotspot_threshold=threshold,
+                       r_scale="raw")
     out = models_dir() / scenario / model_id
     out.mkdir(parents=True, exist_ok=True)
     joblib.dump(fc, out / "model.joblib", compress=3)

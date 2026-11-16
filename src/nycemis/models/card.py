@@ -16,8 +16,10 @@ def write_card(scenario: str, model_id: str, manifest: dict, ev: dict, where: st
     rows = []
     for name in reg:
         r = reg[name]
-        rows.append(f"| {name} | {r['r']['mae']:.3f} | {r['r']['r2']:.3f} | {r['v']['mae']:.3f} | {r['v']['r2']:.3f} | "
-                    f"{r['d']['mae']:.4f} | {hot[name]['pr_auc']:.3f} | {hot[name]['precision_top5pct']:.3f} |")
+        rows.append(f"| {name} | {r['r']['mae']:.3f} | {r['r']['r2']:.3f} | {r['r']['mean_ratio']:.3f} | "
+                    f"{r['r']['calib_slope']:.3f} | {r['v']['mae']:.3f} | {r['v']['r2']:.3f} | "
+                    f"{r['v']['calib_slope']:.3f} | {r['d']['mae']:.4f} | {hot[name]['pr_auc']:.3f} | "
+                    f"{hot[name]['precision_top5pct']:.3f} |")
     skill = [f"| {k} | {v['ci95_low']:+.3f} to {v['ci95_high']:+.3f} |" for k, v in ev["bootstrap"].items()]
     text = "\n".join([
         f"# Model card: {model_id} ({scenario})", "",
@@ -25,7 +27,8 @@ def write_card(scenario: str, model_id: str, manifest: dict, ev: dict, where: st
         "- Task: forecast, for every edge, the next 60 s window's NOx per vehicle-second (r, mg/veh-s) and mean "
         "speed (v, m/s), from F1 traffic-state features only (no emission information); a third model forecasts "
         "NOx density (d, mg per lane-metre) for the hotspot evaluation.",
-        f"- Model: {manifest['backend']} gradient-boosted trees; r and d on the log1p scale; best parameters per "
+        f"- Model: {manifest['backend']} gradient-boosted trees; r and v on their own scale (squared error, so "
+        "conditional means), d on the log1p scale; best parameters per "
         f"target from {manifest['search_trials']} random-search trials with early stopping on validation seeds.",
         f"- Data: dataset experiment(s) {', '.join(manifest['experiments'])}; train seeds {manifest['train_seeds'][0]}-"
         f"{manifest['train_seeds'][-1]}, validation seeds {manifest['validation_seeds'][0]}-"
@@ -34,8 +37,11 @@ def write_card(scenario: str, model_id: str, manifest: dict, ev: dict, where: st
         f"- Hotspot threshold: {manifest['hotspot_threshold_mg_per_lane_m']:.4f} mg per lane-metre per window (95th "
         "percentile of non-empty training edge-windows).",
         f"- Evaluated on: {where}.", "",
-        "| Predictor | r MAE | r R2 | v MAE | v R2 | d MAE | hotspot PR-AUC | precision top 5% |",
-        "|---|---|---|---|---|---|---|---|", *rows, "",
+        "| Predictor | r MAE | r R2 | r mean ratio | r calib. slope | v MAE | v R2 | v calib. slope | d MAE | "
+        "hotspot PR-AUC | precision top 5% |",
+        "|---|---|---|---|---|---|---|---|---|---|---|", *rows, "",
+        "Mean ratio = mean prediction / mean truth; calibration slope = least-squares slope of truth on prediction "
+        "(1 is calibrated).", "",
         "Skill = 1 - MAE(model) / MAE(baseline), 95% cluster-bootstrap interval over runs:", "",
         "| Skill | 95% interval |", "|---|---|", *skill, "",
         "Limitations: simulated traffic and emissions (see docs/LIMITATIONS.md); the r target depends on the fleet "
