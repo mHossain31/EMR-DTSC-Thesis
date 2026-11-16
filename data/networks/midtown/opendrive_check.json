@@ -1,0 +1,32 @@
+{
+  "scenario": "midtown",
+  "variants": [
+    {
+      "variant": "plain",
+      "options": [
+        "--output.original-names"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 9783480,
+      "warnings_count": 34,
+      "errors": [],
+      "file": "data/networks/midtown/midtown.plain.xodr"
+    },
+    {
+      "variant": "scurve",
+      "options": [
+        "--output.original-names",
+        "--junctions.scurve-stretch",
+        "1.0"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 9783086,
+      "warnings_count": 34,
+      "errors": [],
+      "file": "data/networks/midtown/midtown.scurve.xodr"
+    }
+  ],
+  "ok": true
+}

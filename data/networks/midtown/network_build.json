@@ -1,0 +1,91 @@
+{
+  "scenario": "midtown",
+  "command": [
+    "${SUMO_HOME}/bin/netconvert.exe",
+    "--type-files",
+    "${SUMO_HOME}/data/typemap/osmNetconvert.typ.xml",
+    "--geometry.remove",
+    "--ramps.guess",
+    "--junctions.join",
+    "--tls.guess-signals",
+    "--tls.discard-simple",
+    "--tls.join",
+    "--output.original-names",
+    "--output.street-names",
+    "--tls.default-type",
+    "actuated",
+    "--osm-files",
+    "data/osm/midtown.osm.xml.gz",
+    "--keep-edges.by-vclass",
+    "passenger",
+    "--keep-edges.components",
+    "1",
+    "--junctions.join-dist",
+    "20",
+    "--keep-edges.in-geo-boundary",
+    "-73.995000,40.745000,-73.965000,40.765000",
+    "--output-file",
+    "scenarios/midtown/midtown.net.xml.gz"
+  ],
+  "sumo_version": "1.28.0",
+  "seconds": 1.67,
+  "net_file": "scenarios/midtown/midtown.net.xml.gz",
+  "net_sha256": "a8d1ed279895948be217241cf447d363a05bff663d0a63a9236a515a8c1a15bb",
+  "warnings_count": 139,
+  "warnings_sample": [
+    "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '5673063'.",
+    "Warning: Using default width for edge '5673511' as value '32'0\"' could not be parsed.",
+    "Warning: Using default width for edge '23048548' as value '11'' could not be parsed.",
+    "Warning: Unknown lane use specifier '' ignored for way '226041033'",
+    "Warning: Unknown lane use specifier '' ignored for way '226041033'",
+    "Warning: Unknown lane use specifier '' ignored for way '324118553'",
+    "Warning: Unknown lane use specifier '' ignored for way '324118553'",
+    "Warning: Unknown lane use specifier '' ignored for way '324118553'",
+    "Warning: Using default width for edge '460585328' as value '69'6\"' could not be parsed.",
+    "Warning: Using default width for edge '965833822' as value '33'4\"' could not be parsed.",
+    "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '988977545'.",
+    "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '1106482765'.",
+    "Warning: Using default width for edge '1308875366' as value '69'6\"' could not be parsed.",
+    "Warning: Value of key 'maxspeed:type' is not numeric ('US-NY:urban') in edge '1531454920'.",
+    "Warning: Discarding unknown compound 'bus' in type 'bus|highway.service' (first occurrence for edge '5669332').",
+    "Warning: Discarding unknown compound 'cycleway.track' in type 'cycleway.track|highway.residential' (first occurrence for edge '5670197').",
+    "Warning: Discarding unknown compound 'cycleway.track' in type 'cycleway.track|highway.primary' (first occurrence for edge '5671276').",
+    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.tertiary' (first occurrence for edge '5671317').",
+    "Warning: Discarding unknown compound 'cycleway.lane' in type 'cycleway.lane|highway.residential' (first occurrence for edge '5671629').",
+    "Warning: New value for oneway found: reversible"
+  ],
+  "osm_extract": "data/osm/midtown.osm.xml.gz",
+  "osm_sha256": "7c6a4d680c30422bb221fe129400bc5ce670e6702a2acd5c99fae03d4b6ae5ba",
+  "typemap": "osmNetconvert.typ.xml",
+  "osmBuild_DEFAULT_NETCONVERT_OPTS": [
+    "--geometry.remove",
+    "--ramps.guess",
+    "--junctions.join",
+    "--tls.guess-signals",
+    "--tls.discard-simple",
+    "--tls.join",
+    "--output.original-names",
+    "--output.street-names"
+  ],
+  "wizard_additions": [
+    "--tls.default-type",
+    "actuated"
+  ],
+  "vehicle_class_mode": "passenger",
+  "vehicle_class_options": [
+    "--keep-edges.by-vclass",
+    "passenger"
+  ],
+  "extra_options": [
+    "--keep-edges.components",
+    "1"
+  ],
+  "repair_options": [
+    "--junctions.join-dist",
+    "20"
+  ],
+  "clip_option": [
+    "--keep-edges.in-geo-boundary",
+    "bbox of the scenario config"
+  ]
+}

@@ -113,7 +113,44 @@ def build_osm(cfg: ScenarioConfig) -> dict:
         "--output-file", str(out),
     ]
     opts = {**opts, "clip_option": ["--keep-edges.in-geo-boundary", "bbox of the scenario config"]}
-    return _finish(cfg, cmd, out, {"osm_extract": rel(src), "osm_sha256": manifest.sha256_file(src), **opts})
+    record = _finish(cfg, cmd, out, {"osm_extract": rel(src), "osm_sha256": manifest.sha256_file(src), **opts})
+    if cfg.keep_largest_scc:
+        record = _keep_largest_scc(cfg, out, record)
+    return record
+
+
+def _keep_largest_scc(cfg: ScenarioConfig, net_file: Path, record: dict) -> dict:
+    """Second pass: keep only the largest strongly connected component (enabled per scenario, e.g. a one-way grid
+    clipped at the box edge, where one-way streets leading out of the box can never be left again)."""
+    import networkx as nx
+    import sumolib
+
+    net = sumolib.net.readNet(str(net_file))
+    g = nx.DiGraph()
+    for e in net.getEdges():
+        if e.getFunction() == "internal":
+            continue
+        g.add_node(e.getID())
+        for succ in e.getOutgoing():
+            if succ.getFunction() != "internal":
+                g.add_edge(e.getID(), succ.getID())
+    largest = max(nx.strongly_connected_components(g), key=len)
+    keep = report_dir(cfg.id) / "largest_scc_edges.txt"
+    keep.parent.mkdir(parents=True, exist_ok=True)
+    keep.write_text("\n".join(sorted(largest)) + "\n", encoding="utf-8")
+    tmp = net_file.with_name(net_file.name.replace(".net.xml.gz", ".full.net.xml.gz"))
+    net_file.replace(tmp)
+    cmd = [str(env.sumo_binary("netconvert")), "--sumo-net-file", str(tmp), "--keep-edges.input-file", str(keep),
+           "--output-file", str(net_file)]
+    _run(cmd, cwd=repo_root())
+    tmp.unlink()
+    record.update({"scc_pass": {"command": _relcmd(cmd), "edges_before": g.number_of_nodes(),
+                                "edges_kept": len(largest)},
+                   "net_sha256": manifest.sha256_file(net_file)})
+    (report_dir(cfg.id) / "network_build.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    manifest.record(net_file, kind="network", scenario=cfg.id, sumo_version=record["sumo_version"])
+    log.info("kept the largest strongly connected component: %d of %d edges", len(largest), g.number_of_nodes())
+    return record
 
 
 def build_grid(cfg: ScenarioConfig) -> dict:

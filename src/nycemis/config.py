@@ -149,6 +149,7 @@ class ScenarioConfig(Strict):
     source: str
     bbox: tuple[float, float, float, float] | None = None  # west, south, east, north
     grid: GridSpec | None = None
+    keep_largest_scc: bool = False  # second netconvert pass keeping the largest strongly connected component
 
     @model_validator(mode="after")
     def _source(self) -> ScenarioConfig:

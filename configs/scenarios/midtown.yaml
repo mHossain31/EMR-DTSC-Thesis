@@ -1,6 +1,10 @@
 # Midtown Manhattan (dense one-way grid). Tier 2. docs/SPECIFICATION.md 6.3.
+# The initial box (-73.995, 40.745, -73.965, 40.765) gave 1,078 edges, below the 1,500 the validation requires;
+# enlarged per docs/SPECIFICATION.md 6.2 step 3 (DEVIATIONS #10). keep_largest_scc: the one-way grid clipped at the box edge
+# leaves one-way streets that lead out and cannot be left again (DEVIATIONS #11).
 id: midtown
 name: Midtown Manhattan
 role: tier2
 source: osm
-bbox: [-73.995, 40.745, -73.965, 40.765]
+bbox: [-74.000, 40.740, -73.960, 40.770]
+keep_largest_scc: true

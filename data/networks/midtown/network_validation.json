@@ -1,0 +1,78 @@
+{
+  "ok": false,
+  "checks": {
+    "bbox_match": {
+      "ok": true,
+      "detail": "net covers the box shrunk by 5%: True; 90.9% of lane-km inside the box (minimum 90%); net lon/lat extent (-73.9975, 40.7409, -73.9537, 40.7656); box (-73.995, 40.745, -73.965, 40.765)"
+    },
+    "edge_count": {
+      "ok": false,
+      "detail": "1078 non-internal edges (allowed 1500-20000)"
+    },
+    "traffic_lights": {
+      "ok": true,
+      "detail": "340 signalised junctions"
+    },
+    "strong_connectivity": {
+      "ok": false,
+      "detail": "largest strongly connected component holds 83.9% of edges (174 components; minimum 90%)"
+    },
+    "dead_end_share": {
+      "ok": true,
+      "detail": "44 edges without a successor (4.1%); reported, not gated"
+    },
+    "no_zero_length_edges": {
+      "ok": true,
+      "detail": "0 edges shorter than 0.1 m"
+    }
+  },
+  "stats": {
+    "lane_km_inside_bbox_share": 0.9089,
+    "edges": 1078,
+    "nodes": 674,
+    "lane_km": 217.61,
+    "traffic_lights": 340,
+    "largest_scc_edges": 904,
+    "largest_scc_share": 0.8386,
+    "scc_count": 174,
+    "weak_components": 2,
+    "dead_end_edges": 44,
+    "dead_end_share": 0.0408,
+    "source_edges": 47,
+    "speed_limits_kmh": {
+      "10": 5,
+      "16": 9,
+      "40": 655,
+      "48": 1,
+      "50": 139,
+      "64": 11,
+      "80": 42,
+      "100": 208,
+      "142": 8
+    },
+    "road_class_edges": {
+      "primary/secondary": 691,
+      "residential/service": 312,
+      "tertiary": 25,
+      "motorway/trunk": 50
+    },
+    "road_class_lane_km": {
+      "primary/secondary": 144.18,
+      "residential/service": 50.68,
+      "tertiary": 3.18,
+      "motorway/trunk": 19.57
+    },
+    "edge_types": {
+      "highway.secondary": 372,
+      "highway.primary": 315,
+      "highway.residential": 268,
+      "highway.unclassified": 31,
+      "highway.motorway_link": 31,
+      "highway.tertiary": 24,
+      "highway.motorway": 19,
+      "highway.living_street": 13,
+      "highway.primary_link": 4,
+      "highway.tertiary_link": 1
+    }
+  }
+}

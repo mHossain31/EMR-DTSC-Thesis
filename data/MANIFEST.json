@@ -8,11 +8,26 @@
       "endpoint": "https://overpass-api.de/api/interpreter",
       "osm_base": "2026-11-15T05:40:50Z"
     },
+    "data/osm/midtown.osm.xml.gz": {
+      "sha256": "7c6a4d680c30422bb221fe129400bc5ce670e6702a2acd5c99fae03d4b6ae5ba",
+      "bytes": 263294,
+      "kind": "osm_extract",
+      "scenario": "midtown",
+      "endpoint": "https://overpass-api.de/api/interpreter",
+      "osm_base": "2026-11-16T01:07:49Z"
+    },
     "scenarios/flushing/flushing.net.xml.gz": {
       "sha256": "1c6a057c9557a8583847fc25e53c179cc2e0e8177dc3ec0e1f3b3b856dbb6f29",
       "bytes": 976700,
       "kind": "network",
       "scenario": "flushing",
+      "sumo_version": "1.28.0"
+    },
+    "scenarios/midtown/midtown.net.xml.gz": {
+      "sha256": "a8d1ed279895948be217241cf447d363a05bff663d0a63a9236a515a8c1a15bb",
+      "bytes": 527321,
+      "kind": "network",
+      "scenario": "midtown",
       "sumo_version": "1.28.0"
     },
     "scenarios/smoke/smoke.net.xml.gz": {
