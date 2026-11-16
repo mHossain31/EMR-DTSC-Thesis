@@ -6,7 +6,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
 - **Current milestone:** M5 (forecaster and alpha*). G4 passed (pilot complete, n = 60). The dataset experiment
   is complete (432/432, verified). The first gbm_v1 (r on log1p) was set aside before use (DEVIATIONS #14) and is
   being retrained; the validation runs that do not need it are running.
-- **Last updated:** 2026-11-15 23:05.
+- **Last updated:** 2026-11-15 23:22 (all jobs stopped for a PC shutdown; see below to resume).
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -18,11 +18,26 @@ $cmd = "cmd.exe /c `"cd /d $root && set PYTHONIOENCODING=utf-8 && .venv\Scripts\
 Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $root }
 ```
 
-| Job | Started | Log | Notes |
+**No job is running.** All jobs were stopped on 2026-11-15 at 23:21 for a PC shutdown:
+
+| Job | State at stop | Log | Resume |
 |---|---|---|---|
-| train gbm_v1 (r on its own scale, DEVIATIONS #14) | 2026-11-15 23:02 | `results/logs/train_gbm_v1_r_raw.log` | `--n-jobs 8` while validation runs; about 1-1.5 h; not resumable (rerun from scratch) |
-| validation, pass 1 (432 runs: static, tt_adaptive, eco_reactive, random_reroute) | 2026-11-15 23:02 | `results/logs/validation.log` | 14 workers; the 180 eco_ml runs wait for the retrained gbm_v1 (`--controllers eco_ml`) |
-| net fetch dtbk | 2026-11-15 19:26 | `results/logs/fetch_dtbk.log` | Overpass returns 502/504; retries for up to 240 min |
+| train gbm_v1 (r on its own scale, DEVIATIONS #14) | target v, trial 10 of 30; nothing written (training writes only at the end) | `results/logs/train_gbm_v1_r_raw.log` | not resumable: rerun from scratch (about 1 h with all cores, 1.5 h with `--n-jobs 8`) |
+| validation, pass 1 (432 runs: static, tt_adaptive, eco_reactive, random_reroute) | 143 of 432 DONE | `results/logs/validation.log` | resumable: DONE runs are skipped, partial run directories are removed and rerun |
+| net fetch dtbk | still failing (Overpass 502/504) | `results/logs/fetch_dtbk.log` | rerun the fetch |
+
+To resume, from the repository root in PowerShell (the same three jobs, detached):
+
+```powershell
+$root = (Get-Location).Path
+function Start-Detached($args_, $log) {
+  $cmd = "cmd.exe /c `"cd /d $root && set PYTHONIOENCODING=utf-8 && .venv\Scripts\python.exe -m nycemis $args_ >> results\logs\$log 2>&1`""
+  Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $root }
+}
+Start-Detached "train --scenario flushing --model-id gbm_v1 --exp dataset --n-jobs 8" "train_gbm_v1_r_raw.log"
+Start-Detached "experiment run --exp validation --workers 14 --controllers static,tt_adaptive,eco_reactive,random_reroute" "validation.log"
+Start-Detached "net fetch --scenario dtbk --max-wait-min 240" "fetch_dtbk.log"
+```
 
 Progress: `python -m nycemis experiment status --exp <EXP>`. A stopped executor resumes where it left off (runs
 with a `DONE` marker are skipped; partial run directories are removed and rerun).
