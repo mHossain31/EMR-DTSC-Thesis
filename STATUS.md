@@ -4,8 +4,9 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
 `docs/SPECIFICATION.md` for the current milestone.
 
 - **Current milestone:** M5 (forecaster and alpha*). G4 passed (pilot complete, n = 60). The dataset experiment
-  is complete (432/432, verified); the forecaster `gbm_v1` is training.
-- **Last updated:** 2026-11-15 21:35.
+  is complete (432/432, verified). The first gbm_v1 (r on log1p) was set aside before use (DEVIATIONS #14) and is
+  being retrained; the validation runs that do not need it are running.
+- **Last updated:** 2026-11-15 23:05.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -19,7 +20,8 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 
 | Job | Started | Log | Notes |
 |---|---|---|---|
-| train gbm_v1 | 2026-11-15 21:30 | `results/logs/train_gbm_v1.log` | `python -m nycemis train --model-id gbm_v1 --exp dataset`; 30 trials x 3 targets, about 1 h; not resumable (rerun from scratch) |
+| train gbm_v1 (r on its own scale, DEVIATIONS #14) | 2026-11-15 23:02 | `results/logs/train_gbm_v1_r_raw.log` | `--n-jobs 8` while validation runs; about 1-1.5 h; not resumable (rerun from scratch) |
+| validation, pass 1 (432 runs: static, tt_adaptive, eco_reactive, random_reroute) | 2026-11-15 23:02 | `results/logs/validation.log` | 14 workers; the 180 eco_ml runs wait for the retrained gbm_v1 (`--controllers eco_ml`) |
 | net fetch dtbk | 2026-11-15 19:26 | `results/logs/fetch_dtbk.log` | Overpass returns 502/504; retries for up to 240 min |
 
 Progress: `python -m nycemis experiment status --exp <EXP>`. A stopped executor resumes where it left off (runs
@@ -36,8 +38,9 @@ with a `DONE` marker are skipped; partial run directories are removed and rerun)
 
 ## Next steps (in order)
 
-1. When training ends: read `models/flushing/gbm_v1/model_card.md`, commit, tag `model-freeze-v1`.
-2. `python -m nycemis experiment run --exp validation` (planned: 612 runs), detached; then
+1. When training ends: read `models/flushing/gbm_v1/model_card.md` (check the r calibration), commit, tag
+   `model-freeze-v1`.
+2. `python -m nycemis experiment run --exp validation --controllers eco_ml` (180 runs), detached; verify; then
    `python -m nycemis select` (alpha*_reactive, alpha*_ml, eta). G5.
 3. `python -m nycemis prereg` (writes `configs/experiments/confirmatory.yaml` and the frozen
    `docs/PREREGISTRATION.md`); commit, tag `prereg-v1`.
