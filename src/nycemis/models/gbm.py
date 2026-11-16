@@ -67,7 +67,8 @@ def make_regressor(params: dict, seed: int):
 def fit_regressor(params: dict, seed: int, x_tr, y_tr, x_va, y_va, early_stopping: int = 50):
     model = make_regressor(params, seed)
     if HAVE_LGB:
-        model.fit(x_tr, y_tr, eval_set=[(x_va, y_va)], callbacks=[lgb.early_stopping(early_stopping, verbose=False)])
+        model.fit(x_tr, y_tr, eval_X=(x_va,), eval_y=(y_va,),
+                  callbacks=[lgb.early_stopping(early_stopping, verbose=False)])
     else:
         model.fit(x_tr, y_tr)
     return model

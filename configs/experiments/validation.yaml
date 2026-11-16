@@ -1,0 +1,25 @@
+# M5 selection on validation seeds (docs/SPECIFICATION.md 4.3, M5): the alpha sweep for eco_reactive and eco_ml, the references
+# for the selection rule, and the placebo noise grid for matching random_reroute's route-change rate to eco_ml's.
+# eco_ml uses the frozen forecaster `gbm_v1` (models/flushing/gbm_v1).
+name: validation
+scenario: flushing
+levels: [light, moderate, heavy]
+seed_role: validation
+conditions:
+  - {controller: static}
+  - {controller: tt_adaptive}
+  - {controller: eco_reactive, params: {alpha: 0.0}, label: eco_reactive_a0.00}
+  - {controller: eco_reactive, params: {alpha: 0.25}, label: eco_reactive_a0.25}
+  - {controller: eco_reactive, params: {alpha: 0.5}, label: eco_reactive_a0.50}
+  - {controller: eco_reactive, params: {alpha: 0.75}, label: eco_reactive_a0.75}
+  - {controller: eco_reactive, params: {alpha: 1.0}, label: eco_reactive_a1.00}
+  - {controller: eco_ml, params: {alpha: 0.0, model_id: gbm_v1}, label: eco_ml_a0.00}
+  - {controller: eco_ml, params: {alpha: 0.25, model_id: gbm_v1}, label: eco_ml_a0.25}
+  - {controller: eco_ml, params: {alpha: 0.5, model_id: gbm_v1}, label: eco_ml_a0.50}
+  - {controller: eco_ml, params: {alpha: 0.75, model_id: gbm_v1}, label: eco_ml_a0.75}
+  - {controller: eco_ml, params: {alpha: 1.0, model_id: gbm_v1}, label: eco_ml_a1.00}
+  - {controller: random_reroute, params: {eta: 0.1}, label: random_reroute_e0.1}
+  - {controller: random_reroute, params: {eta: 0.3}, label: random_reroute_e0.3}
+  - {controller: random_reroute, params: {eta: 0.6}, label: random_reroute_e0.6}
+  - {controller: random_reroute, params: {eta: 1.0}, label: random_reroute_e1.0}
+  - {controller: random_reroute, params: {eta: 2.0}, label: random_reroute_e2.0}

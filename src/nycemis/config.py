@@ -123,6 +123,7 @@ class Execution(Strict):
     run_timeout_min_floor: int = Field(gt=0)
     max_retries: int = Field(ge=0)
     disk_max_frac_of_free: float = Field(gt=0, le=1)
+    max_concurrent: dict[str, int] = Field(default_factory=dict)
 
 
 class BaseConfig(Strict):

@@ -204,6 +204,36 @@ def train_legacy(scenario: str = typer.Option("flushing")) -> None:
     typer.echo(json.dumps(train(scenario), indent=2))
 
 
+@app.command("train")
+def train_cmd(
+    scenario: str = typer.Option("flushing"), model_id: str = typer.Option("gbm_v1"),
+    exp: str = typer.Option("dataset", "--exp"), sample_frac: float = typer.Option(0.10),
+    trials: int = typer.Option(30), n_jobs: int = typer.Option(-1),
+) -> None:
+    """Fit, tune (validation seeds) and freeze the forecaster; evaluate it on validation rows; write its card."""
+    from nycemis.models.card import write_card
+    from nycemis.models.evaluate import evaluate
+    from nycemis.models.registry import load_forecaster
+    from nycemis.models.train import freeze, load_windows
+
+    manifest = freeze(scenario, model_id, [exp], sample_frac, trials, n_jobs=n_jobs)
+    s = __import__("nycemis.config", fromlist=["base_config"]).base_config().seeds
+    train = load_windows([exp], set(s.train_seeds()), sample_frac, 1)
+    val = load_windows([exp], set(s.validation_seeds()), sample_frac, 2).reset_index(drop=True)
+    ev = evaluate(load_forecaster(scenario, model_id), val, train)
+    typer.echo(f"wrote {write_card(scenario, model_id, manifest, ev, 'validation seeds')}")
+
+
+@app.command("select")
+def select_cmd(exp: str = typer.Option("validation", "--exp")) -> None:
+    """Choose alpha* for eco_reactive and eco_ml and the placebo eta on validation seeds."""
+    from nycemis.experiments.select import select
+
+    res = select(exp)
+    typer.echo(json.dumps({"alpha_reactive": res["eco_reactive"]["alpha_star"],
+                           "alpha_ml": res["eco_ml"]["alpha_star"], "eta": res["random_reroute"]["eta_star"]}))
+
+
 @app.command("analyze-pilot")
 def analyze_pilot(exp: str = typer.Option("pilot", "--exp")) -> None:
     """Pilot analysis: variance, power, budget, alpha = 0 sanity, legacy replication; renders the documents."""

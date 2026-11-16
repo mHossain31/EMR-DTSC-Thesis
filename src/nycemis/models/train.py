@@ -82,9 +82,10 @@ def _val_loss(model, x, y) -> float:
     return float(np.mean((model.predict(x) - y) ** 2))
 
 
-def search_and_fit(train: pd.DataFrame, val: pd.DataFrame, trials: int, seed: int) -> tuple[dict, dict, list]:
+def search_and_fit(train: pd.DataFrame, val: pd.DataFrame, trials: int, seed: int,
+                   n_jobs: int = -1) -> tuple[dict, dict, list]:
     rng = np.random.default_rng(seed)
-    candidates = [sample_params(rng) for _ in range(trials)]
+    candidates = [{**sample_params(rng), "n_jobs": n_jobs} for _ in range(trials)]
     best: dict = {}
     models: dict = {}
     history = []
@@ -103,12 +104,12 @@ def search_and_fit(train: pd.DataFrame, val: pd.DataFrame, trials: int, seed: in
 
 
 def freeze(scenario: str, model_id: str, experiments: list[str], sample_frac: float, trials: int = SEARCH_TRIALS,
-           seed: int = 20261115) -> dict:
+           seed: int = 20261115, n_jobs: int = -1) -> dict:
     t0 = time.perf_counter()
     s = base_config().seeds
     train = load_windows(experiments, set(s.train_seeds()), sample_frac, seed)
     val = load_windows(experiments, set(s.validation_seeds()), sample_frac, seed + 1)
-    best, models, history = search_and_fit(train, val, trials, seed)
+    best, models, history = search_and_fit(train, val, trials, seed, n_jobs)
     nonempty = train.veh_s_next.to_numpy() > 0
     threshold = float(np.quantile(train.d_next.to_numpy()[nonempty], HOTSPOT_QUANTILE))
     names = feature_names("F1")

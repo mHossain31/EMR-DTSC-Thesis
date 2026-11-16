@@ -1,7 +1,8 @@
 """Forecast skill against baselines (docs/SPECIFICATION.md 7.3, 4.7).
 
 Baselines (all use only information available at decision time):
-- persistence: the value observed in window k (r and d from F2's emission lags; v from the window speed),
+- persistence: the value observed in window k (r and d from F2's emission lags, r falling back to the edge's
+  historical mean when window k was empty; v from the window speed, the limit when empty),
 - EMA: weights 0.5, 0.3, 0.2 on windows k, k-1, k-2,
 - historical mean: the per-edge mean of the training rows,
 - Ridge: linear regression on F1 (standardised), fitted on the training rows.
@@ -38,6 +39,13 @@ def baseline_predictions(df: pd.DataFrame, train: pd.DataFrame) -> dict[str, dic
     hist = train.groupby("edge_idx").agg(r=("r_next", "mean"), v=("v_next", "mean"), d=("d_next", "mean"))
     glob = {"r": float(train.r_next.mean()), "v": float(train.v_next.mean()), "d": float(train.d_next.mean())}
     h = hist.reindex(df.edge_idx.to_numpy())
+    h_r = h["r"].fillna(glob["r"]).to_numpy()
+    # A per-vehicle rate is undefined on an empty window: persistence and EMA fall back to the edge's history.
+    seen = _lag_cols(df, "cnt_mean") > 0
+    r_pers = np.where(seen[:, 0], r_lags[:, 0], h_r)
+    w_seen = seen * w
+    w_sum = w_seen.sum(axis=1)
+    r_ema = np.where(w_sum > 0, (r_lags * w_seen).sum(axis=1) / np.maximum(w_sum, 1e-12), h_r)
     names = feature_names("F1")
     ridge = {}
     for t, col in (("r", "r_next"), ("v", "v_next"), ("d", "d_next")):
@@ -47,8 +55,8 @@ def baseline_predictions(df: pd.DataFrame, train: pd.DataFrame) -> dict[str, dic
         pred = model.predict(df[names].to_numpy(np.float32))
         ridge[t] = np.maximum(np.expm1(pred), 0) if t in ("r", "d") else pred
     return {
-        "persistence": {"r": r_lags[:, 0], "v": v_lags[:, 0], "d": d_lags[:, 0]},
-        "ema": {"r": r_lags @ w, "v": v_lags @ w, "d": d_lags @ w},
+        "persistence": {"r": r_pers, "v": v_lags[:, 0], "d": d_lags[:, 0]},
+        "ema": {"r": r_ema, "v": v_lags @ w, "d": d_lags @ w},
         "historical_mean": {t: h[t].fillna(glob[t]).to_numpy() for t in ("r", "v", "d")},
         "ridge": ridge,
     }

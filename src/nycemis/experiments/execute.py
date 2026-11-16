@@ -68,9 +68,14 @@ def run_experiment(name: str, workers: int | None = None, timeout_s: float | Non
             log.warning("run %s attempt %d failed: %s", spec.run_id(), attempt + 1, msg)
         return spec.run_id(), False, msg
 
+    # Memory-heavy controllers get their own small pool (configs/base.yaml execution.max_concurrent); the rest of
+    # the workers run everything else, so the fast runs never wait behind them.
+    limited = {c: n for c, n in cfg.max_concurrent.items() if any(s.controller == c for s, _ in todo)}
+    pools = {c: ThreadPoolExecutor(max_workers=n) for c, n in limited.items()}
+    general = ThreadPoolExecutor(max_workers=max(1, workers - sum(limited.values())))
     done = 0
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        futures = [pool.submit(job, s, r) for s, r in todo]
+    try:
+        futures = [(pools.get(s.controller, general)).submit(job, s, r) for s, r in todo]
         for fut in as_completed(futures):
             rid, ok, msg = fut.result()
             done += 1
@@ -79,6 +84,9 @@ def run_experiment(name: str, workers: int | None = None, timeout_s: float | Non
             if done % max(1, len(todo) // 20) == 0 or done == len(todo):
                 log.info("%s: %d/%d finished (%d failed), %.0f s", name, done, len(todo), len(failures),
                          time.perf_counter() - t0)
+    finally:
+        for p in [*pools.values(), general]:
+            p.shutdown(wait=True)
     _write_failures(d, failures)
     return {"planned": len(doc["runs"]), "ran": len(todo), "failed": len(failures),
             "wall_s": round(time.perf_counter() - t0, 1)}
