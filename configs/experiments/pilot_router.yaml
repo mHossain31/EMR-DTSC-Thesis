@@ -1,0 +1,11 @@
+# Diagnostic for the alpha = 0 sanity gate (DEVIATIONS #13): effort controllers with the travel-time-weights router on
+# the pilot seeds; compared with the pilot's static and tt_adaptive runs on the same route files.
+name: pilot_router
+scenario: flushing
+levels: [light, moderate, heavy]
+seed_role: pilot
+reconcile: true
+conditions:
+  - {controller: random_reroute, params: {eta: 0.3, tau_avg_s: 180, router: traveltime_weights}}
+  - {controller: eco_reactive, params: {alpha: 0.5, tau_avg_s: 180, router: traveltime_weights}}
+  - {controller: eco_reactive, params: {alpha: 0.0, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a0}

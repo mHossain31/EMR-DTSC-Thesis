@@ -98,6 +98,13 @@ def compliant(vid: str, seed: int, p: float) -> bool:
     return derived_seed(vid, seed, f"compliance:{p:g}") / float(2**31 - 1) < p
 
 
+# "effort": edge.setEffort + vehicle.rerouteEffort (docs/SPECIFICATION.md 4.3 as written).
+# "traveltime_weights": the same per-edge values written as global travel-time weights (edge.adaptTraveltime, no
+# begin/end) and vehicle.rerouteTraveltime(currentTravelTimes=False), so SUMO's travel-time router adds its standard
+# junction penalties (minor link 1.5 s, turnaround 5 s), as for C1 and for the route files (DEVIATIONS #13).
+ROUTERS = ("effort", "traveltime_weights")
+
+
 class EffortController(Controller):
     """Common mechanics of C2-C4: efforts on all edges at each tick, staggered ``rerouteEffort`` per vehicle."""
 
@@ -113,6 +120,9 @@ class EffortController(Controller):
         if "tau_avg_s" not in self.params:
             raise ValueError(f"{self.name} needs params.tau_avg_s (travel-time averaging horizon)")
         self.tau_avg_s = int(self.params["tau_avg_s"])
+        self.router = self.params.get("router")
+        if self.router not in ROUTERS:
+            raise ValueError(f"{self.name} needs params.router in {sorted(ROUTERS)}")
         self._speed_hist: deque[np.ndarray] = deque()
         self.efforts_set = False
         self.buckets: dict[int, set[str]] = {k: set() for k in range(self.period)}
@@ -151,7 +161,10 @@ class EffortController(Controller):
         if idx < 0 or idx >= len(route) - 2:
             return
         before = route[idx:]
-        tr.vehicle.rerouteEffort(vid)
+        if self.router == "effort":
+            tr.vehicle.rerouteEffort(vid)
+        else:  # global weights + SUMO's travel-time router (minor-link and turnaround penalties included)
+            tr.vehicle.rerouteTraveltime(vid, False)
         after_route = tr.vehicle.getRoute(vid)
         after = after_route[tr.vehicle.getRouteIndex(vid):]
         self.reroute_calls += 1
@@ -193,9 +206,13 @@ class EffortController(Controller):
         if not np.all(np.isfinite(eff)) or (eff < 0).any():
             raise ValueError(f"{self.name}: invalid efforts at t={t}")
         tr = ctx.traci
+        if self.router == "effort":
+            setter, getter = tr.edge.setEffort, tr.edge.getEffort
+        else:
+            setter, getter = tr.edge.adaptTraveltime, tr.edge.getAdaptedTraveltime
         for eid, value in zip(ctx.info.edge_ids, eff, strict=True):
-            tr.edge.setEffort(eid, float(value))
-        unset = [eid for eid in ctx.info.edge_ids if tr.edge.getEffort(eid, t) < 0]
+            setter(eid, float(value))
+        unset = [eid for eid in ctx.info.edge_ids if getter(eid, t) < 0]
         if unset:
             raise RuntimeError(f"{self.name}: {len(unset)} edges without effort after update (e.g. {unset[:3]})")
         self.efforts_set = True

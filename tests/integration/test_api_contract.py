@@ -53,6 +53,25 @@ def test_reroute_effort_avoids_expensive_edge(libsumo_smoke) -> None:
     assert target not in new
 
 
+def test_adapted_traveltime_weights_and_reroute_traveltime(libsumo_smoke) -> None:
+    """Global travel-time weights (edge.adaptTraveltime without begin/end) are honoured by
+    vehicle.rerouteTraveltime(currentTravelTimes=False); an unset weight reads -1 and a new value overwrites."""
+    tr = libsumo_smoke
+    vid, route, idx = _advance_until_long_route(tr)
+    edge = route[idx + 2]
+    assert tr.edge.getAdaptedTraveltime(edge, 0.0) == -1.0
+    for e in tr.edge.getIDList():
+        if not e.startswith(":"):
+            tr.edge.adaptTraveltime(e, tr.lane.getLength(f"{e}_0") / tr.lane.getMaxSpeed(f"{e}_0"))
+    tr.edge.adaptTraveltime(edge, 1e9)
+    assert tr.edge.getAdaptedTraveltime(edge, 100000.0) == 1e9
+    tr.vehicle.rerouteTraveltime(vid, False)
+    new = tr.vehicle.getRoute(vid)[tr.vehicle.getRouteIndex(vid):]
+    assert edge not in new
+    tr.edge.adaptTraveltime(edge, 2.0)
+    assert tr.edge.getAdaptedTraveltime(edge, 1.0) == 2.0
+
+
 def test_device_vehicle_reroute_effort_behaviour() -> None:
     """Record what rerouteEffort does for a vehicle that carries a rerouting device."""
     tr, _ = start_libsumo(["--device.rerouting.probability", "1"])

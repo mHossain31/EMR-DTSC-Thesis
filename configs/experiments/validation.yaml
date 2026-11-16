@@ -8,18 +8,18 @@ seed_role: validation
 conditions:
   - {controller: static}
   - {controller: tt_adaptive}
-  - {controller: eco_reactive, params: {alpha: 0.0, tau_avg_s: 180}, label: eco_reactive_a0.00}
-  - {controller: eco_reactive, params: {alpha: 0.25, tau_avg_s: 180}, label: eco_reactive_a0.25}
-  - {controller: eco_reactive, params: {alpha: 0.5, tau_avg_s: 180}, label: eco_reactive_a0.50}
-  - {controller: eco_reactive, params: {alpha: 0.75, tau_avg_s: 180}, label: eco_reactive_a0.75}
-  - {controller: eco_reactive, params: {alpha: 1.0, tau_avg_s: 180}, label: eco_reactive_a1.00}
-  - {controller: eco_ml, params: {alpha: 0.0, model_id: gbm_v1, tau_avg_s: 180}, label: eco_ml_a0.00}
-  - {controller: eco_ml, params: {alpha: 0.25, model_id: gbm_v1, tau_avg_s: 180}, label: eco_ml_a0.25}
-  - {controller: eco_ml, params: {alpha: 0.5, model_id: gbm_v1, tau_avg_s: 180}, label: eco_ml_a0.50}
-  - {controller: eco_ml, params: {alpha: 0.75, model_id: gbm_v1, tau_avg_s: 180}, label: eco_ml_a0.75}
-  - {controller: eco_ml, params: {alpha: 1.0, model_id: gbm_v1, tau_avg_s: 180}, label: eco_ml_a1.00}
-  - {controller: random_reroute, params: {eta: 0.1, tau_avg_s: 180}, label: random_reroute_e0.1}
-  - {controller: random_reroute, params: {eta: 0.3, tau_avg_s: 180}, label: random_reroute_e0.3}
-  - {controller: random_reroute, params: {eta: 0.6, tau_avg_s: 180}, label: random_reroute_e0.6}
-  - {controller: random_reroute, params: {eta: 1.0, tau_avg_s: 180}, label: random_reroute_e1.0}
-  - {controller: random_reroute, params: {eta: 2.0, tau_avg_s: 180}, label: random_reroute_e2.0}
+  - {controller: eco_reactive, params: {alpha: 0.0, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a0.00}
+  - {controller: eco_reactive, params: {alpha: 0.25, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a0.25}
+  - {controller: eco_reactive, params: {alpha: 0.5, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a0.50}
+  - {controller: eco_reactive, params: {alpha: 0.75, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a0.75}
+  - {controller: eco_reactive, params: {alpha: 1.0, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a1.00}
+  - {controller: eco_ml, params: {alpha: 0.0, model_id: gbm_v1, tau_avg_s: 180, router: traveltime_weights}, label: eco_ml_a0.00}
+  - {controller: eco_ml, params: {alpha: 0.25, model_id: gbm_v1, tau_avg_s: 180, router: traveltime_weights}, label: eco_ml_a0.25}
+  - {controller: eco_ml, params: {alpha: 0.5, model_id: gbm_v1, tau_avg_s: 180, router: traveltime_weights}, label: eco_ml_a0.50}
+  - {controller: eco_ml, params: {alpha: 0.75, model_id: gbm_v1, tau_avg_s: 180, router: traveltime_weights}, label: eco_ml_a0.75}
+  - {controller: eco_ml, params: {alpha: 1.0, model_id: gbm_v1, tau_avg_s: 180, router: traveltime_weights}, label: eco_ml_a1.00}
+  - {controller: random_reroute, params: {eta: 0.1, tau_avg_s: 180, router: traveltime_weights}, label: random_reroute_e0.1}
+  - {controller: random_reroute, params: {eta: 0.3, tau_avg_s: 180, router: traveltime_weights}, label: random_reroute_e0.3}
+  - {controller: random_reroute, params: {eta: 0.6, tau_avg_s: 180, router: traveltime_weights}, label: random_reroute_e0.6}
+  - {controller: random_reroute, params: {eta: 1.0, tau_avg_s: 180, router: traveltime_weights}, label: random_reroute_e1.0}
+  - {controller: random_reroute, params: {eta: 2.0, tau_avg_s: 180, router: traveltime_weights}, label: random_reroute_e2.0}

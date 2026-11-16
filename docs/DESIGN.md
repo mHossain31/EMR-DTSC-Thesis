@@ -89,7 +89,8 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
   used. Junction (internal) lanes are not attributed to edges; run totals come from tripinfo and include them.
 - **Per-vehicle emissions** (reconciliation, the legacy controller's inputs, legacy RF records) come from vehicle
   subscriptions made on departure; the departure step is read with direct getters.
-- **Controllers** follow docs/SPECIFICATION.md 4.3; efforts are set on every non-internal edge without begin/end and checked
+- **Controllers** follow docs/SPECIFICATION.md 4.3 with DEVIATIONS #12-#13 (device-equivalent travel time; values written as
+  global travel-time weights and routed by SUMO's travel-time router); they are set on every non-internal edge without begin/end and checked
   after each update; rerouting starts after the first effort update (t = 60 s). Travel time per edge is the
   window-mean L / max(v, v_min), floored at free-flow time, for every effort controller, so alpha = 0 is the same
   objective in C2-C4.

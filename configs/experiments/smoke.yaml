@@ -9,8 +9,8 @@ reconcile: true
 conditions:
   - {controller: static}
   - {controller: tt_adaptive}
-  - {controller: random_reroute, params: {eta: 0.3, tau_avg_s: 180}}
-  - {controller: eco_reactive, params: {alpha: 0.5, tau_avg_s: 180}, dataset: true}
-  - {controller: eco_reactive, params: {alpha: 0.0, tau_avg_s: 180}, label: eco_reactive_a0}
-  - {controller: eco_ml, params: {alpha: 0.5, model_id: toy, tau_avg_s: 180}}
+  - {controller: random_reroute, params: {eta: 0.3, tau_avg_s: 180, router: traveltime_weights}}
+  - {controller: eco_reactive, params: {alpha: 0.5, tau_avg_s: 180, router: traveltime_weights}, dataset: true}
+  - {controller: eco_reactive, params: {alpha: 0.0, tau_avg_s: 180, router: traveltime_weights}, label: eco_reactive_a0}
+  - {controller: eco_ml, params: {alpha: 0.5, model_id: toy, tau_avg_s: 180, router: traveltime_weights}}
   - {controller: legacy_ml, params: {threshold_mg_s: 1.0, model_id: toy}}
