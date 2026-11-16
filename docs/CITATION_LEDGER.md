@@ -9,8 +9,20 @@ appears here.
 
 | Key | Work | Identifier | Checked | Read | Supports |
 |---|---|---|---|---|---|
+| lopez2018sumo | Lopez, Wiessner, Behrisch, Bieker-Walz, Erdmann, Flotterod et al., "Microscopic Traffic Simulation using SUMO", IEEE ITSC 2018, pp. 2575-2582 | doi:10.1109/ITSC.2018.8569938 | 2026-11-15 (Crossref) | metadata | SUMO is the simulator used |
+| ahn2008route | Ahn and Rakha, "The effects of route choice decisions on vehicle energy consumption and emissions", Transp. Res. D 13(3):151-167, 2008 | doi:10.1016/j.trd.2008.01.005 | 2026-11-15 (Crossref; abstract-level summaries at swov.nl and peeref.com) | abstract-level summary | route choice changes energy use and emissions; the faster route is not always the lower-emission one |
+| ahn2013ecorouting | Ahn and Rakha, "Network-wide impacts of eco-routing strategies: A large-scale case study", Transp. Res. D 25:119-130, 2013 | doi:10.1016/j.trd.2013.09.006 | 2026-11-15 (Crossref; summary in a Rakha project report found by web search) | summary only | eco-routing has been evaluated network-wide in simulation (INTEGRATION; Cleveland and Columbus); savings depend on network and market penetration |
+| fazzini2022signals | Fazzini, Torre, Rizza, Petracchini, "Effects of Smart Traffic Signal Control on Air Quality", Front. Sustain. Cities 4:756539, 2022 | doi:10.3389/frsc.2022.756539 | 2026-11-15 (Crossref abstract) | abstract | multi-agent RL signal control evaluated for its effect on air quality |
+| haydari2021signals | Haydari, Zhang, Chuah, Ghosal, "Impact of Deep RL-based Traffic Signal Control on Air Quality", IEEE VTC2021-Spring, pp. 1-6 | doi:10.1109/VTC2021-Spring51267.2021.9448639 | 2026-11-15 (Crossref; abstract at itspubs.ucdavis.edu, id 3693) | abstract | deep RL signal control compared with max-pressure on fuel and CO2 in simulated networks |
+| du2021rerouting | Du, Chen, Dong, Chen, Fu, Labi, "Urban traffic dynamic rerouting framework: A DRL-based model with fog-cloud architecture", arXiv:2110.05532, 2021 | arXiv:2110.05532 | 2026-11-14 (arXiv abstract page) | abstract | learning-based dynamic rerouting aimed at travel efficiency (speed), not emissions |
+| wilcoxon1945 | Wilcoxon, "Individual Comparisons by Ranking Methods", Biometrics Bulletin 1(6):80-83, 1945 | doi:10.2307/3001968 | 2026-11-15 (Crossref) | metadata | the signed-rank test |
+| schuirmann1987tost | Schuirmann, "A comparison of the Two One-Sided Tests Procedure and the Power Approach for assessing the equivalence of average bioavailability", J. Pharmacokinet. Biopharm. 15(6):657-680, 1987 | doi:10.1007/BF01068419 | 2026-11-15 (Crossref) | metadata | the two one-sided tests (TOST) procedure for equivalence |
+| efron1987bca | Efron, "Better Bootstrap Confidence Intervals", JASA 82(397):171-185, 1987 | doi:10.1080/01621459.1987.10478410 | 2026-11-15 (Crossref) | metadata | BCa bootstrap intervals |
+| holm1979 | Holm, "A Simple Sequentially Rejective Multiple Test Procedure", Scand. J. Stat. 6(2):65-70, 1979 | https://www.jstor.org/stable/4615733 (no DOI resolves on Crossref) | 2026-11-15 (JSTOR record and catalogue entries found by web search) | abstract-level summary | the Holm step-down procedure controls the familywise error rate |
+| ke2017lightgbm | Ke, Meng, Finley, Wang, Chen, Ma, Ye, Liu, "LightGBM: A Highly Efficient Gradient Boosting Decision Tree", NeurIPS 2017 | https://papers.nips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html | 2026-11-15 (proceedings page metadata) | metadata | the gradient-boosting library used |
 
-Part A is empty until sources are read for the paper (M9). Candidates from docs/SPECIFICATION.md Appendix D (Du et al. 2021;
+A source is cited only for the claim in its row; rows marked "summary" or "metadata" support no claim about the
+source's results beyond what is written there. Candidates from docs/SPECIFICATION.md Appendix D (Du et al. 2021;
 Fazzini et al. 2022; Haydari et al. 2021; Ahn and Rakha 2008, 2013) are listed in part C until read.
 
 ## B. Legacy references (checked 2026-11-14; none reused)
@@ -31,7 +43,7 @@ that locator.
 The report's text also carries "(MDPI)" and "(SpringerLink)" tags after these citations (PDF page 7), which match
 no entry in its reference list.
 
-## C. Candidates to read before citing (docs/SPECIFICATION.md Appendix D; existence noted, not yet read)
+## C. Appendix D candidates (all now in part A)
 
 | Work | Identifier |
 |---|---|

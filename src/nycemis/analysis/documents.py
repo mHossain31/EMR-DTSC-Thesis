@@ -77,8 +77,8 @@ def render_pilot_report() -> str:
     lines += ["", f"Total {bud['total_core_hours']:.1f} core-hours; {bud['wall_clock_hours']:.1f} h wall-clock at "
               f"{bud['workers']} workers (limit 24 h: {'within' if bud['wall_clock_hours'] <= 24 else 'EXCEEDED'}). "
               f"Disk estimate {bud['disk_gb_estimate']:.1f} GB of {bud['free_disk_gb']:.0f} GB free.", "",
-              "Median wall-clock per run (s): " + ", ".join(f"{LABELS.get(k, k)} {v:.0f}" for k, v in
-                                                             sorted(bud["median_wall_s_by_condition"].items())), "",
+              "Median core-seconds per run (CPU time where recorded, else wall-clock): " + ", ".join(
+                  f"{LABELS.get(k, k)} {v:.0f}" for k, v in sorted(bud["median_core_s_by_condition"].items())), "",
               "## Legacy-protocol replication", "",
               f"D1 horizon artifact {'reproduced' if d1_confirmed(rep) else 'not reproduced'}; the legacy rule changed "
               f"{100 * mean_change_rate(rep):.1f}% of the routes it recomputed. Details: `docs/LEGACY_AUDIT.md`, "

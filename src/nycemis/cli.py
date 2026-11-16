@@ -234,6 +234,16 @@ def select_cmd(exp: str = typer.Option("validation", "--exp")) -> None:
                            "alpha_ml": res["eco_ml"]["alpha_star"], "eta": res["random_reroute"]["eta_star"]}))
 
 
+@app.command("analyze")
+def analyze_cmd(exp: str = typer.Option("confirmatory", "--exp"), scenario: str = typer.Option("flushing"),
+                model_id: str = typer.Option("gbm_v1")) -> None:
+    """Frozen analysis (M7): PC1-PC4 with Holm, exploratory comparisons, spatial side effects, figures, claims."""
+    from nycemis.analysis.run_all import run
+
+    for path in run(exp, scenario, model_id):
+        typer.echo(f"wrote {path}")
+
+
 @app.command("analyze-pilot")
 def analyze_pilot(exp: str = typer.Option("pilot", "--exp")) -> None:
     """Pilot analysis: variance, power, budget, alpha = 0 sanity, legacy replication; renders the documents."""

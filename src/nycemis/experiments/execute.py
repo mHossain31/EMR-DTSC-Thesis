@@ -4,6 +4,10 @@ Each run is ``python -m nycemis sim run --spec <run dir>/spec.json`` in its own 
 simulation per process), launched by a pool of worker threads that only wait on subprocesses. A run already marked
 ``DONE`` is skipped. A run gets a timeout and at most ``max_retries`` retries; a run that still fails is recorded in
 ``failed_runs.csv`` with the last error lines, and ``experiment verify`` reports it.
+
+Before a batch starts, two guards run (docs/SPECIFICATION.md 6.6 and the memory incident of 2026-11-15, docs/DESIGN.md):
+the expected disk use must stay below ``disk_max_frac_of_free`` of the free space (else the batch aborts), and the
+worker pools are trimmed so that their expected commit memory fits in 80% of the available commit memory.
 """
 
 from __future__ import annotations
@@ -41,6 +45,58 @@ def _run_once(spec: RunSpec, rdir: Path, timeout_s: float) -> tuple[bool, str]:
     return False, f"exit {proc.returncode}: {' | '.join(tail)}"
 
 
+COMMIT_GB_PER_RUN = 1.1  # measured: one simulation process commits about 1.0 GB
+COMMIT_GB_BY_CONTROLLER = {"legacy_ml": 4.5}  # measured: 4.2 GB with the legacy RF loaded
+DEFAULT_RUN_DISK_MB = 60.0
+
+
+def available_commit_gb() -> float | None:
+    """Available commit memory (RAM + page file not yet committed), Windows only; None elsewhere."""
+    if os.name != "nt":
+        return None
+    import ctypes
+
+    class MemoryStatus(ctypes.Structure):
+        _fields_ = [("dwLength", ctypes.c_ulong), ("dwMemoryLoad", ctypes.c_ulong),
+                    ("ullTotalPhys", ctypes.c_ulonglong), ("ullAvailPhys", ctypes.c_ulonglong),
+                    ("ullTotalPageFile", ctypes.c_ulonglong), ("ullAvailPageFile", ctypes.c_ulonglong),
+                    ("ullTotalVirtual", ctypes.c_ulonglong), ("ullAvailVirtual", ctypes.c_ulonglong),
+                    ("ullAvailExtendedVirtual", ctypes.c_ulonglong)]
+
+    st = MemoryStatus()
+    st.dwLength = ctypes.sizeof(MemoryStatus)
+    if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(st)):
+        return None
+    return st.ullAvailPageFile / 1e9
+
+
+def _disk_guard(d: Path, n_todo: int, frac: float) -> None:
+    sizes = [sum(f.stat().st_size for f in r.iterdir()) / 1e6 for r in d.iterdir()
+             if r.is_dir() and (r / "DONE").is_file()]
+    per_run = sorted(sizes)[len(sizes) // 2] if sizes else DEFAULT_RUN_DISK_MB
+    need_gb = n_todo * per_run / 1e3
+    free_gb = shutil.disk_usage(d).free / 1e9
+    log.info("disk: about %.1f GB needed for %d runs (%.0f MB each), %.0f GB free", need_gb, n_todo, per_run, free_gb)
+    if need_gb > frac * free_gb:
+        raise RuntimeError(f"expected disk use {need_gb:.1f} GB exceeds {frac:.0%} of free space ({free_gb:.0f} GB)")
+
+
+def _memory_guard(general: int, limited: dict[str, int]) -> int:
+    avail = available_commit_gb()
+    if avail is None:
+        log.warning("cannot read available commit memory on this platform; worker pools not checked")
+        return general
+    fixed = sum(n * COMMIT_GB_BY_CONTROLLER.get(c, COMMIT_GB_PER_RUN) for c, n in limited.items())
+    budget = 0.8 * avail - fixed
+    fit = max(1, int(budget // COMMIT_GB_PER_RUN))
+    if fit < general:
+        log.warning("memory: %.1f GB commit available; general pool trimmed from %d to %d workers", avail, general,
+                    fit)
+        return fit
+    log.info("memory: %.1f GB commit available; pools fit (%d general workers)", avail, general)
+    return general
+
+
 def run_experiment(name: str, workers: int | None = None, timeout_s: float | None = None) -> dict:
     cfg = base_config().execution
     workers = workers or cfg.workers or max(1, (os.cpu_count() or 2) - 1)
@@ -71,8 +127,10 @@ def run_experiment(name: str, workers: int | None = None, timeout_s: float | Non
     # Memory-heavy controllers get their own small pool (configs/base.yaml execution.max_concurrent); the rest of
     # the workers run everything else, so the fast runs never wait behind them.
     limited = {c: n for c, n in cfg.max_concurrent.items() if any(s.controller == c for s, _ in todo)}
+    _disk_guard(d, len(todo), cfg.disk_max_frac_of_free)
+    n_general = _memory_guard(max(1, workers - sum(limited.values())), limited)
     pools = {c: ThreadPoolExecutor(max_workers=n) for c, n in limited.items()}
-    general = ThreadPoolExecutor(max_workers=max(1, workers - sum(limited.values())))
+    general = ThreadPoolExecutor(max_workers=n_general)
     done = 0
     try:
         futures = [(pools.get(s.controller, general)).submit(job, s, r) for s, r in todo]

@@ -86,6 +86,7 @@ def execute(spec: RunSpec, outdir: Path | None = None) -> dict:
                        extra=[*controller.sumo_options(), "--log", str(outdir / "sumo.log")])
     info = load_netinfo(str(net))
     wall0 = time.perf_counter()
+    cpu0 = time.process_time()
     if backend.name == "traci":
         tr.start(cmd, label=f"run_{spec.run_id()}")
     else:
@@ -126,7 +127,9 @@ def execute(spec: RunSpec, outdir: Path | None = None) -> dict:
     finally:
         tr.close()
     wall = time.perf_counter() - wall0
-    return _finish(spec, outdir, controller, info, t, wall, backend.name, n_route_vehicles, vlog, elog, recorder,
+    cpu = time.process_time() - cpu0
+    return _finish(spec, outdir, controller, info, t, (wall, cpu), backend.name, n_route_vehicles, vlog, elog,
+                   recorder,
                    (series_t, series_nox, series_running), records, {"net": sha256_file(net), "routes": route_sha,
                                                                      "vtypes": sha256_file(vtypes)})
 
@@ -140,9 +143,10 @@ def _vehicle_rows(vlog: VehicleEmissionLogger, t: float) -> np.ndarray:
     return np.asarray(rows, dtype=np.float32).reshape(-1, 6)
 
 
-def _finish(spec, outdir, controller, info, sim_end_s, wall, backend_name, n_route_vehicles, vlog, elog, recorder,
+def _finish(spec, outdir, controller, info, sim_end_s, times, backend_name, n_route_vehicles, vlog, elog, recorder,
             series, records, hashes) -> dict:
     proto = base_config().protocol
+    wall, cpu = times
     trips = parse_tripinfo(outdir / "tripinfo.xml")
     stats = parse_statistics(outdir / "stats.xml")
     metrics = run_metrics(trips, stats, n_route_vehicles, proto.depart_end_s)
@@ -157,6 +161,7 @@ def _finish(spec, outdir, controller, info, sim_end_s, wall, backend_name, n_rou
                             <= v.teleport_max_frac and not metrics["timed_out"])
     metrics["sim_end_s"] = float(sim_end_s)
     metrics["wall_s"] = round(wall, 2)
+    metrics["cpu_s"] = round(cpu, 2)  # core-seconds of this process (simulation and controller); wall depends on load
     if vlog is not None:
         trip_total = float(trips.nox_mg.sum())
         metrics["recon_step_nox_mg"] = vlog.total_nox_mg
@@ -203,7 +208,7 @@ def _finish(spec, outdir, controller, info, sim_end_s, wall, backend_name, n_rou
         "run_id": spec.run_id(), "spec": spec.model_dump(), "backend": backend_name,
         "sumo_version": env.sumo_version(), "packages": env.package_versions(), "platform": env.platform_info(),
         "git": git_state(), "input_sha256": hashes, "controller_summary": summ,
-        "timings": {"wall_s": round(wall, 2), "sim_end_s": float(sim_end_s)},
+        "timings": {"wall_s": round(wall, 2), "cpu_s": round(cpu, 2), "sim_end_s": float(sim_end_s)},
     }
     (outdir / "run.json").write_text(json.dumps(run_json, indent=2, default=str) + "\n", encoding="utf-8")
     (outdir / "run_metrics.json").write_text(json.dumps(metrics, indent=2, default=float) + "\n", encoding="utf-8")

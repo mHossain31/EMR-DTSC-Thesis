@@ -90,7 +90,9 @@ def _legacy_replication(df: pd.DataFrame, experiment: str) -> dict:
 
 
 def _budget(df: pd.DataFrame, n_conf: int, workers: int) -> dict:
-    med = df.groupby("label").wall_s.median().to_dict()
+    # core-seconds per run: cpu_s where recorded; wall_s otherwise (an upper bound when cores were shared)
+    cost = df.cpu_s.fillna(df.wall_s) if "cpu_s" in df else df.wall_s
+    med = df.assign(cost_s=cost).groupby("label").cost_s.median().to_dict()
     eco = med.get("eco_reactive", float("nan"))
     plan = {
         "M5 dataset (4 policies x 3 levels x 24 train seeds)": (288, np.mean([med.get("static"), med.get("tt_adaptive"),
@@ -106,7 +108,7 @@ def _budget(df: pd.DataFrame, n_conf: int, workers: int) -> dict:
     run_dirs = [d for d in exp_dir("pilot").iterdir() if d.is_dir()]
     disk_mb_per_run = np.median([sum(f.stat().st_size for f in d.iterdir()) for d in run_dirs]) / 1e6
     n_runs = sum(v["runs"] for v in rows.values())
-    return {"median_wall_s_by_condition": {k: float(v) for k, v in med.items()}, "plan": rows,
+    return {"median_core_s_by_condition": {k: float(v) for k, v in med.items()}, "plan": rows,
             "total_core_hours": core_h, "workers": workers, "wall_clock_hours": core_h / workers,
             "disk_gb_estimate": float(n_runs * disk_mb_per_run / 1e3 + 288 * 0.03),
             "free_disk_gb": shutil.disk_usage(results_dir()).free / 1e9}

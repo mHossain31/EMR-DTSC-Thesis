@@ -21,3 +21,13 @@ tailpipe emission mass**, per trip and in total.
    study areas.
 9. **Simulation-specific effects.** Results hold for one SUMO version (recorded per run) and one platform; SUMO
    documents platform-dependent differences in some numerical routines.
+10. **Deadlock mitigation.** All runs use `--ignore-junction-blocker 30` (DEVIATIONS #6): a vehicle stuck inside a
+    junction for 30 s no longer blocks others. This keeps congested runs from gridlocking at a few OSM junction
+    clusters, at the cost of some physically implausible passing in those situations.
+11. **Spatial tables exclude junction lanes.** Per-edge NOx (road-class shares, maps, Gini, peak density) covers
+    non-internal edges only; emissions on internal junction lanes (their share is 1 - edge_logger_total_nox_mg /
+    tripinfo NOx in each run's run_metrics.json) count in
+    run totals but are not attributed to a road class.
+12. **Fleet shares are assumed.** The mix of emission classes in `configs/fleet.yaml` is a modelling choice, not
+    New York registration data; diesel vehicles emit far more NOx per kilometre than petrol ones in HBEFA, so the
+    mix strongly affects absolute NOx.
