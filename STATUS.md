@@ -6,8 +6,9 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
 - **Current milestone:** M6 (confirmatory runs). G5 passed: validation 612/612 verified; `python -m nycemis select`
   gave alpha*_reactive = alpha*_ml = 0.75 and eta = 1 (`results/validation/selection.json`). The preregistration is
   frozen (commit 0a020b3, tag `prereg-v1`, analysis-code hash 09dbec7a, the same in a clean clone of the tag;
-  `verify-all --only prereg` passes). The confirmatory experiment (1,080 runs, test seeds 200-259) is running.
-- **Last updated:** 2026-11-16 23:30.
+  `verify-all --only prereg` passes). The confirmatory experiment (1,080 runs, test seeds 200-259) is paused at
+  20/1080; resume it first.
+- **Last updated:** 2026-11-16 23:33.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -21,7 +22,7 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 
 | Job | Started | Log | Notes |
 |---|---|---|---|
-| confirmatory, 6 conditions x 3 levels x 60 seeds (1,080 runs) | 2026-11-16 23:25 | `results/logs/confirmatory.log` | memory gate, budget 14.3 GB; about 5 h; CPU-heavy |
+| confirmatory, 6 conditions x 3 levels x 60 seeds (1,080 runs) | 2026-11-16 23:25, **paused 23:32** on request (PC shut down overnight), 20/1080 DONE | `results/logs/confirmatory.log` | resume with the command above and `--exp confirmatory`; about 5 h; CPU-heavy |
 
 The dtbk extract for the enlarged box was downloaded at 22:44 after 12 failed Overpass attempts (commit 256eabb).
 
@@ -47,6 +48,8 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
+0. Resume the confirmatory batch (WMI command above, `<EXP>` = confirmatory); runs started after the tag, so
+   resuming keeps the prereg check valid.
 1. When the confirmatory batch ends: `python -m nycemis experiment verify --exp confirmatory` (G6) and
    `python -m nycemis verify-all --only prereg` (the tag predates every confirmatory run).
 2. `python -m nycemis analyze` (M7; rehearsed end to end on relabelled pilot runs, Pareto plot included), then an
