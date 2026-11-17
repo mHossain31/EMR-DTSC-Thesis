@@ -8,6 +8,7 @@ analysis on pairs where both runs are valid; sensitivity analysis on all pairs. 
 from __future__ import annotations
 
 import json
+import logging
 
 import pandas as pd
 
@@ -15,6 +16,8 @@ from nycemis.analysis.pilot import load_runs, paired_deltas
 from nycemis.analysis.stats import holm, paired
 from nycemis.config import base_config
 from nycemis.paths import results_dir
+
+log = logging.getLogger(__name__)
 
 LEVELS = ("light", "moderate", "heavy")
 PCS = (
@@ -76,9 +79,23 @@ def _invalid_counts(df: pd.DataFrame) -> list[dict]:
             .join(g.size().rename("runs")).reset_index().to_dict("records"))
 
 
+def _analysis_code_record() -> dict:
+    """The analysis code's hash now and at the preregistration freeze; a difference must be in docs/DEVIATIONS.md
+    (``verify-all`` checks it)."""
+    from nycemis.experiments.prereg import analysis_code_sha256
+
+    path = results_dir() / "validation" / "prereg_freeze.json"
+    frozen = json.loads(path.read_text(encoding="utf-8"))["analysis_code_sha256"] if path.is_file() else None
+    current = analysis_code_sha256()
+    if frozen is not None and frozen != current:
+        log.warning("analysis code differs from the preregistration freeze (%s, now %s): record the change in "
+                    "docs/DEVIATIONS.md", frozen, current)
+    return {"sha256": current, "frozen_sha256": frozen, "matches_freeze": frozen == current}
+
+
 def analyze(experiment: str = "confirmatory") -> dict:
     df = load_runs(experiment)
-    out = {"experiment": experiment, "runs": int(len(df)),
+    out = {"experiment": experiment, "runs": int(len(df)), "analysis_code": _analysis_code_record(),
            "confirmatory": _tests(df, valid_only=True),
            "sensitivity_all_pairs": _tests(df, valid_only=False),
            "exploratory": _exploratory(df), "invalid_runs": _invalid_counts(df),

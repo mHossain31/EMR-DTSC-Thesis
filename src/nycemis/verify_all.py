@@ -4,6 +4,8 @@
    alpha = 0 sanity, artifact demonstration, hygiene, regression);
 2. ruff on src, tests and scripts;
 3. ``experiment verify`` for every final experiment that has a plan (completeness, pairing by route hash, schema);
+   the preregistration came before the test seeds and the analysis code still has its frozen hash (or the change
+   is in docs/DEVIATIONS.md);
 4. the paper: macros regenerated; every macro main.tex uses is defined; no percentage or decimal typed in its body;
 5. ``docs/OPEN_ITEMS.md`` holds only items labelled out-of-scope-by-design or environment-limited;
 6. the smoke harness tests from a clean clone of the committed tree whose path contains a space.
@@ -94,6 +96,42 @@ def check_open_items() -> tuple[bool, str]:
     return not bad, "\n".join(bad) or f"{len(rows)} items, all labelled {' or '.join(OPEN_ITEM_LABELS)}"
 
 
+def check_prereg() -> tuple[bool, str]:
+    """The preregistration came first and still holds: the freeze and its tag exist; the confirmatory plan and every
+    confirmatory run are newer than the tagged commit; the analysis code has the frozen hash, or
+    ``docs/DEVIATIONS.md`` records the new hash."""
+    import json
+
+    from nycemis.experiments.plan import exp_dir
+    from nycemis.experiments.prereg import analysis_code_sha256
+    from nycemis.paths import results_dir
+
+    path = results_dir() / "validation" / "prereg_freeze.json"
+    if not path.is_file():
+        return False, "no preregistration freeze (python -m nycemis prereg)"
+    frozen = json.loads(path.read_text(encoding="utf-8"))
+    ok, tag_time = _run(["git", "log", "-1", "--format=%ct", frozen["tag"]], repo_root(), timeout=60)
+    if not ok:
+        return False, f"tag {frozen['tag']} not found"
+    tagged = float(tag_time.strip())
+    msg, good = [f"tag {frozen['tag']} at {tagged:.0f}"], True
+    d = exp_dir("confirmatory")
+    if (d / "plan.json").is_file():
+        early = [p.parent.name for p in [d / "plan.json", *d.glob("*/DONE")] if p.stat().st_mtime < tagged]
+        good &= not early
+        msg.append(f"confirmatory files older than the tag: {early[:5]}" if early else
+                   "confirmatory plan and runs are newer than the tag")
+    current = analysis_code_sha256()
+    if current == frozen["analysis_code_sha256"]:
+        msg.append("analysis code matches the frozen hash")
+    elif current in (docs_dir() / "DEVIATIONS.md").read_text(encoding="utf-8"):
+        msg.append(f"analysis code changed after the freeze; recorded in DEVIATIONS.md ({current[:12]})")
+    else:
+        good = False
+        msg.append(f"analysis code changed after the freeze ({current[:12]}) and DEVIATIONS.md does not record it")
+    return good, "\n".join(msg)
+
+
 def _force_remove(func, path, _exc) -> None:
     os.chmod(path, stat.S_IWRITE)  # git marks pack files read-only on Windows
     func(path)
@@ -114,8 +152,8 @@ def check_space_path() -> tuple[bool, str]:
         shutil.rmtree(tmp, onexc=_force_remove)
 
 
-CHECKS = {"pytest": check_pytest, "ruff": check_ruff, "experiments": check_experiments, "paper": check_paper,
-          "open_items": check_open_items, "space_path": check_space_path}
+CHECKS = {"pytest": check_pytest, "ruff": check_ruff, "experiments": check_experiments, "prereg": check_prereg,
+          "paper": check_paper, "open_items": check_open_items, "space_path": check_space_path}
 
 
 def verify_all(only: list[str] | None = None) -> dict:
