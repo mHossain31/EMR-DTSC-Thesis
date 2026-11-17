@@ -1,12 +1,12 @@
 {
   "files": {
     "data/osm/dtbk.osm.xml.gz": {
-      "sha256": "a503a6528fd3c12062dea78fd12e8ac30f866912c9ff8feaf68dd14859f2bec6",
-      "bytes": 183731,
+      "sha256": "3e6e9d202fb8a362fbf5a3ca48a4d334c3e59592c38d4ee43694e790b922d9d1",
+      "bytes": 341419,
       "kind": "osm_extract",
       "scenario": "dtbk",
       "endpoint": "https://overpass-api.de/api/interpreter",
-      "osm_base": "2026-11-16T23:50:12Z"
+      "osm_base": "2026-11-17T03:43:20Z"
     },
     "data/osm/flushing.osm.xml.gz": {
       "sha256": "40ee78f3e515fbcda3ebbaa2b9d2fa9769e2498b04bb34d38725c061c11020c1",

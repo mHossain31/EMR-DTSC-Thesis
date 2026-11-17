@@ -2,17 +2,17 @@
   "scenario": "dtbk",
   "bbox_wsen": [
     -74.005,
-    40.685,
-    -73.975,
+    40.675,
+    -73.96,
     40.705
   ],
   "endpoint": "https://overpass-api.de/api/interpreter",
-  "downloaded_utc": "2026-11-16T23:51:47+00:00",
-  "osm_base": "2026-11-16T23:50:12Z",
+  "downloaded_utc": "2026-11-17T03:44:43+00:00",
+  "osm_base": "2026-11-17T03:43:20Z",
   "counts": {
-    "nodes": 5632,
-    "ways": 1377,
-    "relations": 301
+    "nodes": 10960,
+    "ways": 2664,
+    "relations": 514
   },
   "shapes": false,
   "road_types": {
@@ -38,5 +38,5 @@
   },
   "tool": "osmGet.py (SUMO tools)",
   "sumo_version": "1.28.0",
-  "failed_attempts_before_success": 0
+  "failed_attempts_before_success": 12
 }
