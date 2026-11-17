@@ -74,6 +74,13 @@ def macros() -> dict[str, str]:
         m["ConfirmatoryN"] = f"{p['power']['n_confirmatory']}"
         m["NPowerSup"] = f"{p['power']['n_superiority']}"
         m["NPowerEq"] = f"{p['power']['n_equivalence']}"
+    fz = _load(results_dir() / "validation" / "prereg_freeze.json")
+    if fz and fz.get("power_at_n"):
+        pw = fz["power_at_n"]
+        m["PowerAtNSup"] = f"{100 * pw['superiority']:.0f}"
+        m["PowerAtNEq"] = f"{100 * pw['equivalence']:.0f}"
+        m["DetectableEffect"] = f"{pw['detectable_effect_pct']:.1f}"
+        m["DetectableMargin"] = f"{pw['detectable_margin_pct']:.1f}"
     sel = _load(results_dir() / "validation" / "selection.json")
     if sel:
         m["AlphaStarReactive"] = f"{sel['eco_reactive']['alpha_star']:g}"

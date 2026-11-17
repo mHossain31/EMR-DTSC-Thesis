@@ -56,6 +56,29 @@ def n_required(kind: str, sd: float, sesoi: float, alpha: float, sims: int = 200
     return hi, sorted(curve)
 
 
+def power_at(kind: str, n: int, sd: float, effect_or_margin: float, alpha: float, sims: int = 2000,
+             seed: int = 20261115) -> float:
+    """Simulated power at a given n: for superiority, the true effect is ``effect_or_margin``; for equivalence, the
+    true effect is 0 and the TOST margin is ``effect_or_margin``."""
+    return _power(kind, n, sd, effect_or_margin, alpha, sims, np.random.default_rng(seed))
+
+
+def detectable_at(kind: str, n: int, sd: float, alpha: float, sims: int = 2000, seed: int = 20261115,
+                  tol: float = 0.05) -> float:
+    """Smallest true effect (superiority) or TOST margin (equivalence), in %, with at least 80% power at n, by
+    bisection (to ``tol``) with the same fixed-seed simulation."""
+    lo, hi = 0.0, max(1.0, 4.0 * sd)
+    while power_at(kind, n, sd, hi, alpha, sims, seed) < TARGET_POWER:
+        lo, hi = hi, 2 * hi
+    while hi - lo > tol:
+        mid = (lo + hi) / 2
+        if power_at(kind, n, sd, mid, alpha, sims, seed) >= TARGET_POWER:
+            hi = mid
+        else:
+            lo = mid
+    return hi
+
+
 def confirmatory_n(n_power: int | None, n_min: int, n_max: int) -> int:
     if n_power is None:
         return n_max

@@ -171,6 +171,19 @@ def render_interim_note() -> str:
     return rel(out)
 
 
+def _power_at_n_lines(pw: dict | None, n: int, sesoi: float) -> list[str]:
+    """What the chosen n can detect (computed at the freeze by ``experiments/prereg.py``, same simulation as n_power)."""
+    if not pw:
+        return []
+    return [
+        f"At n = {n} the simulated power is {100 * pw['superiority']:.0f}% for a true change of {sesoi:g}% "
+        f"(superiority) and {100 * pw['equivalence']:.0f}% for showing equivalence within +-{sesoi:g}% when the true "
+        f"change is 0 (TOST). 80% power is reached for a true change of {pw['detectable_effect_pct']:.1f}% and for an "
+        f"equivalence margin of +-{pw['detectable_margin_pct']:.1f}%. The confirmatory tests are therefore "
+        f"underpowered for effects near the SESOI: a non-significant superiority test does not show that a "
+        f"{sesoi:g}% effect is absent, and equivalence that is not shown does not show a difference.", ""]
+
+
 def render_preregistration(stage: str, frozen: dict | None = None) -> str:
     """``stage`` is "draft (M4)" or "frozen (M6)"; ``frozen`` holds the M5/M6 values (alpha*, eta, model id, tag)."""
     cfg = base_config()
@@ -247,7 +260,8 @@ def render_preregistration(stage: str, frozen: dict | None = None) -> str:
         f"Pilot SD of paired NOx changes {p['power']['sd_pct_used']:.3f}% (largest over comparisons and levels); "
         f"alpha per test {p['power']['alpha_adjusted']:.5f}; 80% power needs n = {p['power']['n_superiority']} "
         f"(superiority at 2%) and {p['power']['n_equivalence']} (TOST at +-2%, true effect 0); confirmatory n = "
-        f"{n}.", "",
+        f"{n} (n = max({cfg.seeds.test_n_min}, ceil(1.2 n_power)), capped at {cfg.seeds.test_n_max}).", "",
+        *_power_at_n_lines(fz.get("power_at_n"), n, cfg.analysis.sesoi_pct),
         "## Exploratory (not confirmatory)", "",
         "Everything except PC1-PC4: secondary metrics, CO2, RQ5 side effects, Pareto curves over alpha, forecast "
         "skill, the literal-threshold legacy variant, the travel-time effects, Tier 2.", "",

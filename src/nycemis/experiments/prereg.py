@@ -15,6 +15,7 @@ from datetime import date
 import yaml
 
 from nycemis.experiments.plan import load_experiment
+from nycemis.experiments.power import detectable_at, power_at
 from nycemis.manifest import sha256_file
 from nycemis.models.train import model_path
 from nycemis.paths import configs_dir, rel, repo_root, results_dir
@@ -87,6 +88,15 @@ def freeze() -> dict:
     sel = json.loads((results_dir() / "validation" / "selection.json").read_text(encoding="utf-8"))
     pilot = json.loads((results_dir() / "pilot" / "pilot_summary.json").read_text(encoding="utf-8"))
     n = int(pilot["power"]["n_confirmatory"])
+    pw = pilot["power"]
+    args = (n, pw["sd_pct_used"])
+    sim = {"alpha": pw["alpha_adjusted"], "sims": pw["sims_per_n"], "seed": pw["seed"]}
+    power_at_n = {
+        "superiority": power_at("superiority", *args, pw["sesoi_pct"], **sim),
+        "equivalence": power_at("equivalence", *args, pw["sesoi_pct"], **sim),
+        "detectable_effect_pct": detectable_at("superiority", *args, **sim),
+        "detectable_margin_pct": detectable_at("equivalence", *args, **sim),
+    }
     a_ml = sel["eco_ml"]["alpha_star"]
     model_id = _validation_params(f"eco_ml_a{a_ml:.2f}")["model_id"]
     mpath = model_path(SCENARIO, model_id)
@@ -101,6 +111,7 @@ def freeze() -> dict:
         "date": date.today().isoformat(),
         "commit": "the commit tagged prereg-v1",
         "tag": "prereg-v1",
+        "power_at_n": power_at_n,
     }
     cfg_path = write_confirmatory(sel, n)
     doc = render_preregistration("frozen (M6)", frozen=frozen)

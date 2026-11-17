@@ -8,7 +8,7 @@ from scipy import stats
 
 from nycemis.analysis.spatial import gini
 from nycemis.analysis.stats import bca_ci, holm, paired, pct_change, tost_wilcoxon, wilcoxon_two_sided
-from nycemis.experiments.power import confirmatory_n
+from nycemis.experiments.power import confirmatory_n, detectable_at, power_at
 
 
 def test_pct_change() -> None:
@@ -62,6 +62,14 @@ def test_confirmatory_n_rule() -> None:
     assert confirmatory_n(40, 30, 60) == 48
     assert confirmatory_n(70, 30, 60) == 60
     assert confirmatory_n(None, 30, 60) == 60
+
+
+@pytest.mark.parametrize("kind", ["superiority", "equivalence"])
+def test_detectable_effect_is_the_80_percent_power_point(kind: str) -> None:
+    sim = {"alpha": 0.05, "sims": 300, "seed": 3}
+    e = detectable_at(kind, 20, 3.0, tol=0.02, **sim)
+    assert power_at(kind, 20, 3.0, e, **sim) >= 0.8
+    assert power_at(kind, 20, 3.0, e - 0.02, **sim) < 0.8
 
 
 def test_gini() -> None:

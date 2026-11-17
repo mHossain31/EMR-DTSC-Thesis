@@ -87,7 +87,12 @@ per-vehicle NOx rate is \ModelMAER\ (persistence: \PersistMAER) and for speed \M
 For each seed we compute the percent change of total NOx against the reference. PC2 (C4 vs C0) and PC3 (C4 vs C1)
 are two-sided Wilcoxon tests; PC1 (C5 vs C0) and PC4 (C4 vs C3) are TOST equivalence tests with a margin of
 $\pm$\SESOI\%. The \TestsInFamily\ tests (four comparisons times three levels) form one Holm family at \FamilywiseAlpha. The
-pilot SD of paired changes (\PilotSD\%) gave $n = \ConfirmatoryN$ test seeds per condition and level.
+pilot SD of paired changes (\PilotSD\%) gave $n = \ConfirmatoryN$ test seeds per condition and level, the cap of
+the preregistered rule (80\% power would need $n = \NPowerSup$ for superiority and $n = \NPowerEq$ for equivalence). At
+$n = \ConfirmatoryN$ the simulated power is \PowerAtNSup\% for a true change of \SESOI\% and \PowerAtNEq\% for showing
+equivalence within $\pm$\SESOI\% when the true change is zero; 80\% power is reached at a true change of
+\DetectableEffect\% and a margin of $\pm$\DetectableMargin\%. A non-significant test is therefore not evidence that an
+effect of \SESOI\% is absent.
 
 \section{Results}\label{sec:results}
 \subsection{The legacy result}
