@@ -3,23 +3,23 @@
   "checks": {
     "bbox_match": {
       "ok": false,
-      "detail": "net covers the box shrunk by 5%: True; 81.7% of lane-km inside the box (minimum 90%); net lon/lat extent (-74.0058, 40.6811, -73.9647, 40.7145); box (-74.005, 40.685, -73.975, 40.705)"
+      "detail": "net covers the box shrunk by 5%: True; 89.6% of lane-km inside the box (minimum 90%); net lon/lat extent (-74.0138, 40.6484, -73.9578, 40.7145); box (-74.005, 40.675, -73.96, 40.705)"
     },
     "edge_count": {
-      "ok": false,
-      "detail": "1078 non-internal edges (allowed 1500-20000)"
+      "ok": true,
+      "detail": "2444 non-internal edges (allowed 1500-20000)"
     },
     "traffic_lights": {
       "ok": true,
-      "detail": "178 signalised junctions"
+      "detail": "454 signalised junctions"
     },
     "strong_connectivity": {
       "ok": true,
-      "detail": "largest strongly connected component holds 91.3% of edges (94 components; minimum 90%)"
+      "detail": "largest strongly connected component holds 93.2% of edges (166 components; minimum 90%)"
     },
     "dead_end_share": {
       "ok": true,
-      "detail": "16 edges without a successor (1.5%); reported, not gated"
+      "detail": "36 edges without a successor (1.5%); reported, not gated"
     },
     "no_zero_length_edges": {
       "ok": true,
@@ -27,55 +27,56 @@
     }
   },
   "stats": {
-    "lane_km_inside_bbox_share": 0.8166,
-    "edges": 1078,
-    "nodes": 601,
-    "lane_km": 158.25,
-    "traffic_lights": 178,
-    "largest_scc_edges": 984,
-    "largest_scc_share": 0.9128,
-    "scc_count": 94,
+    "lane_km_inside_bbox_share": 0.8959,
+    "edges": 2444,
+    "nodes": 1251,
+    "lane_km": 336.0,
+    "traffic_lights": 454,
+    "largest_scc_edges": 2279,
+    "largest_scc_share": 0.9325,
+    "scc_count": 166,
     "weak_components": 1,
-    "dead_end_edges": 16,
-    "dead_end_share": 0.0148,
-    "source_edges": 15,
+    "dead_end_edges": 36,
+    "dead_end_share": 0.0147,
+    "source_edges": 38,
     "speed_limits_kmh": {
-      "10": 7,
-      "16": 4,
-      "24": 18,
-      "32": 333,
-      "40": 397,
-      "48": 10,
-      "50": 165,
+      "10": 9,
+      "16": 11,
+      "24": 24,
+      "32": 505,
+      "40": 857,
+      "48": 13,
+      "50": 614,
       "56": 8,
-      "72": 25,
-      "80": 75,
-      "100": 36
+      "72": 43,
+      "80": 174,
+      "100": 185,
+      "142": 1
     },
     "road_class_edges": {
-      "residential/service": 521,
-      "primary/secondary": 367,
-      "tertiary": 92,
-      "motorway/trunk": 98
+      "residential/service": 1222,
+      "tertiary": 209,
+      "primary/secondary": 857,
+      "motorway/trunk": 156
     },
     "road_class_lane_km": {
-      "residential/service": 50.17,
-      "primary/secondary": 57.64,
-      "tertiary": 8.61,
-      "motorway/trunk": 41.83
+      "residential/service": 136.08,
+      "tertiary": 18.29,
+      "primary/secondary": 113.46,
+      "motorway/trunk": 68.17
     },
     "edge_types": {
-      "highway.residential": 451,
-      "highway.secondary": 224,
-      "highway.primary": 125,
-      "highway.tertiary": 92,
-      "highway.unclassified": 63,
+      "highway.residential": 1048,
+      "highway.secondary": 586,
+      "highway.primary": 247,
+      "highway.tertiary": 209,
+      "highway.unclassified": 158,
+      "highway.motorway_link": 58,
+      "highway.motorway": 54,
       "highway.trunk": 38,
-      "highway.motorway_link": 29,
-      "highway.motorway": 25,
-      "highway.secondary_link": 10,
+      "highway.living_street": 16,
+      "highway.secondary_link": 16,
       "highway.primary_link": 8,
-      "highway.living_street": 7,
       "highway.trunk_link": 6
     }
   }

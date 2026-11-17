@@ -25,8 +25,8 @@
       "osm_base": "2026-11-16T01:11:13Z"
     },
     "scenarios/dtbk/dtbk.net.xml.gz": {
-      "sha256": "006bac57373dd2a965077c14d83377d8b730ce4cb67e371259ef3326e77dd934",
-      "bytes": 431570,
+      "sha256": "e4bc33480a45fd6b41050eddd0d59bb5d4956a5062fb3b301c85c4a4632a1fe9",
+      "bytes": 988059,
       "kind": "network",
       "scenario": "dtbk",
       "sumo_version": "1.28.0"

@@ -8,8 +8,8 @@
       ],
       "ok": true,
       "exit_code": 0,
-      "bytes": 8117767,
-      "warnings_count": 33,
+      "bytes": 19272612,
+      "warnings_count": 44,
       "errors": [],
       "file": "data/networks/dtbk/dtbk.plain.xodr"
     },
@@ -22,8 +22,8 @@
       ],
       "ok": true,
       "exit_code": 0,
-      "bytes": 8116873,
-      "warnings_count": 40,
+      "bytes": 19269946,
+      "warnings_count": 46,
       "errors": [],
       "file": "data/networks/dtbk/dtbk.scurve.xodr"
     }

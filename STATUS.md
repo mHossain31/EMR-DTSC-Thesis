@@ -3,11 +3,11 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** M5 (forecaster and alpha*). G4 passed (pilot complete, n = 60). The dataset experiment
-  is complete (432/432, verified). The forecaster gbm_v1 is frozen (tag `model-freeze-v1`; r and v on their own
-  scale, DEVIATIONS #14; the first, log1p version is kept as `models/flushing/gbm_v1_rejected_log1p/`). The
-  validation experiment (alpha sweeps, placebo eta) is running.
-- **Last updated:** 2026-11-16 22:10.
+- **Current milestone:** M6 (confirmatory runs). G5 passed: validation 612/612 verified; `python -m nycemis select`
+  gave alpha*_reactive = alpha*_ml = 0.75 and eta = 1 (`results/validation/selection.json`). The preregistration is
+  frozen (commit 0a020b3, tag `prereg-v1`, analysis-code hash 09dbec7a, the same in a clean clone of the tag;
+  `verify-all --only prereg` passes). The confirmatory experiment (1,080 runs, test seeds 200-259) is running.
+- **Last updated:** 2026-11-16 23:30.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -21,11 +21,9 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 
 | Job | Started | Log | Notes |
 |---|---|---|---|
-| validation, all controllers (370 of 612 runs left) | 2026-11-16 22:05 | `results/logs/validation.log` | memory gate, budget 16.5 GB |
-| dtbk OSM download, enlarged box (DEVIATIONS #15) | 2026-11-16 22:07 | `results/logs/fetch_dtbk3.log` | network only |
+| confirmatory, 6 conditions x 3 levels x 60 seeds (1,080 runs) | 2026-11-16 23:25 | `results/logs/confirmatory.log` | memory gate, budget 14.3 GB; about 5 h; CPU-heavy |
 
-The 19:30 dtbk download did not happen: the fetch reused the old extract because it checked only the file hash; it
-now also compares the box (`network/osm_fetch.py`).
+The dtbk extract for the enlarged box was downloaded at 22:44 after 12 failed Overpass attempts (commit 256eabb).
 
 If a job is stopped, run the same command again: DONE runs are skipped, partial run directories are removed and
 rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
@@ -49,24 +47,26 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
-1. When validation ends: `python -m nycemis experiment verify --exp validation`; `python -m nycemis select`
-   (alpha*_reactive, alpha*_ml, eta). G5.
-2. `python -m nycemis prereg` (writes `configs/experiments/confirmatory.yaml` and the frozen
-   `docs/PREREGISTRATION.md`); review, commit, tag `prereg-v1`.
-3. `python -m nycemis experiment plan --exp confirmatory`; run detached (1,080 runs, overnight); verify (G6).
-4. `python -m nycemis analyze` (M7), adversarial review, G7; then M9.
-5. dtbk: when the download ends, `python -m nycemis net build --scenario dtbk` and check G1.
+1. When the confirmatory batch ends: `python -m nycemis experiment verify --exp confirmatory` (G6) and
+   `python -m nycemis verify-all --only prereg` (the tag predates every confirmatory run).
+2. `python -m nycemis analyze` (M7; rehearsed end to end on relabelled pilot runs, Pareto plot included), then an
+   independent adversarial review, G7.
+3. M9: `python -m nycemis paper` (tectonic into `tools/`), application materials, `RESEARCH_AGENDA.md`,
+   `verify-all`, tag v1.0.
+4. Any change to `src/nycemis/analysis/*.py` or `configs/base.yaml` from here on changes the frozen hash: record
+   it in `docs/DEVIATIONS.md` with the new hash, or `verify-all` fails.
 
 ## Gates
 
 | Gate | Status | Evidence |
 |---|---|---|
 | G0 | done except doctor's Overpass check (server-side, intermittent) | `docs/LEGACY_AUDIT.md`; `python -m nycemis doctor` |
-| G1 | Flushing, smoke and Midtown done; dtbk box enlarged (DEVIATIONS #15), download running | `data/networks/<s>/network_report.md` |
+| G1 | Flushing, smoke and Midtown done; dtbk built for the enlarged box and passes every check but bbox_match (89.6%, minimum 90%; DEVIATIONS #16, open item 1: decision) | `data/networks/<s>/network_report.md` |
 | G2 | done | `configs/demand_levels.yaml`, `results/calibration/flushing/` |
 | G3 | done | 62 tests pass (`pytest`), including API contract, determinism, libsumo vs TraCI, reconciliation, shadow parity, alpha = 0 sanity on smoke, poison test, statistics |
 | G4 | done | `results/pilot/pilot_report.md`: alpha = 0 sanity passes at every level, all C2/C3 runs valid, n = 60 |
-| G5 | in progress | dataset verified (432 runs); `models/flushing/gbm_v1/model_card.md` (tag `model-freeze-v1`); validation running |
+| G5 | done | dataset verified (432 runs); `models/flushing/gbm_v1/model_card.md` (tag `model-freeze-v1`); validation verified (612 runs); `results/validation/selection.json` |
+| G6 | in progress | `docs/PREREGISTRATION.md` (tag `prereg-v1`); confirmatory running |
 
 ## Decisions so far
 
