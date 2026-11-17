@@ -31,3 +31,7 @@ tailpipe emission mass**, per trip and in total.
 12. **Fleet shares are assumed.** The mix of emission classes in `configs/fleet.yaml` is a modelling choice, not
     New York registration data; diesel vehicles emit far more NOx per kilometre than petrol ones in HBEFA, so the
     mix strongly affects absolute NOx.
+13. **Downtown Brooklyn overhangs its box.** The Tier-2 Downtown Brooklyn network keeps whole the roads that cross its
+    box edge, so 10.4% of its lane-km (mostly the Manhattan and Brooklyn Bridges and the Gowanus Expressway) lie
+    outside the box, against the 90% inside share the other networks meet (DEVIATIONS #16). It is used in no
+    experiment.

@@ -61,7 +61,7 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 | Gate | Status | Evidence |
 |---|---|---|
 | G0 | done except doctor's Overpass check (server-side, intermittent) | `docs/LEGACY_AUDIT.md`; `python -m nycemis doctor` |
-| G1 | Flushing, smoke and Midtown done; dtbk built for the enlarged box and passes every check but bbox_match (89.6%, minimum 90%; DEVIATIONS #16, open item 1: decision) | `data/networks/<s>/network_report.md` |
+| G1 | done: Flushing, smoke, Midtown and dtbk validated; dtbk misses bbox_match (89.6% inside, minimum 90%), accepted as a documented Tier-2 limitation (DEVIATIONS #16, LIMITATIONS 13) | `data/networks/<s>/network_report.md` |
 | G2 | done | `configs/demand_levels.yaml`, `results/calibration/flushing/` |
 | G3 | done | 62 tests pass (`pytest`), including API contract, determinism, libsumo vs TraCI, reconciliation, shadow parity, alpha = 0 sanity on smoke, poison test, statistics |
 | G4 | done | `results/pilot/pilot_report.md`: alpha = 0 sanity passes at every level, all C2/C3 runs valid, n = 60 |
