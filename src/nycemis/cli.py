@@ -257,12 +257,16 @@ def prereg_cmd() -> None:
 
 @app.command("paper")
 def paper_cmd(pdf: bool = typer.Option(True, "--pdf/--no-pdf")) -> None:
-    """Regenerate paper/macros.tex and the interview FAQ from results files; compile the PDF if a TeX engine exists."""
+    """Regenerate paper/macros.tex, the interview FAQ, the one-page research summary and the project page from results
+    files; compile the PDF if a TeX engine exists."""
     from nycemis.analysis.documents import render_faq
     from nycemis.analysis.paper import build_pdf, write_macros
+    from nycemis.application import write_application
 
     typer.echo(f"wrote {write_macros()}")
     typer.echo(f"wrote {render_faq()}")
+    for path in write_application():
+        typer.echo(f"wrote {path}")
     if pdf:
         out = build_pdf()
         if out is None:
