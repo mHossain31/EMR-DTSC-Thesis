@@ -98,10 +98,11 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
   mean of everything observed so far in the run), weight vs / (vs + 30).
 - **C1 route changes** are counted by sampling every vehicle's remaining route at each tick; `n_reroutes` is the
   sum of tripinfo `rerouteNo`.
-- **C5** (`legacy_ml`): the legacy RF (100 trees, unbounded depth, as the notebook) holds about 2.6 GB resident
-  (4 GB committed) per process; the executor runs at most 5 C5 runs at a time (`execution.max_concurrent`) in their
-  own pool. On 2026-11-15 an earlier pilot attempt without the limit ran out of commit memory (exit code
-  0xC000012D) and those runs were rerun.
+- **C5** (`legacy_ml`): the legacy RF (100 trees, unbounded depth, as the notebook) is loaded as a shared
+  memory-mapped forest (see "Legacy RF at run time" below), so a C5 run commits about 1.1 GB like the other
+  controllers; C5 runs are slower (CPU) and run in their own pool of at most 8 (`execution.max_concurrent`). On
+  2026-11-15, when each process still loaded scikit-learn's format (about 4 GB committed), a pilot attempt ran out
+  of commit memory (exit code 0xC000012D) and those runs were rerun.
 - **Long batches** are launched as detached processes (WMI `Win32_Process.Create`) so they survive the end of an
   interactive session; logs are in `results/logs/`.
 

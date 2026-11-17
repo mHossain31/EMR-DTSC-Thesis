@@ -113,11 +113,16 @@ def fetch(
     base_delay_s: float = 60.0,
     force: bool = False,
 ) -> dict:
-    """Download (or reuse) the frozen extract. Returns the download metadata."""
+    """Download (or reuse) the frozen extract. Returns the download metadata. A frozen extract is reused only when its
+    hash matches the manifest and it was downloaded for the same box as the scenario config now gives."""
     target = osm_path(scenario)
     if target.is_file() and manifest.verify(target) and not force:
-        log.info("%s already frozen (hash matches the manifest); not downloading again", rel(target))
-        return json.loads(meta_path(scenario).read_text(encoding="utf-8"))
+        frozen = json.loads(meta_path(scenario).read_text(encoding="utf-8"))
+        if frozen.get("bbox_wsen") == list(bbox):
+            log.info("%s already frozen (hash matches the manifest); not downloading again", rel(target))
+            return frozen
+        log.warning("%s was downloaded for box %s, but the scenario config now gives %s: downloading again",
+                    rel(target), frozen.get("bbox_wsen"), list(bbox))
 
     target.parent.mkdir(parents=True, exist_ok=True)
     deadline = time.monotonic() + 60 * max_wait_min
