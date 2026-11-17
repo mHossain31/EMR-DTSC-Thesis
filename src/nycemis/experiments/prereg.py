@@ -31,11 +31,18 @@ def analysis_code_files() -> list:
     return [*files, root / "configs" / "base.yaml"]
 
 
+def text_sha256(path) -> str:
+    """SHA-256 of a text file with CRLF read as LF: the repository stores LF (.gitattributes), while a Windows
+    checkout may hold CRLF, and the hash must be the same in both."""
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
 def analysis_code_sha256() -> str:
-    """SHA-256 over (relative path, file SHA-256) pairs, so a renamed or edited file changes the hash."""
+    """SHA-256 over (relative path, file SHA-256) pairs, so a renamed or edited file changes the hash; line endings
+    do not (``text_sha256``)."""
     h = hashlib.sha256()
     for p in analysis_code_files():
-        h.update(f"{rel(p)}\0{sha256_file(p)}\n".encode())
+        h.update(f"{rel(p)}\0{text_sha256(p)}\n".encode())
     return h.hexdigest()
 
 
