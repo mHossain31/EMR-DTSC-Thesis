@@ -107,7 +107,8 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
 
 ## Models (M4, M5)
 
-- **Frozen binaries are not committed** (`models/**/*.joblib`): the legacy RF is 556 MB. Each model directory
+- **Frozen binaries**: the forecaster `models/flushing/gbm_v1/model.joblib` (34 MB) is committed with the `model-freeze-v1`
+  tag (docs/SPECIFICATION.md 7.5). Other binaries are not committed (`models/**/*.joblib`; the legacy RF is 556 MB). Each model directory
   commits its `metrics.json`, `model_card.md` and `train_manifest.json` (training runs and data hashes); the binary
   is rebuilt deterministically by `python -m nycemis train-legacy` / `train` (fixed seeds).
 - **Legacy RF at run time** (`models/compact_forest.py`): legacy_ml runs load the RF as flat arrays (child indices,

@@ -45,3 +45,4 @@ paper/*.toc
 models/**/*.joblib
 models/**/compact/*.npy
 models/smoke/
+!models/flushing/gbm_v1/model.joblib
