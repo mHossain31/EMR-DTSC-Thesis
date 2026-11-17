@@ -41,13 +41,14 @@ def _tests(df: pd.DataFrame, valid_only: bool) -> list[dict]:
                          a.bootstrap_seed)
             p = res.p_tost if kind == "equivalence" else res.p_wilcoxon
             rows.append({"pc": pc, "condition": cond, "reference": ref, "kind": kind, "level": level,
-                         "p_test": p, **res.as_dict()})
+                         "margin_pct": a.sesoi_pct if kind == "equivalence" else None, "p_test": p,
+                         **res.as_dict()})
     reject, adj = holm([r["p_test"] for r in rows], a.familywise_alpha)
     for r, rej, pa in zip(rows, reject, adj, strict=True):
         r["p_holm"] = pa
         r["reject_holm"] = rej
         if r["kind"] == "equivalence":
-            r["outcome"] = "equivalent within +-2%" if rej else "equivalence not shown"
+            r["outcome"] = f"equivalent within +-{r['margin_pct']:g}%" if rej else "equivalence not shown"
         else:
             r["outcome"] = ("reduction" if r["mean_pct"] < 0 else "increase") if rej else "no significant difference"
     return rows

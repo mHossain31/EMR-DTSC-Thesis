@@ -21,10 +21,11 @@ def confirmatory_sentence(r: dict) -> str:
     ci95 = f"95% CI {r['ci95_low']:+.2f}% to {r['ci95_high']:+.2f}%"
     if r["kind"] == "equivalence":
         ci90 = f"90% CI {r['ci90_low']:+.2f}% to {r['ci90_high']:+.2f}%"
+        margin = f"+-{r['margin_pct']:g}%"
         if r["reject_holm"]:
-            return (f"At {lvl} demand, total NOx under {cond} is equivalent to {ref} within +-2% (mean "
+            return (f"At {lvl} demand, total NOx under {cond} is equivalent to {ref} within {margin} (mean "
                     f"{r['mean_pct']:+.2f}%, {ci90}; Holm-adjusted TOST p = {r['p_holm']:.3g}).")
-        return (f"At {lvl} demand, equivalence of {cond} and {ref} within +-2% is not shown (mean "
+        return (f"At {lvl} demand, equivalence of {cond} and {ref} within {margin} is not shown (mean "
                 f"{r['mean_pct']:+.2f}%, {ci90}; Holm-adjusted TOST p = {r['p_holm']:.3g}).")
     if r["reject_holm"]:
         verb = "lower" if r["mean_pct"] < 0 else "higher"
