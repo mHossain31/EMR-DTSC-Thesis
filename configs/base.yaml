@@ -45,3 +45,4 @@ execution:
   disk_max_frac_of_free: 0.5
   max_concurrent:              # per-controller limits (memory): a legacy_ml process holds about 4 GB
     legacy_ml: 5
+  memory_reserve_gb: 6.0       # physical RAM kept free for the OS, the display driver and other programs

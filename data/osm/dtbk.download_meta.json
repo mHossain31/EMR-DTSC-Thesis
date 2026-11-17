@@ -1,0 +1,42 @@
+{
+  "scenario": "dtbk",
+  "bbox_wsen": [
+    -74.005,
+    40.685,
+    -73.975,
+    40.705
+  ],
+  "endpoint": "https://overpass-api.de/api/interpreter",
+  "downloaded_utc": "2026-11-16T23:51:47+00:00",
+  "osm_base": "2026-11-16T23:50:12Z",
+  "counts": {
+    "nodes": 5632,
+    "ways": 1377,
+    "relations": 301
+  },
+  "shapes": false,
+  "road_types": {
+    "Highway": [
+      "motorway",
+      "motorway_link",
+      "trunk",
+      "trunk_link",
+      "primary",
+      "primary_link",
+      "secondary",
+      "secondary_link",
+      "tertiary",
+      "tertiary_link",
+      "unclassified",
+      "residential",
+      "living_street",
+      "unsurfaced",
+      "service",
+      "raceway",
+      "bus_guideway"
+    ]
+  },
+  "tool": "osmGet.py (SUMO tools)",
+  "sumo_version": "1.28.0",
+  "failed_attempts_before_success": 0
+}

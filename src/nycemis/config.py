@@ -124,6 +124,7 @@ class Execution(Strict):
     max_retries: int = Field(ge=0)
     disk_max_frac_of_free: float = Field(gt=0, le=1)
     max_concurrent: dict[str, int] = Field(default_factory=dict)
+    memory_reserve_gb: float = Field(ge=0)
 
 
 class BaseConfig(Strict):

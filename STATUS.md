@@ -6,7 +6,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
 - **Current milestone:** M5 (forecaster and alpha*). G4 passed (pilot complete, n = 60). The dataset experiment
   is complete (432/432, verified). The first gbm_v1 (r on log1p) was set aside before use (DEVIATIONS #14) and is
   being retrained; the validation runs that do not need it are running.
-- **Last updated:** 2026-11-16 18:55 (jobs relaunched after a PC shutdown).
+- **Last updated:** 2026-11-16 19:35 (PC crash at 19:14; training relaunched alone).
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -18,13 +18,14 @@ $cmd = "cmd.exe /c `"cd /d $root && set PYTHONIOENCODING=utf-8 && .venv\Scripts\
 Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cmd; CurrentDirectory = $root }
 ```
 
-Relaunched on 2026-11-16 at 18:51 after the PC shutdown (stopped 2026-11-15 23:21):
+After the crash of 2026-11-16 19:14 (see machine facts), training runs alone:
 
 | Job | Started | Log | Notes |
 |---|---|---|---|
-| train gbm_v1 (r on its own scale, DEVIATIONS #14) | 2026-11-16 18:51 | `results/logs/train_gbm_v1_r_raw.log` | `--n-jobs 8`; from scratch (not resumable); about 1.5 h |
-| validation, pass 1 (static, tt_adaptive, eco_reactive, random_reroute) | 2026-11-16 18:51 | `results/logs/validation.log` | 143 of 432 were DONE; 289 to run on 10 workers (memory guard) |
-| net fetch dtbk | 2026-11-16 18:51 | `results/logs/fetch_dtbk.log` | Overpass 502/504 so far; retries for up to 240 min |
+| train gbm_v1 (r on its own scale, DEVIATIONS #14) | 2026-11-16 19:29 | `results/logs/train_gbm_v1_r_raw.log` | all cores, alone; memory sampled to `results/logs/train_gbm_v1_memory.log`; about 1 h |
+
+Waiting: validation pass 1 (232 of 612 DONE; resumable) and the dtbk network build (OSM extract downloaded
+2026-11-16). Start them after training, not beside it.
 
 If they are stopped again, resume with the commands below (DONE validation runs are skipped; training restarts).
 
@@ -46,8 +47,12 @@ with a `DONE` marker are skipped; partial run directories are removed and rerun)
 
 ## Machine facts that matter for scheduling
 
-- One simulation process commits about 1.1 GB; a legacy_ml process about 4.5 GB. The executor trims its pools to
-  the available commit memory and runs at most 5 legacy_ml at a time.
+- One simulation process commits about 1.1 GB; a legacy_ml process about 4.5 GB. The executor sizes its pools to
+  the free physical RAM minus a 6 GB reserve (`execution.memory_reserve_gb`), runs at most 5 legacy_ml at a time,
+  and holds new runs while free RAM is below the reserve.
+- 2026-11-16 19:14: the PC crashed (bugcheck 0x116, display driver timeout with STATUS_INSUFFICIENT_RESOURCES)
+  while forecaster training (8 threads) ran beside 10 simulations and about 17 GB of other programs; the old guard
+  counted the page file as available memory. Do not run training beside a simulation batch.
 - With the Windows "Balanced" power plan, 15 of 24 logical processors were parked under load (2026-11-15 19:38):
   about 9 cores do the work, whatever the worker count. Switching Windows to the "Best performance" power mode would
   likely unpark them; that is a Windows power setting.
@@ -68,7 +73,7 @@ with a `DONE` marker are skipped; partial run directories are removed and rerun)
 | Gate | Status | Evidence |
 |---|---|---|
 | G0 | done except doctor's Overpass check (server-side, intermittent) | `docs/LEGACY_AUDIT.md`; `python -m nycemis doctor` |
-| G1 | Flushing, smoke and Midtown done; dtbk waits for the Overpass API | `data/networks/<s>/network_report.md` |
+| G1 | Flushing, smoke and Midtown done; dtbk extract downloaded, network build pending | `data/networks/<s>/network_report.md` |
 | G2 | done | `configs/demand_levels.yaml`, `results/calibration/flushing/` |
 | G3 | done | 62 tests pass (`pytest`), including API contract, determinism, libsumo vs TraCI, reconciliation, shadow parity, alpha = 0 sanity on smoke, poison test, statistics |
 | G4 | done | `results/pilot/pilot_report.md`: alpha = 0 sanity passes at every level, all C2/C3 runs valid, n = 60 |
