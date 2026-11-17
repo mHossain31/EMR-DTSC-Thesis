@@ -4,8 +4,8 @@
   "seed": 9000,
   "identical": true,
   "differences": {},
-  "peak_working_set_gb": 0.0,
-  "peak_commit_gb": 0.0,
+  "peak_working_set_gb": 1.27,
+  "peak_commit_gb": 1.1,
   "compared": [
     "total_nox_g",
     "total_co2_kg",

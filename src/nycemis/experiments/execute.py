@@ -52,9 +52,10 @@ def _run_once(spec: RunSpec, rdir: Path, timeout_s: float) -> tuple[bool, str]:
 
 
 COMMIT_GB_PER_RUN = 1.1  # measured: one simulation process commits about 1.0 GB
-# legacy_ml: a simulation plus the vehicle logger's extra pollutants; the legacy RF itself is a memory-mapped file
-# shared by all legacy_ml processes (models/compact_forest.py), counted once through the free-RAM check.
-COMMIT_GB_BY_CONTROLLER = {"legacy_ml": 1.6}
+# legacy_ml: measured peak 1.1 GB private, 1.27 GB working set including the touched pages of the legacy RF, a
+# memory-mapped file shared by all legacy_ml processes (models/compact_forest.py; results/legacy_audit/
+# rerun_check.json); the shared copy is counted once, through the free-RAM check.
+COMMIT_GB_BY_CONTROLLER = {"legacy_ml": 1.4}
 DEFAULT_RUN_DISK_MB = 60.0
 
 
