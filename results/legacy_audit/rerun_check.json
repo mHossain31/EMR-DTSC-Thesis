@@ -1,0 +1,23 @@
+{
+  "run_id": "ec653fef2988",
+  "level": "moderate",
+  "seed": 9000,
+  "identical": true,
+  "differences": {},
+  "peak_working_set_gb": 0.0,
+  "peak_commit_gb": 0.0,
+  "compared": [
+    "total_nox_g",
+    "total_co2_kg",
+    "mean_tt_s",
+    "p95_tt_s",
+    "vkm_total",
+    "arrived",
+    "teleports",
+    "mean_timeloss_s",
+    "last_arrival_s",
+    "n_reroutes",
+    "route_change_rate",
+    "valid"
+  ]
+}

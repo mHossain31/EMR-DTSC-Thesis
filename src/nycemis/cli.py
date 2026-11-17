@@ -198,6 +198,14 @@ def exp_verify(exp: str = typer.Option(..., "--exp")) -> None:
         raise typer.Exit(code=1)
 
 
+@app.command("export-legacy-compact")
+def export_legacy_compact_cmd(scenario: str = typer.Option("flushing")) -> None:
+    """Write the memory-mapped copy of the legacy RF that legacy_ml runs load (identical predictions)."""
+    from nycemis.models.registry import export_legacy_compact
+
+    typer.echo(json.dumps(export_legacy_compact(scenario), indent=2))
+
+
 @app.command("train-legacy")
 def train_legacy(scenario: str = typer.Option("flushing")) -> None:
     """Train and test the legacy RF (C5) on the legacy_train records; writes models/<scenario>/legacy_rf/."""

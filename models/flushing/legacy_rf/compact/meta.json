@@ -1,0 +1,11 @@
+{
+  "n_trees": 100,
+  "n_nodes": 36364934,
+  "max_depth": 118,
+  "n_features": 4,
+  "source": {
+    "name": "model.joblib",
+    "size": 556477160,
+    "mtime_ns": 1794752331511526900
+  }
+}

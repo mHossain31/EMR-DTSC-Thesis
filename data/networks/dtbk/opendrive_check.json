@@ -1,0 +1,32 @@
+{
+  "scenario": "dtbk",
+  "variants": [
+    {
+      "variant": "plain",
+      "options": [
+        "--output.original-names"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 8117767,
+      "warnings_count": 33,
+      "errors": [],
+      "file": "data/networks/dtbk/dtbk.plain.xodr"
+    },
+    {
+      "variant": "scurve",
+      "options": [
+        "--output.original-names",
+        "--junctions.scurve-stretch",
+        "1.0"
+      ],
+      "ok": true,
+      "exit_code": 0,
+      "bytes": 8116873,
+      "warnings_count": 40,
+      "errors": [],
+      "file": "data/networks/dtbk/dtbk.scurve.xodr"
+    }
+  ],
+  "ok": true
+}

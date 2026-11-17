@@ -110,6 +110,18 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
 - **Frozen binaries are not committed** (`models/**/*.joblib`): the legacy RF is 556 MB. Each model directory
   commits its `metrics.json`, `model_card.md` and `train_manifest.json` (training runs and data hashes); the binary
   is rebuilt deterministically by `python -m nycemis train-legacy` / `train` (fixed seeds).
+- **Legacy RF at run time** (`models/compact_forest.py`): legacy_ml runs load the RF as flat arrays (child indices,
+  split feature, float64 threshold, leaf value; 36.4 million nodes, about 0.9 GB) that every process memory-maps
+  read-only, so concurrent runs share one physical copy; scikit-learn's own format took about 4 GB per process.
+  Predictions are identical to `RandomForestRegressor.predict` (float32 inputs against float64 thresholds, trees added
+  in estimator order), checked exactly on synthetic forests, on 100,000 logged records with the frozen RF
+  (`tests/regression/test_legacy_compact.py`), and by rerunning a pilot legacy_ml run
+  (`scripts/check_legacy_rerun.py`, `results/legacy_audit/rerun_check.json`). `python -m nycemis train-legacy` writes
+  the arrays; `python -m nycemis export-legacy-compact` rebuilds them from `model.joblib`.
+- **Executor memory** (2026-11-16): a batch gets a memory budget (free RAM minus a 6 GB reserve); a gate admits a
+  run only while the admitted runs' expected memory fits it and free RAM stays above the reserve. Pools only bound
+  concurrency. The earlier guard counted the page file as free memory and preceded a system crash
+  (`STATUS.md`).
 - **Legacy RF training data**: 642,472 rows (the legacy data frame's size) drawn at random (seed 42) from the
   per-vehicle-step records of static runs on train seeds 0-1, all three levels.
 - **Forecaster**: LightGBM per target (r and v on their own scale, so conditional means; d on log1p; DEVIATIONS #14), random search of 30 trials with early stopping

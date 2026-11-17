@@ -1,0 +1,11 @@
+{
+  "seconds_simulated": 300,
+  "exit_code": 0,
+  "errors": 0,
+  "errors_sample": [],
+  "warnings_count": 0,
+  "warnings_sample": [],
+  "vehicles_inserted": 158,
+  "wall_s": 0.54,
+  "gui_command": "sumo-gui -c scenarios/dtbk/dtbk.sumocfg   (or: python -m nycemis gui --scenario dtbk)"
+}

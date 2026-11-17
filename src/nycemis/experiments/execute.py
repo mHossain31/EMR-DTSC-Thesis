@@ -7,11 +7,11 @@ simulation per process), launched by a pool of worker threads that only wait on 
 
 Before a batch starts, two guards run (docs/SPECIFICATION.md 6.6 and the memory incidents of 2026-11-15 and 2026-11-16,
 docs/DESIGN.md): the expected disk use must stay below ``disk_max_frac_of_free`` of the free space (else the batch
-aborts), and the worker pools are trimmed so that their expected memory fits in the available physical RAM minus
-``memory_reserve_gb`` (and in 80% of the available commit memory). While the batch runs, a memory gate holds back
-each new run until the free physical RAM exceeds the reserve plus the run's expected use, and spaces launches a few
-seconds apart, so other programs that grow or start during a batch pause it instead of pushing the machine into
-paging. (On 2026-11-16 a pool sized on commit memory, which counts the page file, plus a concurrent training job
+aborts), and the batch gets a memory budget: the free physical RAM minus ``memory_reserve_gb`` (at most 80% of the
+free commit memory). A memory gate (``MemoryGate``) admits each run only while the expected memory of the admitted
+runs fits that budget and the free RAM still exceeds the reserve plus the run's expected use; launches are
+serialised and spaced a few seconds apart. Other programs that grow or start during a batch therefore pause it
+instead of pushing the machine into paging. (On 2026-11-16 a pool sized on commit memory, which counts the page file, plus a concurrent training job
 paged the machine until the display driver failed: bugcheck 0x116 with STATUS_INSUFFICIENT_RESOURCES.)
 """
 
@@ -52,7 +52,9 @@ def _run_once(spec: RunSpec, rdir: Path, timeout_s: float) -> tuple[bool, str]:
 
 
 COMMIT_GB_PER_RUN = 1.1  # measured: one simulation process commits about 1.0 GB
-COMMIT_GB_BY_CONTROLLER = {"legacy_ml": 4.5}  # measured: 4.2 GB with the legacy RF loaded
+# legacy_ml: a simulation plus the vehicle logger's extra pollutants; the legacy RF itself is a memory-mapped file
+# shared by all legacy_ml processes (models/compact_forest.py), counted once through the free-RAM check.
+COMMIT_GB_BY_CONTROLLER = {"legacy_ml": 1.6}
 DEFAULT_RUN_DISK_MB = 60.0
 
 
@@ -92,32 +94,62 @@ def _memory_status() -> tuple[float, float] | None:
     return st.ullAvailPhys / 1e9, st.ullAvailPageFile / 1e9
 
 
-class MemoryGate:
-    """Holds back each launch until free physical RAM exceeds the reserve plus the run's expected use."""
+def memory_budget_gb(reserve_gb: float) -> float | None:
+    """Memory a batch may use: free physical RAM minus the reserve, and at most 80% of the free commit memory."""
+    st = _memory_status()
+    if st is None:
+        return None
+    phys, commit = st
+    budget = min(phys - reserve_gb, 0.8 * commit)
+    log.info("memory: %.1f GB RAM free, reserve %.1f GB, %.1f GB commit free: batch budget %.1f GB", phys,
+             reserve_gb, commit, budget)
+    return budget
 
-    def __init__(self, reserve_gb: float) -> None:
+
+class MemoryGate:
+    """Admits one launch at a time. A run is launched only when (1) the expected memory of the runs already admitted
+    plus its own stays within the batch budget (the first run is always admitted) and (2) the free physical RAM still
+    exceeds the reserve plus its expected use, which catches other programs growing during the batch. Launches are
+    serialised and spaced, so a large run waiting for memory is not overtaken by small ones."""
+
+    def __init__(self, budget_gb: float | None, reserve_gb: float) -> None:
+        self.budget_gb = budget_gb
         self.reserve_gb = reserve_gb
-        self._lock = threading.Lock()
+        self.in_use_gb = 0.0
+        self._launch = threading.Lock()
+        self._account = threading.Lock()
         self._last = 0.0
 
-    def wait(self, need_gb: float) -> None:
-        with self._lock:
+    def _fits(self, need_gb: float) -> tuple[bool, float | None]:
+        with self._account:
+            in_use = self.in_use_gb
+        avail = available_phys_gb()
+        budget_ok = self.budget_gb is None or in_use == 0 or in_use + need_gb <= self.budget_gb
+        ram_ok = avail is None or in_use == 0 or avail - self.reserve_gb >= need_gb
+        return budget_ok and ram_ok, avail
+
+    def acquire(self, need_gb: float) -> None:
+        with self._launch:
             warned = False
             while True:
-                avail = available_phys_gb()
-                if avail is None or avail - self.reserve_gb >= need_gb:
+                ok, avail = self._fits(need_gb)
+                if ok:
                     break
                 if not warned:
-                    log.warning("memory gate: %.1f GB RAM free, reserve %.1f GB: holding new runs", avail,
-                                self.reserve_gb)
+                    log.info("memory gate: %.1f of %.1f GB admitted, %.1f GB RAM free: holding the next launch",
+                             self.in_use_gb, self.budget_gb or 0.0, avail or 0.0)
                     warned = True
                 time.sleep(GATE_POLL_S)
-            if warned:
-                log.info("memory gate: %.1f GB RAM free again; resuming launches", available_phys_gb() or 0.0)
             pause = LAUNCH_SPACING_S - (time.monotonic() - self._last)
             if pause > 0:
                 time.sleep(pause)
             self._last = time.monotonic()
+            with self._account:
+                self.in_use_gb += need_gb
+
+    def release(self, need_gb: float) -> None:
+        with self._account:
+            self.in_use_gb -= need_gb
 
 
 def _disk_guard(d: Path, n_todo: int, frac: float) -> None:
@@ -129,24 +161,6 @@ def _disk_guard(d: Path, n_todo: int, frac: float) -> None:
     log.info("disk: about %.1f GB needed for %d runs (%.0f MB each), %.0f GB free", need_gb, n_todo, per_run, free_gb)
     if need_gb > frac * free_gb:
         raise RuntimeError(f"expected disk use {need_gb:.1f} GB exceeds {frac:.0%} of free space ({free_gb:.0f} GB)")
-
-
-def _memory_guard(general: int, limited: dict[str, int], reserve_gb: float) -> int:
-    st = _memory_status()
-    if st is None:
-        log.warning("cannot read available memory on this platform; worker pools not checked")
-        return general
-    phys, commit = st
-    fixed = sum(n * COMMIT_GB_BY_CONTROLLER.get(c, COMMIT_GB_PER_RUN) for c, n in limited.items())
-    budget = min(phys - reserve_gb, 0.8 * commit) - fixed
-    fit = max(1, int(budget // COMMIT_GB_PER_RUN))
-    if fit < general:
-        log.warning("memory: %.1f GB RAM free (reserve %.1f GB), %.1f GB commit; general pool trimmed from %d to %d "
-                    "workers", phys, reserve_gb, commit, general, fit)
-        return fit
-    log.info("memory: %.1f GB RAM free (reserve %.1f GB), %.1f GB commit; pools fit (%d general workers)", phys,
-             reserve_gb, commit, general)
-    return general
 
 
 def run_experiment(name: str, workers: int | None = None, timeout_s: float | None = None,
@@ -170,26 +184,28 @@ def run_experiment(name: str, workers: int | None = None, timeout_s: float | Non
     failures: dict[str, str] = {}
     t0 = time.perf_counter()
 
-    gate = MemoryGate(cfg.memory_reserve_gb)
+    _disk_guard(d, len(todo), cfg.disk_max_frac_of_free)
+    gate = MemoryGate(memory_budget_gb(cfg.memory_reserve_gb), cfg.memory_reserve_gb)
 
     def job(spec: RunSpec, rdir: Path) -> tuple[str, bool, str]:
         msg = ""
         need = COMMIT_GB_BY_CONTROLLER.get(spec.controller, COMMIT_GB_PER_RUN)
         for attempt in range(cfg.max_retries + 1):
-            gate.wait(need)
-            ok, msg = _run_once(spec, rdir, timeout_s)
+            gate.acquire(need)
+            try:
+                ok, msg = _run_once(spec, rdir, timeout_s)
+            finally:
+                gate.release(need)
             if ok:
                 return spec.run_id(), True, ""
             log.warning("run %s attempt %d failed: %s", spec.run_id(), attempt + 1, msg)
         return spec.run_id(), False, msg
 
-    # Memory-heavy controllers get their own small pool (configs/base.yaml execution.max_concurrent); the rest of
-    # the workers run everything else, so the fast runs never wait behind them.
+    # Pools bound concurrency (CPU): controllers listed in configs/base.yaml execution.max_concurrent get their own
+    # small pool, the remaining workers run everything else. Memory is bounded by the gate, shared by all pools.
     limited = {c: n for c, n in cfg.max_concurrent.items() if any(s.controller == c for s, _ in todo)}
-    _disk_guard(d, len(todo), cfg.disk_max_frac_of_free)
-    n_general = _memory_guard(max(1, workers - sum(limited.values())), limited, cfg.memory_reserve_gb)
     pools = {c: ThreadPoolExecutor(max_workers=n) for c, n in limited.items()}
-    general = ThreadPoolExecutor(max_workers=n_general)
+    general = ThreadPoolExecutor(max_workers=max(1, workers - sum(limited.values())))
     done = 0
     try:
         futures = [(pools.get(s.controller, general)).submit(job, s, r) for s, r in todo]

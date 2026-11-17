@@ -24,6 +24,13 @@
       "endpoint": "https://overpass-api.de/api/interpreter",
       "osm_base": "2026-11-16T01:11:13Z"
     },
+    "scenarios/dtbk/dtbk.net.xml.gz": {
+      "sha256": "006bac57373dd2a965077c14d83377d8b730ce4cb67e371259ef3326e77dd934",
+      "bytes": 431570,
+      "kind": "network",
+      "scenario": "dtbk",
+      "sumo_version": "1.28.0"
+    },
     "scenarios/flushing/flushing.net.xml.gz": {
       "sha256": "1c6a057c9557a8583847fc25e53c179cc2e0e8177dc3ec0e1f3b3b856dbb6f29",
       "bytes": 976700,

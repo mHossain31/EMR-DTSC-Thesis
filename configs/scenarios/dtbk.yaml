@@ -1,6 +1,10 @@
 # Downtown Brooklyn. Tier 2. docs/SPECIFICATION.md 6.3.
+# The initial box (-74.005, 40.685, -73.975, 40.705) gave 1,078 edges (below the 1,500 the validation requires) and
+# only 81.7% of lane-km inside the box: the Brooklyn and Manhattan Bridge approaches and the BQE overhang its north
+# edge, and extending north would add Lower Manhattan. Enlarged east and south per docs/SPECIFICATION.md 6.2 step 3
+# (DEVIATIONS #15).
 id: dtbk
 name: Downtown Brooklyn
 role: tier2
 source: osm
-bbox: [-74.005, 40.685, -73.975, 40.705]
+bbox: [-74.005, 40.675, -73.960, 40.705]

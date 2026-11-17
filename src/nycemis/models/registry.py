@@ -16,10 +16,26 @@ def _model_file(scenario: str, model_id: str) -> Path:
     return path
 
 
+def legacy_compact_dir(scenario: str, model_id: str | None) -> Path:
+    return models_dir() / scenario / (model_id or "legacy_rf") / "compact"
+
+
 def load_legacy_rf(scenario: str, model_id: str | None):
-    model = joblib.load(_model_file(scenario, model_id or "legacy_rf"))
-    model.set_params(n_jobs=1)
-    return model
+    """The legacy RF as a memory-mapped CompactForest (identical predictions; one shared copy across processes)."""
+    from nycemis.models.compact_forest import CompactForest
+
+    source = _model_file(scenario, model_id or "legacy_rf")
+    compact = legacy_compact_dir(scenario, model_id)
+    if not (compact / "meta.json").is_file():
+        raise FileNotFoundError(f"no compact export at {compact}; run `python -m nycemis export-legacy-compact`")
+    return CompactForest.load(compact, source=source)
+
+
+def export_legacy_compact(scenario: str, model_id: str | None = None) -> dict:
+    from nycemis.models.compact_forest import export
+
+    source = _model_file(scenario, model_id or "legacy_rf")
+    return export(joblib.load(source), legacy_compact_dir(scenario, model_id), source=source)
 
 
 def load_forecaster(scenario: str, model_id: str | None):

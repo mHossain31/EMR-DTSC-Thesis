@@ -97,6 +97,9 @@ def train(scenario: str) -> dict:
     out = model_dir(scenario)
     out.mkdir(parents=True, exist_ok=True)
     joblib.dump(rf, out / "model.joblib", compress=3)
+    from nycemis.models.compact_forest import export
+
+    export(rf, out / "compact", source=out / "model.joblib")  # what legacy_ml runs load (models/registry.py)
     metrics = {
         "model": "RandomForestRegressor(n_estimators=100, random_state=42)", "features_mg_s": FEATURES,
         "target_mg_s": TARGET, "records_pooled": int(len(rec)), "rows_used": int(len(sample)),

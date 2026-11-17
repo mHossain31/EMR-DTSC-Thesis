@@ -43,4 +43,5 @@ paper/*.toc
 
 # Frozen model binaries are reproducible from their train manifests (hashes recorded there); not committed.
 models/**/*.joblib
+models/**/compact/*.npy
 models/smoke/
