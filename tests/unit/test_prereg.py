@@ -4,9 +4,16 @@ from __future__ import annotations
 
 import hashlib
 
+import pytest
 import yaml
 
-from nycemis.experiments.prereg import _flow, analysis_code_files, analysis_code_sha256, text_sha256
+from nycemis.experiments.prereg import (
+    _flow,
+    _validation_params,
+    analysis_code_files,
+    analysis_code_sha256,
+    text_sha256,
+)
 
 
 def test_analysis_code_hash_is_stable_and_covers_the_analysis() -> None:
@@ -27,3 +34,11 @@ def test_condition_lines_round_trip() -> None:
     cond = {"controller": "eco_ml", "params": {"alpha": 0.25, "model_id": "gbm_v1", "tau_avg_s": 180,
                                                "router": "traveltime_weights"}, "dataset": True}
     assert yaml.safe_load(_flow(cond)) == cond
+
+
+def test_validation_params_match_by_value() -> None:
+    # selection.json holds floats (eta 1.0); the lookup must not depend on how a label formats them
+    assert _validation_params("random_reroute", eta=1.0)["eta"] == 1.0
+    assert _validation_params("eco_ml", alpha=0.75)["model_id"]
+    with pytest.raises(KeyError):
+        _validation_params("eco_ml", alpha=0.6)

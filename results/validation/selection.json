@@ -1,0 +1,433 @@
+{
+  "experiment": "validation",
+  "tt_budget": 0.05,
+  "eco_reactive": {
+    "alpha_star": 0.75,
+    "table": [
+      {
+        "alpha": 0.0,
+        "nox_ratio_mean": 1.0105838039810233,
+        "tt_ratio_max": 1.0175998262043078,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 0.25,
+        "nox_ratio_mean": 0.9859711903757425,
+        "tt_ratio_max": 1.0062098840663327,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 0.5,
+        "nox_ratio_mean": 0.9629885755514901,
+        "tt_ratio_max": 1.0159358975179669,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 0.75,
+        "nox_ratio_mean": 0.9402399584556531,
+        "tt_ratio_max": 1.0279614941751063,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 1.0,
+        "nox_ratio_mean": 0.9276596170271914,
+        "tt_ratio_max": 1.0648409613481784,
+        "levels": 3,
+        "feasible": false
+      }
+    ],
+    "per_level": [
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.0,
+        "level": "light",
+        "nox_ratio": 1.0056977285924198,
+        "tt_ratio": 1.0065156030241915,
+        "route_change_rate": 0.09437776746233588,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.0,
+        "level": "moderate",
+        "nox_ratio": 1.0131452702979151,
+        "tt_ratio": 1.0118068909874358,
+        "route_change_rate": 0.14062238060877416,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.0,
+        "level": "heavy",
+        "nox_ratio": 1.012908413052735,
+        "tt_ratio": 1.0175998262043078,
+        "route_change_rate": 0.1729485740314968,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.25,
+        "level": "light",
+        "nox_ratio": 0.9851907092257983,
+        "tt_ratio": 1.0062098840663327,
+        "route_change_rate": 0.1597668959344535,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.25,
+        "level": "moderate",
+        "nox_ratio": 0.9877174782213558,
+        "tt_ratio": 1.0049132358733455,
+        "route_change_rate": 0.19405759594598762,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.25,
+        "level": "heavy",
+        "nox_ratio": 0.9850053836800737,
+        "tt_ratio": 0.9983043490741763,
+        "route_change_rate": 0.2197126914398314,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.5,
+        "level": "light",
+        "nox_ratio": 0.9659179118187696,
+        "tt_ratio": 1.0159358975179669,
+        "route_change_rate": 0.2430118894238212,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.5,
+        "level": "moderate",
+        "nox_ratio": 0.9640558665825608,
+        "tt_ratio": 1.0112976179080646,
+        "route_change_rate": 0.2704756237010127,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.5,
+        "level": "heavy",
+        "nox_ratio": 0.9589919482531396,
+        "tt_ratio": 0.9987427366584163,
+        "route_change_rate": 0.2955416901461552,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.75,
+        "level": "light",
+        "nox_ratio": 0.9365885823935659,
+        "tt_ratio": 1.0218343839561663,
+        "route_change_rate": 0.31875207841217146,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.75,
+        "level": "moderate",
+        "nox_ratio": 0.9452312053050589,
+        "tt_ratio": 1.0279614941751063,
+        "route_change_rate": 0.345656856364054,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 0.75,
+        "level": "heavy",
+        "nox_ratio": 0.9389000876683347,
+        "tt_ratio": 1.0150366586998494,
+        "route_change_rate": 0.3634478180558465,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 1.0,
+        "level": "light",
+        "nox_ratio": 0.9158021193507173,
+        "tt_ratio": 1.0472063729961265,
+        "route_change_rate": 0.3825180159754089,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 1.0,
+        "level": "moderate",
+        "nox_ratio": 0.9294408599827374,
+        "tt_ratio": 1.0518144015280848,
+        "route_change_rate": 0.40311785791473226,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_reactive",
+        "alpha": 1.0,
+        "level": "heavy",
+        "nox_ratio": 0.9377358717481191,
+        "tt_ratio": 1.0648409613481784,
+        "route_change_rate": 0.4198841808502755,
+        "valid_share": 1.0,
+        "runs": 12
+      }
+    ]
+  },
+  "eco_ml": {
+    "alpha_star": 0.75,
+    "table": [
+      {
+        "alpha": 0.0,
+        "nox_ratio_mean": 1.0105838039810233,
+        "tt_ratio_max": 1.0175998262043078,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 0.25,
+        "nox_ratio_mean": 0.9765504231085087,
+        "tt_ratio_max": 1.0040374313164833,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 0.5,
+        "nox_ratio_mean": 0.9423347018237601,
+        "tt_ratio_max": 1.0106956205888349,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 0.75,
+        "nox_ratio_mean": 0.9147355187310208,
+        "tt_ratio_max": 1.0217381385181734,
+        "levels": 3,
+        "feasible": true
+      },
+      {
+        "alpha": 1.0,
+        "nox_ratio_mean": 0.8974390328271805,
+        "tt_ratio_max": 1.0691509456697088,
+        "levels": 3,
+        "feasible": false
+      }
+    ],
+    "per_level": [
+      {
+        "controller": "eco_ml",
+        "alpha": 0.0,
+        "level": "light",
+        "nox_ratio": 1.0056977285924198,
+        "tt_ratio": 1.0065156030241915,
+        "route_change_rate": 0.09437776746233588,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.0,
+        "level": "moderate",
+        "nox_ratio": 1.0131452702979151,
+        "tt_ratio": 1.0118068909874358,
+        "route_change_rate": 0.14062238060877416,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.0,
+        "level": "heavy",
+        "nox_ratio": 1.012908413052735,
+        "tt_ratio": 1.0175998262043078,
+        "route_change_rate": 0.1729485740314968,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.25,
+        "level": "light",
+        "nox_ratio": 0.9776187946134056,
+        "tt_ratio": 1.0040374313164833,
+        "route_change_rate": 0.13864936685372195,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.25,
+        "level": "moderate",
+        "nox_ratio": 0.9772791903020887,
+        "tt_ratio": 0.9991334270118974,
+        "route_change_rate": 0.16592370240316145,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.25,
+        "level": "heavy",
+        "nox_ratio": 0.974753284410032,
+        "tt_ratio": 0.9912060673266934,
+        "route_change_rate": 0.19004118566779762,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.5,
+        "level": "light",
+        "nox_ratio": 0.9471299361520379,
+        "tt_ratio": 1.0106956205888349,
+        "route_change_rate": 0.20858998210651947,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.5,
+        "level": "moderate",
+        "nox_ratio": 0.9447772858494579,
+        "tt_ratio": 1.0046672300578066,
+        "route_change_rate": 0.22449753751875146,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.5,
+        "level": "heavy",
+        "nox_ratio": 0.9350968834697845,
+        "tt_ratio": 0.9802208612242815,
+        "route_change_rate": 0.23732043911979492,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.75,
+        "level": "light",
+        "nox_ratio": 0.9100538930996576,
+        "tt_ratio": 1.0166478995218147,
+        "route_change_rate": 0.2826083844939687,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.75,
+        "level": "moderate",
+        "nox_ratio": 0.9153642983302988,
+        "tt_ratio": 1.0217381385181734,
+        "route_change_rate": 0.29067691417274216,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 0.75,
+        "level": "heavy",
+        "nox_ratio": 0.9187883647631062,
+        "tt_ratio": 1.0102282167087688,
+        "route_change_rate": 0.29531512275550686,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 1.0,
+        "level": "light",
+        "nox_ratio": 0.8788102394907015,
+        "tt_ratio": 1.0193873933106918,
+        "route_change_rate": 0.3373436872963734,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 1.0,
+        "level": "moderate",
+        "nox_ratio": 0.895228388601526,
+        "tt_ratio": 1.0366551682888607,
+        "route_change_rate": 0.34124931767797456,
+        "valid_share": 1.0,
+        "runs": 12
+      },
+      {
+        "controller": "eco_ml",
+        "alpha": 1.0,
+        "level": "heavy",
+        "nox_ratio": 0.9182784703893143,
+        "tt_ratio": 1.0691509456697088,
+        "route_change_rate": 0.3347829492496222,
+        "valid_share": 0.9166666666666666,
+        "runs": 12
+      }
+    ]
+  },
+  "random_reroute": {
+    "eta_star": 1.0,
+    "target_rates": {
+      "light": 0.2826083844939687,
+      "moderate": 0.29067691417274216,
+      "heavy": 0.29531512275550686
+    },
+    "table": [
+      {
+        "eta": 1.0,
+        "mean_abs_diff": 0.022903815292445544,
+        "rate_light": 0.2774201269480487,
+        "rate_moderate": 0.30866429851412464,
+        "rate_heavy": 0.340850926745541
+      },
+      {
+        "eta": 0.6,
+        "mean_abs_diff": 0.04545858037276377,
+        "rate_light": 0.2110812850441697,
+        "rate_moderate": 0.24568132384587113,
+        "rate_heavy": 0.27546207141388557
+      },
+      {
+        "eta": 0.3,
+        "mean_abs_diff": 0.10386256552347388,
+        "rate_light": 0.149356670567778,
+        "rate_moderate": 0.1896692956002811,
+        "rate_heavy": 0.217986758683737
+      },
+      {
+        "eta": 2.0,
+        "mean_abs_diff": 0.12112595084808568,
+        "rate_light": 0.3815627937281691,
+        "rate_moderate": 0.4144789347484463,
+        "rate_heavy": 0.43593654548985933
+      },
+      {
+        "eta": 0.1,
+        "mean_abs_diff": 0.14110634640962694,
+        "rate_light": 0.10937111562276669,
+        "rate_moderate": 0.1521390294500133,
+        "rate_heavy": 0.18377123712055685
+      }
+    ]
+  }
+}

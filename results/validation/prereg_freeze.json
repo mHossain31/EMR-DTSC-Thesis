@@ -1,0 +1,32 @@
+{
+  "alpha_reactive": "0.75",
+  "alpha_ml": "0.75",
+  "eta": "1",
+  "model_id": "gbm_v1",
+  "model_sha256": "aff0192553ccbac45f71fb144f5f29fd26c6ba5cc8f2b6a60623180bdb30cb84",
+  "analysis_code_sha256": "09dbec7ab79be7f326c0e4c4a33fc1bb0a9052b82f88539ea80603bde0b5598b",
+  "analysis_code_files": [
+    "src/nycemis/analysis/__init__.py",
+    "src/nycemis/analysis/claims.py",
+    "src/nycemis/analysis/confirmatory.py",
+    "src/nycemis/analysis/documents.py",
+    "src/nycemis/analysis/figures.py",
+    "src/nycemis/analysis/paper.py",
+    "src/nycemis/analysis/pilot.py",
+    "src/nycemis/analysis/run_all.py",
+    "src/nycemis/analysis/spatial.py",
+    "src/nycemis/analysis/stats.py",
+    "configs/base.yaml"
+  ],
+  "date": "2026-11-16",
+  "tag": "prereg-v1",
+  "power_at_n": {
+    "superiority": 0.516,
+    "equivalence": 0.27,
+    "detectable_effect_pct": 2.529806312499927,
+    "detectable_margin_pct": 2.644797508522651
+  },
+  "n": 60,
+  "confirmatory_config": "configs/experiments/confirmatory.yaml",
+  "preregistration": "docs/PREREGISTRATION.md"
+}

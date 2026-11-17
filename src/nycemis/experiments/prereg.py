@@ -46,11 +46,14 @@ def analysis_code_sha256() -> str:
     return h.hexdigest()
 
 
-def _validation_params(label: str) -> dict:
-    for c in load_experiment("validation").conditions:
-        if c.label == label:
-            return dict(c.params)
-    raise KeyError(f"validation condition {label!r} not found")
+def _validation_params(controller: str, **match) -> dict:
+    """Parameters of the one validation condition of ``controller`` whose parameters include ``match``; matched by
+    value, not by label, so the label's number format does not matter."""
+    hits = [dict(c.params) for c in load_experiment("validation").conditions
+            if c.controller == controller and all(c.params.get(k) == v for k, v in match.items())]
+    if len(hits) != 1:
+        raise KeyError(f"expected one validation condition {controller} with {match}, found {len(hits)}")
+    return hits[0]
 
 
 def _flow(d: dict) -> str:
@@ -64,9 +67,9 @@ def write_confirmatory(selection: dict, n: int) -> str:
     conditions = [
         {"controller": "static", "dataset": True},
         {"controller": "tt_adaptive"},
-        {"controller": "random_reroute", "params": _validation_params(f"random_reroute_e{eta:g}")},
-        {"controller": "eco_reactive", "params": _validation_params(f"eco_reactive_a{a_r:.2f}")},
-        {"controller": "eco_ml", "params": _validation_params(f"eco_ml_a{a_ml:.2f}"), "dataset": True},
+        {"controller": "random_reroute", "params": _validation_params("random_reroute", eta=eta)},
+        {"controller": "eco_reactive", "params": _validation_params("eco_reactive", alpha=a_r)},
+        {"controller": "eco_ml", "params": _validation_params("eco_ml", alpha=a_ml), "dataset": True},
         {"controller": "legacy_ml", "params": {"threshold_mg_s": "legacy_quantile", "model_id": "legacy_rf"}},
     ]
     lines = [
@@ -105,7 +108,7 @@ def freeze() -> dict:
         "detectable_margin_pct": detectable_at("equivalence", *args, **sim),
     }
     a_ml = sel["eco_ml"]["alpha_star"]
-    model_id = _validation_params(f"eco_ml_a{a_ml:.2f}")["model_id"]
+    model_id = _validation_params("eco_ml", alpha=a_ml)["model_id"]
     mpath = model_path(SCENARIO, model_id)
     frozen = {
         "alpha_reactive": f"{sel['eco_reactive']['alpha_star']:g}",
@@ -116,7 +119,6 @@ def freeze() -> dict:
         "analysis_code_sha256": analysis_code_sha256(),
         "analysis_code_files": [rel(p) for p in analysis_code_files()],
         "date": date.today().isoformat(),
-        "commit": "the commit tagged prereg-v1",
         "tag": "prereg-v1",
         "power_at_n": power_at_n,
     }
