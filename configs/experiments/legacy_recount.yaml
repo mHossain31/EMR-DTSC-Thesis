@@ -1,0 +1,11 @@
+# Recount of the legacy rule's route changes (docs/DEVIATIONS.md #18; adversarial review finding 7).
+# The pilot's primary C5 condition on the pilot seeds, unchanged except that legacy_ml now counts a call as a route
+# change only when the path ahead changes (calls made on a junction were all counted before). The behaviour is the
+# same, so total NOx must equal the pilot's legacy_ml runs exactly; the route-change rate replaces the old count.
+name: legacy_recount
+scenario: flushing
+levels: [light, moderate, heavy]
+seed_role: pilot
+reconcile: true
+conditions:
+  - {controller: legacy_ml, params: {threshold_mg_s: legacy_quantile, model_id: legacy_rf}}

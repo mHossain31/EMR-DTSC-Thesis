@@ -32,7 +32,7 @@ OPEN_ITEM_LABELS = ("out-of-scope-by-design", "environment-limited")
 LATEX_UPPER = {"LaTeX", "TeX"}  # LaTeX commands with an uppercase initial that are not project macros
 # a model version, the confidence level and the power target (built from the constant the sample size used, so a
 # changed target makes the typed number fail): design constants, not results
-ALLOWED_NUMBERS = (r"HBEFA~4\.2", r"95\\% BCa", rf"{100 * TARGET_POWER:g}\\% power")
+ALLOWED_NUMBERS = (r"HBEFA~4\.2", r"95\\% BCa", r"95\\% cluster-bootstrap", rf"{100 * TARGET_POWER:g}\\% power")
 SPACE_PATH_TESTS = ("tests/integration/test_harness.py::test_reconciliation_within_tolerance",
                     "tests/integration/test_harness.py::test_determinism_same_spec_twice")
 

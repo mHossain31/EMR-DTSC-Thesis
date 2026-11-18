@@ -35,3 +35,20 @@ tailpipe emission mass**, per trip and in total.
     box edge, so 10.4% of its lane-km (mostly the Manhattan and Brooklyn Bridges and the Gowanus Expressway) lie
     outside the box, against the 90% inside share the other networks meet (DEVIATIONS #16). It is used in no
     experiment.
+14. **Speed coding and junction control favour residential detours.** Where OpenStreetMap has no speed tag,
+    netconvert assigns SUMO's default speed for the road type, as the OSM Web Wizard does, so most arterial lane-km in
+    Flushing carry type defaults rather than posted limits; signals sit on arterials and no junction is
+    stop-controlled (paper macros `SpeedPrimSec`, `SpeedResid`, `JunctionsSignal`, `JunctionsStop`, computed from the
+    network file). Emission-aware rerouting lowers NOx largely by moving vehicle-hours from signalised arterials onto
+    residential and service streets (docs/CLAIMS.md, RQ5 section). How cheap those detours are depends on this coding,
+    so the size of the PC2 and PC3 reductions may not carry over to a network coded with posted limits and stop
+    control (docs/RESEARCH_AGENDA.md, question 1).
+15. **Displacement is not exposure.** RQ5 measures where tailpipe NOx is emitted, by road class. Residential streets
+    are where people live, but without dispersion and population data nothing follows about exposure or health,
+    in either direction.
+16. **Departure delay sits outside travel time.** Travel-time metrics run from departure; the wait to enter the
+    network is reported separately (`mean_depart_delay_s`, in seconds in the claims ledger).
+17. **The forecast is not isolated.** No confirmatory condition separates the forecast from the rest of the eco_ml
+    controller (the shuffled-forecast control C7 is Tier 2), and the forecaster's skill against a per-edge
+    historical mean is reported in docs/CLAIMS.md (RQ2 section). Differences between eco_ml and eco_reactive (PC4) are
+    therefore not attributed to forecasting.

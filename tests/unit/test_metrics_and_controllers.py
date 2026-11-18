@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from nycemis.controllers.base import EffortController, compliant
+from nycemis.controllers.legacy_ml import path_changed
 from nycemis.sim.metrics import parse_statistics, parse_tripinfo, run_metrics, speed_ratio
 from nycemis.sim.run_spec import RunSpec
 
@@ -97,3 +98,12 @@ def test_run_id_ignores_logging_options() -> None:
     b = RunSpec(**{**base, "reconcile": True, "backend": "traci", "experiment": "y"})
     c = RunSpec(**{**base, "seed": 2})
     assert a.run_id() == b.run_id() != c.run_id()
+
+
+def test_legacy_route_change_counts_paths_not_junction_positions() -> None:
+    # on edge a: findRoute returns the same path from a -> no change; a different path -> change
+    assert not path_changed("a", ["a", ":j1_0", "b", "c"], ["a", "b", "c"])
+    assert path_changed("a", ["a", "b", "c"], ["a", "x", "c"])
+    # on junction :j1_0 after a: the route index still points at a, findRoute starts at b (DEVIATIONS #18)
+    assert not path_changed(":j1_0", ["a", "b", "c"], ["b", "c"])
+    assert path_changed(":j1_0", ["a", "b", "c"], ["x", "c"])

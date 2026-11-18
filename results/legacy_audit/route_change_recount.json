@@ -1,0 +1,29 @@
+{
+  "runs": 15,
+  "matched_to_pilot": 15,
+  "nox_identical_to_pilot": true,
+  "per_level": {
+    "heavy": {
+      "n": 5,
+      "reroute_calls": 2201504,
+      "route_changes": 57,
+      "route_change_rate": 2.5891390612962775e-05,
+      "old_counter_rate_mean": 0.12511172883044164
+    },
+    "light": {
+      "n": 5,
+      "reroute_calls": 846769,
+      "route_changes": 31,
+      "route_change_rate": 3.6609748349313685e-05,
+      "old_counter_rate_mean": 0.1495836629958695
+    },
+    "moderate": {
+      "n": 5,
+      "reroute_calls": 1394754,
+      "route_changes": 48,
+      "route_change_rate": 3.4414670974236316e-05,
+      "old_counter_rate_mean": 0.14373545858551637
+    }
+  },
+  "route_change_rate_all": 3.060976221841551e-05
+}

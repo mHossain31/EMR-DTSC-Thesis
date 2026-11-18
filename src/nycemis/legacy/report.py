@@ -62,13 +62,13 @@ def render_audit(n: dict) -> str:
     d1_status, d2_status = "supported-indirect", "supported-indirect"
     rep_path = results_dir() / "legacy_audit" / "replication.json"
     if rep_path.is_file():
-        from nycemis.legacy.replicate import d1_confirmed, mean_change_rate
+        from nycemis.legacy.replicate import d1_confirmed, mean_change_rate, rate_text
 
         rep = json.loads(rep_path.read_text(encoding="utf-8"))
         d1_status = ("confirmed by the replication (section 5)" if d1_confirmed(rep)
                      else "not reproduced by the replication (section 5)")
-        d2_status = (f"replication: {100 * mean_change_rate(rep):.1f}% of the legacy calls changed the route "
-                     "(section 5)")
+        d2_status = (f"replication: {rate_text(mean_change_rate(rep))} of the legacy calls changed the vehicle's "
+                     "path (section 5)")
 
     inventory = "\n".join(
         f"| `{v['path']}` | `{v['sha256'][:16]}...` | {_int(v['bytes'])} | {pages.get(k, '-')} |"

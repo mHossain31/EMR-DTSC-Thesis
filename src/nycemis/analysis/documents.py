@@ -5,10 +5,11 @@ the preregistration. The prose is fixed here; every number is read from JSON/YAM
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 
 from nycemis.config import base_config, load_yaml
-from nycemis.legacy.replicate import d1_confirmed, mean_change_rate
+from nycemis.legacy.replicate import d1_confirmed, mean_change_rate, rate_text
 from nycemis.manifest import load_manifest
 from nycemis.paths import configs_dir, docs_dir, rel, repo_root, results_dir
 
@@ -81,7 +82,7 @@ def render_pilot_report() -> str:
                   f"{LABELS.get(k, k)} {v:.0f}" for k, v in sorted(bud["median_core_s_by_condition"].items())), "",
               "## Legacy-protocol replication", "",
               f"D1 horizon artifact {'reproduced' if d1_confirmed(rep) else 'not reproduced'}; the legacy rule changed "
-              f"{100 * mean_change_rate(rep):.1f}% of the routes it recomputed. Details: `docs/LEGACY_AUDIT.md`, "
+              f"{rate_text(mean_change_rate(rep))} of the routes it recomputed. Details: `docs/LEGACY_AUDIT.md`, "
               "section 5.", ""]
     text = "\n".join(lines)
     (results_dir() / "pilot" / "pilot_report.md").write_text(text, encoding="utf-8")
@@ -104,13 +105,22 @@ def render_interim_note() -> str:
                 parts.append(f"{lv} {v['mean_pct']:+.1f}% ({v['min_pct']:+.1f} to {v['max_pct']:+.1f})")
         return "; ".join(parts)
 
+    # A re-render keeps the original writing date and says what changed (docs/DEVIATIONS.md #17, #18).
+    out = repo_root() / "application" / "interim_note.md"
+    today = date.today().isoformat()
+    found = re.search(r"Written (\d{4}-\d{2}-\d{2})", out.read_text(encoding="utf-8")) if out.is_file() else None
+    written = found.group(1) if found else today
+    status = ("The confirmatory study is preregistered and has not run yet; nothing below is a confirmatory result."
+              if written == today else
+              f"Revised {today}: the legacy rule's route-change share is recounted with a corrected counter "
+              "(docs/DEVIATIONS.md #18); the confirmatory study, which had not run when this note was written, is "
+              "reported in `application/research_summary_1page.md`. Nothing below is a confirmatory result.")
     lines = [
         "# Interim note: audit of the 2024 SUMO + ML project and pilot results",
         "",
-        f"**Interim and non-confirmatory.** Written {date.today().isoformat()} from "
-        "`results/legacy_audit/` and `results/pilot/`. The confirmatory study is preregistered and has not run yet; "
-        "nothing below is a confirmatory result. All quantities are simulated tailpipe emissions in SUMO, not air "
-        "quality or exposure.",
+        f"**Interim and non-confirmatory.** Written {written} from "
+        f"`results/legacy_audit/` and `results/pilot/`. {status} All quantities are simulated tailpipe emissions in "
+        "SUMO, not air quality or exposure.",
         "",
         "## What the original project reported",
         "",
@@ -147,7 +157,7 @@ def render_interim_note() -> str:
                          f"the matched metric reports {v['matched_drop_pct_mean']:+.2f}% "
                          f"({v['matched_drop_pct_min']:+.2f} to {v['matched_drop_pct_max']:+.2f}%).")
     lines += [
-        f"- The legacy rule changed {100 * mean_change_rate(rep):.1f}% of the routes it recomputed.",
+        f"- The legacy rule changed {rate_text(mean_change_rate(rep))} of the routes it recomputed.",
         "",
         "## Pilot effects of the new controllers (exploratory, 5 seeds, change in total NOx vs no rerouting)",
         "",
@@ -165,7 +175,6 @@ def render_interim_note() -> str:
         "no dispersion or weather (emissions are not concentrations); OSM-derived network; full driver compliance.",
         "",
     ]
-    out = repo_root() / "application" / "interim_note.md"
     out.parent.mkdir(exist_ok=True)
     out.write_text("\n".join(lines), encoding="utf-8")
     return rel(out)
@@ -295,19 +304,24 @@ def render_faq() -> str:
         f"drop of the reported size ({d1['reported_drops_pct']['RF']['NOx']:g}% NOx). Second, the rerouting call "
         "was SUMO's default route search with no traffic information (free-flow travel times); "
         f"{d2['rf']['repeat_unchanged']:,} of {d2['rf']['repeat_calls']:,} repeated calls returned the unchanged "
-        "route, and on our networks the same call reproduces the free-flow routes vehicles are generated with. "
-        "Third, the model predicted "
+        "route. Third, the model predicted "
         "NOx from other pollutants emitted by the same vehicle in the same second, with a random row split, so its "
         "tiny error measured the emission model, not forecasting.",
     ]
-    if rep_path.is_file():
-        rep = _load(rep_path)
+    # the replication on the test seeds (n = 60 per level) replaces the pilot's five seeds when it exists (DEVIATIONS #17)
+    test_path = results_dir() / "legacy_audit" / "replication_confirmatory.json"
+    src_path, src_label = (test_path, "test seeds") if test_path.is_file() else (rep_path, "pilot seeds")
+    if src_path.is_file():
+        rep = _load(src_path)
         s = {k.split("/")[1]: v for k, v in rep["summary"].items() if k.startswith("legacy_ml/")}
         if "moderate" in s:
             v = s["moderate"]
-            lines += ["", "I then replicated the legacy rule under a matched protocol: at moderate demand the "
-                      f"legacy metric reports a {v['legacy_metric_drop_pct_mean']:.1f}% drop, the matched metric "
-                      f"{v['matched_drop_pct_mean']:+.2f}%."]
+            lines += ["", f"I then replicated the legacy rule under a matched protocol ({v['n']} {src_label} at "
+                      f"moderate demand): the legacy metric reports a {v['legacy_metric_drop_pct_mean']:.1f}% drop; "
+                      f"the matched metric's change is {-v['matched_drop_pct_mean']:+.2f}% (negative = lower NOx)."]
+        if rep_path.is_file():
+            lines[-1] += (f" Its reroute calls changed the vehicle's path in "
+                          f"{rate_text(mean_change_rate(_load(rep_path)))} of cases.")
     lines += [
         "", "## Why a simulation, and what can it not tell you?", "",
         "Rerouting experiments cannot be randomised on real streets, and simulation lets every condition share the "
@@ -334,6 +348,40 @@ def render_faq() -> str:
         lines += ["## What did the preregistered comparisons show?", ""]
         lines += [f"- {confirmatory_sentence(r)}" for r in res["confirmatory"]]
         lines.append("")
+        # added after the adversarial review (DEVIATIONS #17); exploratory
+        from nycemis.analysis.claims import equivalence_direction, forecast_sentences, spatial_sentences
+
+        notes = [n for n in map(equivalence_direction, res["confirmatory"]) if n]
+        if notes:
+            lines += ["## Equivalence was not shown for PC4. Was that a power problem?", ""]
+            sds = [r["sd_pct"] for r in res["confirmatory"]]
+            lines += [f"- {n}" for n in notes]
+            lines += [f"- The planned power came from the pilot's spread; the observed SDs of the paired changes "
+                      f"were {min(sds):.2f}% to {max(sds):.2f}%.", ""]
+        sp = [claim for claim, _ in spatial_sentences("confirmatory")]
+        summ = _load(results_dir() / "confirmatory" / "spatial_summary.json")
+        comp = [x for x in (summ or {}).get("composition", []) if x["reference"] == "static"]
+        if sp and comp:
+            low = min(x["ci95_low"] for x in comp)
+            share = ("mostly" if low > 0.5 else "partly" if low > 0 else "not clearly")
+            lines += ["## Where does the reduction come from?", "",
+                      f"The road-class mix of vehicle-hours explains it {share} (lowest 95% bound over the three "
+                      f"levels: {100 * low:.0f}% of the edge-NOx change against no rerouting). The statements below "
+                      "give the shift onto residential and service streets that RQ5 asks about; how attractive those "
+                      "streets are depends on the network's speed and junction coding (docs/LIMITATIONS.md).", ""]
+            lines += [f"- {x}" for x in sp] + [""]
+        fc = [claim for claim, _ in forecast_sentences("confirmatory")]
+        ft = _load(results_dir() / "confirmatory" / "forecast_test.json")
+        if fc and ft:
+            b = ft["bootstrap"]["r_mae_skill_vs_historical_mean"]
+            verdict = ("beats" if b["ci95_low"] > 0 else "is worse than" if b["ci95_high"] < 0 else
+                       "does not clearly beat")
+            lines += ["## Does the forecast matter?", "",
+                      f"On the test seeds, for NOx per vehicle-second (the quantity the controller's emission cost "
+                      f"uses), the forecaster {verdict} the per-edge historical average (skill {b['ci95_low']:+.3f} "
+                      f"to {b['ci95_high']:+.3f}). No condition in the confirmatory design isolates the forecast, so "
+                      "eco_ml's difference from measured-emission rerouting is not attributed to forecasting.", ""]
+            lines += [f"- {x}" for x in fc] + [""]
     out = repo_root() / "application" / "interview_faq.md"
     out.parent.mkdir(exist_ok=True)
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")

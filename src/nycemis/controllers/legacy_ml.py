@@ -4,7 +4,9 @@ Every step, the NOx emission rate of every vehicle is predicted from its CO2, CO
 legacy RF's features) in one batched call. Each vehicle whose prediction exceeds the threshold gets the legacy
 treatment: ``simulation.findRoute(current edge, last edge of its route)`` with default arguments, then
 ``vehicle.setRoute``. No rerouting device is attached. A failed call is counted (the legacy code printed it) and
-the run continues. A call "changes the route" when the new edge list differs from the vehicle's remaining route.
+the run continues. A call "changes the route" when the new path differs from the path still ahead (``path_changed``;
+on a junction the route index still points at the edge just left, which findRoute does not return). Runs made before
+this fix counted every call made on a junction as a change (docs/DEVIATIONS.md #18); the behaviour was the same.
 
 The threshold is given in mg/s. The primary C5 uses the quantile of training NOx at which the legacy run flagged
 vehicle-steps (``docs/LEGACY_AUDIT.md``, D6); the literal 1.88 (mg/s) is a variant.
@@ -20,6 +22,20 @@ import numpy as np
 from nycemis.controllers.base import Controller, ControlLog, SimContext
 
 FEATURES = ("co2", "co", "hc", "pmx")
+
+
+def _plain(edges) -> tuple[str, ...]:
+    return tuple(e for e in edges if not e.startswith(":"))
+
+
+def path_changed(current: str, remaining, new) -> bool:
+    """True if ``new`` (findRoute from ``current``) leaves a different path than ``remaining`` (the route from the
+    vehicle's route index). On a junction (``current`` internal) the index still points at the edge just left, so the
+    path ahead is ``remaining`` without its first edge."""
+    ahead = _plain(remaining)
+    if current.startswith(":") and ahead:
+        ahead = ahead[1:]
+    return _plain(new) != ahead
 
 
 class NoxPredictor(Protocol):
@@ -76,8 +92,7 @@ class LegacyMLController(Controller):
                 self.reroute_calls += 1
                 if new:
                     tr.vehicle.setRoute(vid, new)
-                    remaining = tuple(e for e in route[idx:] if not e.startswith(":"))
-                    if tuple(e for e in new if not e.startswith(":")) != remaining:
+                    if path_changed(current, route[idx:], new):
                         self.route_changes += 1
             except exc_type as exc:  # the legacy code printed and continued; here it is counted
                 self.failures += 1

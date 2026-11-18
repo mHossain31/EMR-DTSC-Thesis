@@ -234,6 +234,15 @@ def train_cmd(
     typer.echo(f"wrote {write_card(scenario, model_id, manifest, ev, 'validation seeds')}")
 
 
+@app.command("forecast-test")
+def forecast_test(scenario: str = typer.Option("flushing"), model_id: str = typer.Option("gbm_v1"),
+                  exp: str = typer.Option("confirmatory", "--exp")) -> None:
+    """Held-out forecast evaluation of the frozen model on the test seeds' edge windows (RQ2; DEVIATIONS #20)."""
+    from nycemis.models.test_eval import evaluate_on_test
+
+    typer.echo(f"wrote {evaluate_on_test(scenario, model_id, exp)}")
+
+
 @app.command("select")
 def select_cmd(exp: str = typer.Option("validation", "--exp")) -> None:
     """Choose alpha* for eco_reactive and eco_ml and the placebo eta on validation seeds."""

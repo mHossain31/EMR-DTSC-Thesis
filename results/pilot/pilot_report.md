@@ -101,4 +101,4 @@ Median core-seconds per run (CPU time where recorded, else wall-clock): C3 eco_r
 
 ## Legacy-protocol replication
 
-D1 horizon artifact reproduced; the legacy rule changed 13.9% of the routes it recomputed. Details: `docs/LEGACY_AUDIT.md`, section 5.
+D1 horizon artifact reproduced; the legacy rule changed 0.003% of the routes it recomputed. Details: `docs/LEGACY_AUDIT.md`, section 5.
