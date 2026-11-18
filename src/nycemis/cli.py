@@ -259,15 +259,20 @@ def prereg_cmd() -> None:
 def paper_cmd(pdf: bool = typer.Option(True, "--pdf/--no-pdf")) -> None:
     """Regenerate paper/macros.tex, the interview FAQ, the one-page research summary and the project page from results
     files; compile the PDF if a TeX engine exists."""
+    import os
+
     from nycemis.analysis.documents import render_faq
     from nycemis.analysis.paper import build_pdf, write_macros
     from nycemis.application import write_application
+    from nycemis.paths import repo_root
 
     typer.echo(f"wrote {write_macros()}")
     typer.echo(f"wrote {render_faq()}")
     for path in write_application():
         typer.echo(f"wrote {path}")
     if pdf:
+        # tectonic downloads its TeX bundle on first use; keep it in the gitignored tools/ rather than the user profile
+        os.environ.setdefault("TECTONIC_CACHE_DIR", (repo_root() / "tools" / "tectonic-cache").as_posix())
         out = build_pdf()
         if out is None:
             logging.getLogger(__name__).warning("no TeX engine (tools/tectonic.exe, tectonic or latexmk on PATH): "

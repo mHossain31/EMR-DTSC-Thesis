@@ -1,21 +1,30 @@
 """Package the paper sources for an optional arXiv upload (docs/SPECIFICATION.md M9).
 
-Writes ``paper/build/arxiv_bundle.tar.gz`` holding ``main.tex``, ``macros.tex``, ``refs.bib``, the compiled
+Writes ``paper/build/arxiv_bundle.tar.gz`` holding ``main.tex``, ``macros.tex``, ``refs.bib``, a compiled
 ``main.bbl`` (arXiv does not run BibTeX on every submission) and every file under ``figures/`` and ``tables/`` that
 ``main.tex`` or a table references. Nothing is uploaded; whether to post, and with which co-authors, is the
 author's decision.
+
+``python -m nycemis paper`` compiles with tectonic, which discards the ``.bbl``, so this script compiles once more
+into a temporary directory with ``--keep-intermediates`` and packages that ``.bbl``. Without tectonic it uses the
+``paper/build/main.bbl`` that latexmk leaves, and warns if there is none.
 
 Usage: python scripts/make_arxiv_bundle.py
 """
 
 from __future__ import annotations
 
+import os
 import re
+import shutil
+import subprocess
 import sys
 import tarfile
+import tempfile
 from pathlib import Path
 
-PAPER = Path(__file__).resolve().parents[1] / "paper"
+ROOT = Path(__file__).resolve().parents[1]
+PAPER = ROOT / "paper"
 REQUIRED = ("main.tex", "macros.tex", "refs.bib")
 REF = re.compile(r"\\(?:input|include|includegraphics)(?:\[[^\]]*\])?\{([^}]+)\}")
 
@@ -43,24 +52,42 @@ def collect() -> list[str]:
                 files.add(name)
                 if path.suffix == ".tex":
                     todo.append(path)
-    bbl = PAPER / "build" / "main.bbl"
-    if bbl.is_file():
-        files.add("build/main.bbl")
-    else:
-        print("warning: paper/build/main.bbl not found; compile the paper first so arXiv gets the bibliography",
-              file=sys.stderr)
     return sorted(files)
+
+
+def tectonic_bbl(outdir: Path) -> Path | None:
+    """Compile with tectonic keeping intermediates and return the ``.bbl``; None if tectonic is not available."""
+    local = ROOT / "tools" / ("tectonic.exe" if os.name == "nt" else "tectonic")
+    engine = str(local) if local.is_file() else shutil.which("tectonic")
+    if engine is None:
+        return None
+    env = {**os.environ}
+    env.setdefault("TECTONIC_CACHE_DIR", (ROOT / "tools" / "tectonic-cache").as_posix())
+    proc = subprocess.run([engine, "-X", "compile", "main.tex", "--outdir", str(outdir), "--keep-intermediates"],
+                          cwd=PAPER, env=env, capture_output=True, text=True, check=False)
+    if proc.returncode != 0:
+        raise SystemExit(f"tectonic failed:\n{(proc.stdout + proc.stderr)[-3000:]}")
+    bbl = outdir / "main.bbl"
+    if not bbl.is_file():
+        raise SystemExit("tectonic finished without writing main.bbl")
+    return bbl
 
 
 def main() -> None:
     files = collect()
     out = PAPER / "build" / "arxiv_bundle.tar.gz"
     out.parent.mkdir(exist_ok=True)
-    with tarfile.open(out, "w:gz") as tar:
-        for name in files:
-            arcname = "main.bbl" if name == "build/main.bbl" else name
-            tar.add(PAPER / name, arcname=arcname)
-    print(f"wrote {out.relative_to(PAPER.parent).as_posix()} ({len(files)} files)")
+    with tempfile.TemporaryDirectory(prefix="arxiv_bbl_") as tmp:
+        bbl = tectonic_bbl(Path(tmp)) or PAPER / "build" / "main.bbl"
+        with tarfile.open(out, "w:gz") as tar:
+            for name in files:
+                tar.add(PAPER / name, arcname=name)
+            has_bbl = bbl.is_file()
+            if has_bbl:
+                tar.add(bbl, arcname="main.bbl")
+            else:
+                print("warning: no TeX engine kept a main.bbl; the bundle has no bibliography", file=sys.stderr)
+    print(f"wrote {out.relative_to(ROOT).as_posix()} ({len(files) + has_bbl} files)")
 
 
 if __name__ == "__main__":

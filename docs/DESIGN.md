@@ -25,6 +25,12 @@ Decisions that docs/SPECIFICATION.md leaves to the implementation, and every adj
 - **libsumo DLL loading on Windows.** libsumo 1.28's `__init__.py` calls `os.add_dll_directory` itself; its
   `simulation` class has no `preloadLibraries` attribute in this version (checked with `dir()`), so nothing extra is
   needed. Recorded in `docs/SUMO_API_NOTES.md`.
+- **TeX engine: tectonic 0.17.0** (2026-11-17), the `x86_64-pc-windows-msvc` zip from the project's GitHub
+  release `tectonic@0.17.0`, checked against the SHA-256 digest GitHub publishes for it
+  (`f61ce51f0b0ade1015b7de7ef368541c5424e9756ecbd0d7af97d6d48030845f`), unpacked to the gitignored
+  `tools/tectonic.exe`; no admin rights, nothing outside the repository. Its TeX bundle downloads on first compile
+  into `tools/tectonic-cache` (`paper` and `scripts/make_arxiv_bundle.py` set `TECTONIC_CACHE_DIR` unless it is
+  already set). On another machine: put tectonic on PATH or at `tools/tectonic.exe`, or use latexmk.
 
 ## Legacy audit
 
