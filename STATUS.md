@@ -3,16 +3,20 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** M7 (analysis and adversarial review), with M9 work in progress. PAUSED for the night on
-  2026-11-17 at 23:50 on request; nothing is running.
-- **Done today:** confirmatory 1,080/1,080 runs, `experiment verify` clean (G6); frozen analysis run and committed
+- **Current milestone:** M7 (analysis and adversarial review), with M9 work in progress. PAUSED again on
+  2026-11-18 at 23:30 on request, with the forecast evaluation unfinished; nothing is running.
+- **2026-11-18:** paper proofread (8 pages; three wording fixes), README brought up to date, guard so
+  `analyze-pilot` cannot overwrite the frozen `docs/PREREGISTRATION.md`, `RESEARCH_BREAKDOWN.md` kept out of git
+  (decision). `doctor` passes except the Overpass check (all four servers timed out: an outside outage; the
+  OSM extracts are frozen in `data/`, so no stage needs Overpass now): retry before release.
+- **Done 2026-11-17:** confirmatory 1,080/1,080 runs, `experiment verify` clean (G6); frozen analysis run and committed
   unedited (12c18b3); independent adversarial review (docs/SPECIFICATION.md 9.11). Its findings and the responses are in
   `docs/DEVIATIONS.md` #17-#20: RQ5 side effects and the composition decomposition, the network's speed coding as a
   threat to validity, PC4 direction and observed SDs, tail travel time and departure delay, the legacy replication
   on the test seeds, and the legacy_ml route-change counter bug (fixed; recount `legacy_recount`, 15 runs, NOx
   identical: 136 of 4,443,027 calls changed a path). PC1-PC4 are identical before and after. New analysis-code hash
   3b97c291 is recorded in DEVIATIONS #17; `verify-all --only prereg` passes.
-- **Last updated:** 2026-11-17 23:50.
+- **Last updated:** 2026-11-18 23:30.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -28,7 +32,7 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 |---|---|---|---|
 | confirmatory (1,080 runs) | done 2026-11-17 23:01, verified | `results/logs/confirmatory.log` | |
 | legacy_recount (15 runs) | done 2026-11-17, NOx identical to the pilot's legacy_ml runs | `results/logs/legacy_recount.log` | DEVIATIONS #18 |
-| `python -m nycemis forecast-test` | STOPPED (user pause) after about 10 min of the bootstrap; not resumable, rerun from the start (about 25-30 min, single process, about 6 GB RAM) | `results/logs/forecast_test.log` | DEVIATIONS #20; writes `results/confirmatory/forecast_test.json` |
+| `python -m nycemis forecast-test` | STOPPED twice by user pauses (2026-11-17 after about 10 min; 2026-11-18 after 39 min of evaluation); not resumable, rerun from the start. Expect about 55 min: loading 1 min, then evaluation scaled from the freeze-time validation evaluation (19.4 min for 1.37M rows; the test set has 3.58M rows). Single process, one core, about 4 GB RAM | `results/logs/forecast_test.log` | DEVIATIONS #20; writes `results/confirmatory/forecast_test.json` |
 
 The dtbk extract for the enlarged box was downloaded at 22:44 after 12 failed Overpass attempts (commit 256eabb).
 
@@ -54,17 +58,19 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
-1. `python -m nycemis forecast-test` (held-out forecast evaluation; nothing else runs beside it).
+1. `python -m nycemis forecast-test` (held-out forecast evaluation, about 55 min; start it first, in the
+   background, and nothing CPU-heavy beside it).
 2. `python -m nycemis analyze` again, so `docs/CLAIMS.md` gains the RQ2 test-seed section (the analysis code is
    final: hash 3b97c291; PC1-PC4 must stay identical).
 3. `python -m nycemis paper`: macros (the paper's forecast paragraph, `\ForecastVerdictR`, the abstract's last
    sentence and the summary's forecast line need `forecast_test.json`), FAQ, one-page summary (366 words before the
    forecast line; limit 450), project page, PDF. Read the PDF end to end (new Discussion and RQ5 sections).
-4. `python -m nycemis verify-all`; then commit (M7/M9) and close G7 (every PC reported; claims ledger complete).
+4. `python -m nycemis verify-all` (retry `doctor`'s Overpass check too); tick the Definition of Done (docs/SPECIFICATION.md
+   section 11) here with evidence; commit (M7/M9) and close G7 (every PC reported; claims ledger complete).
 5. Open item: the sensitivity experiment (Flushing rebuilt with posted speed limits and stop control, PC2/PC3
    repeated; `docs/RESEARCH_AGENDA.md` question 1) is new scope and was not started. Then tag v1.0.
-6. Untracked `RESEARCH_BREAKDOWN.md` (repository root, written 2026-11-17 21:58 by another session, not by this
-   one): left as it is until a decision on whether to commit it or keep it out of git.
+6. `RESEARCH_BREAKDOWN.md` (repository root; personal notes written by another session) is kept out of git by
+   `.gitignore`, as decided on 2026-11-18.
 7. Any further change to `src/nycemis/analysis/*.py` or `configs/base.yaml` changes the hash again: record the new
    hash in `docs/DEVIATIONS.md`, or `verify-all` fails.
 

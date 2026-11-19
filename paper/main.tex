@@ -129,7 +129,7 @@ heavy), while the matched metric changes by \LegacyTestLightMatchedChange\%, \Le
 
 \PCFourLightSentence{} \PCFourModerateSentence{} \PCFourHeavySentence{}
 
-\PCFourDirection{}
+{\sloppy\PCFourDirection{}\par}
 
 \begin{figure}[t]
 \centering
@@ -149,8 +149,8 @@ rerouting. Total vehicle-kilometres changed by \EcoVkmVsStaticLight\%, \EcoVkmVs
 \EcoCOTwoVsStaticHeavy\%. Against the random-rerouting placebo, whose route-change rate was matched on validation
 seeds, NOx changed by \EcoNOxVsPlaceboLight\%, \EcoNOxVsPlaceboModerate\% and \EcoNOxVsPlaceboHeavy\%, so rerouting
 as such does not explain the reduction. Measured-emission rerouting changed NOx by \ReactiveNOxVsStaticLight\%,
-\ReactiveNOxVsStaticModerate\% and \ReactiveNOxVsStaticHeavy\% against no rerouting, travel-time rerouting by
-\TTNOxVsStaticLight\%, \TTNOxVsStaticModerate\% and \TTNOxVsStaticHeavy\%.
+\ReactiveNOxVsStaticModerate\% and \ReactiveNOxVsStaticHeavy\% against no rerouting, and travel-time rerouting
+changed it by \TTNOxVsStaticLight\%, \TTNOxVsStaticModerate\% and \TTNOxVsStaticHeavy\%.
 
 \subsection{Where the change occurs (exploratory, RQ5)}\label{sec:rq5}
 Per-edge NOx (junction lanes excluded) shows where the reduction comes from. Against no rerouting, forecast
@@ -198,7 +198,7 @@ change); checking that an intervention does something applies to the checking co
 \paragraph{What eco-rerouting does in this model.} Emission-aware rerouting lowered simulated network NOx against
 no rerouting, against travel-time rerouting and against a placebo matched in route-change rate, at a cost of a few
 percent in travel time that is larger in the tail than in the mean. The reduction comes \CompositionWord\ from where
-vehicles drive: the router moves vehicle-hours from signalised tertiary and arterial roads onto residential and
+vehicles drive: the router moves vehicle-hours from tertiary, primary and secondary roads onto residential and
 service streets, where SUMO's emission model produces less NOx per vehicle-hour at the speeds and junction
 controls this network encodes. Measured-emission rerouting does the same. Two consequences follow. First, the
 size of the reduction depends on network coding: in Flushing the arterials carry SUMO's type-default speeds and

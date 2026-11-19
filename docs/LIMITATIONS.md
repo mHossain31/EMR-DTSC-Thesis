@@ -37,8 +37,8 @@ tailpipe emission mass**, per trip and in total.
     experiment.
 14. **Speed coding and junction control favour residential detours.** Where OpenStreetMap has no speed tag,
     netconvert assigns SUMO's default speed for the road type, as the OSM Web Wizard does, so most arterial lane-km in
-    Flushing carry type defaults rather than posted limits; signals sit on arterials and no junction is
-    stop-controlled (paper macros `SpeedPrimSec`, `SpeedResid`, `JunctionsSignal`, `JunctionsStop`, computed from the
+    Flushing carry type defaults rather than posted limits; most signals sit at junctions with a tertiary or larger
+    road, and no junction is stop-controlled (paper macros `SpeedPrimSec`, `SpeedResid`, `JunctionsSignal`, `JunctionsStop`, computed from the
     network file). Emission-aware rerouting lowers NOx largely by moving vehicle-hours from signalised arterials onto
     residential and service streets (docs/CLAIMS.md, RQ5 section). How cheap those detours are depends on this coding,
     so the size of the PC2 and PC3 reductions may not carry over to a network coded with posted limits and stop

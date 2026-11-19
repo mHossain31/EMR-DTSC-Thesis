@@ -46,3 +46,6 @@ models/**/*.joblib
 models/**/compact/*.npy
 models/smoke/
 !models/flushing/gbm_v1/model.joblib
+
+# personal notes kept out of the repository (decision, 2026-11-18)
+RESEARCH_BREAKDOWN.md

@@ -319,11 +319,17 @@ def analyze_pilot(exp: str = typer.Option("pilot", "--exp")) -> None:
     from nycemis.analysis.pilot import analyze
     from nycemis.legacy.audit import run_audit
     from nycemis.legacy.report import render_audit
+    from nycemis.paths import results_dir
 
     res = analyze(exp)
     numbers, _ = run_audit()
-    for path in (render_audit(numbers), render_pilot_report(), render_interim_note(),
-                 render_preregistration("draft (M4)")):
+    docs = [render_audit(numbers), render_pilot_report(), render_interim_note()]
+    # after the freeze, docs/PREREGISTRATION.md is the frozen document: never overwrite it with a draft
+    if (results_dir() / "validation" / "prereg_freeze.json").is_file():
+        logging.getLogger(__name__).warning("preregistration is frozen: docs/PREREGISTRATION.md left unchanged")
+    else:
+        docs.append(render_preregistration("draft (M4)"))
+    for path in docs:
         typer.echo(f"wrote {path}")
     typer.echo(json.dumps({"n_confirmatory": res["power"]["n_confirmatory"], "sd_used": res["power"]["sd_pct_used"],
                            "wall_clock_hours": res["budget"]["wall_clock_hours"]}, indent=2))
