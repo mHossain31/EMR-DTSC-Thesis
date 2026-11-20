@@ -13,7 +13,8 @@ of M9 are generated from the results). Where to read the results:
   exploratory claims are kept apart.
 - `paper/main.tex`, compiled to `paper/build/main.pdf` by `python -m nycemis paper`.
 - `docs/PREREGISTRATION.md` (git tag `prereg-v1`), `docs/DEVIATIONS.md`, `docs/LIMITATIONS.md`,
-  `docs/LEGACY_AUDIT.md`, `docs/RESEARCH_AGENDA.md`.
+  `docs/LEGACY_AUDIT.md`, `docs/RESEARCH_AGENDA.md`; the street-coding sensitivity experiment:
+  `docs/SENSITIVITY_PLAN.md` (git tag `sensitivity-v1`) and `docs/CLAIMS_SENSITIVITY.md`.
 
 All quantities are simulated tailpipe emissions in SUMO. Nothing here is a claim about health or air quality.
 
@@ -51,6 +52,8 @@ The full pipeline, in order (each stage is idempotent; `python -m nycemis <stage
 .venv/Scripts/python.exe -m nycemis experiment verify --exp confirmatory
 .venv/Scripts/python.exe -m nycemis forecast-test                    # held-out forecast evaluation
 .venv/Scripts/python.exe -m nycemis analyze                          # frozen analysis, figures, claims
+.venv/Scripts/python.exe -m nycemis experiment run --exp sensitivity_posted  # street-coding sensitivity
+.venv/Scripts/python.exe -m nycemis sensitivity                      # its analysis (docs/SENSITIVITY_PLAN.md)
 .venv/Scripts/python.exe -m nycemis paper                            # macros, documents, PDF
 .venv/Scripts/python.exe -m nycemis verify-all                       # every automated check
 ```
