@@ -3,8 +3,10 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** M7 (analysis and adversarial review), with M9 work in progress. PAUSED again on
-  2026-11-18 at 23:30 on request, with the forecast evaluation unfinished; nothing is running.
+- **Current milestone:** M7/M9 finishing, plus the street-coding sensitivity experiment the authors asked for on
+  2026-11-19 (docs/SENSITIVITY_PLAN.md, DEVIATIONS #21; frozen in fc892fd, tag `sensitivity-v1`, before its runs).
+  Running since 2026-11-19 21:11: the `sensitivity_posted` batch (540 runs) and `forecast-test` (since 20:54).
+  Target: project and report complete by Tuesday 2026-11-24 (user); expected Friday 2026-11-20 evening.
 - **2026-11-18:** paper proofread (8 pages; three wording fixes), README brought up to date, guard so
   `analyze-pilot` cannot overwrite the frozen `docs/PREREGISTRATION.md`, `RESEARCH_BREAKDOWN.md` kept out of git
   (decision). `doctor` passes except the Overpass check (all four servers timed out: an outside outage; the
@@ -16,7 +18,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
   on the test seeds, and the legacy_ml route-change counter bug (fixed; recount `legacy_recount`, 15 runs, NOx
   identical: 136 of 4,443,027 calls changed a path). PC1-PC4 are identical before and after. New analysis-code hash
   3b97c291 is recorded in DEVIATIONS #17; `verify-all --only prereg` passes.
-- **Last updated:** 2026-11-18 23:30.
+- **Last updated:** 2026-11-19 21:15.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -33,6 +35,7 @@ Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ Comma
 | confirmatory (1,080 runs) | done 2026-11-17 23:01, verified | `results/logs/confirmatory.log` | |
 | legacy_recount (15 runs) | done 2026-11-17, NOx identical to the pilot's legacy_ml runs | `results/logs/legacy_recount.log` | DEVIATIONS #18 |
 | `python -m nycemis forecast-test` | STOPPED twice by user pauses (2026-11-17 after about 10 min; 2026-11-18 after 39 min of evaluation); not resumable, rerun from the start. Expect about 55 min: loading 1 min, then evaluation scaled from the freeze-time validation evaluation (19.4 min for 1.37M rows; the test set has 3.58M rows). Single process, one core, about 4 GB RAM | `results/logs/forecast_test.log` | DEVIATIONS #20; writes `results/confirmatory/forecast_test.json` |
+| sensitivity_posted, 3 conditions x 3 levels x 60 seeds (540 runs) | started 2026-11-19 21:11 (detached, pid 29252) | `results/logs/sensitivity_posted.log` | memory gate; about 2 h; resumes after a pause like the other batches |
 
 The dtbk extract for the enlarged box was downloaded at 22:44 after 12 failed Overpass attempts (commit 256eabb).
 
@@ -58,8 +61,8 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
-1. `python -m nycemis forecast-test` (held-out forecast evaluation, about 55 min; start it first, in the
-   background, and nothing CPU-heavy beside it).
+1. `python -m nycemis forecast-test` (held-out forecast evaluation, about 55 min; running since 2026-11-19
+   20:54; rerun from the start if stopped).
 2. `python -m nycemis analyze` again, so `docs/CLAIMS.md` gains the RQ2 test-seed section (the analysis code is
    final: hash 3b97c291; PC1-PC4 must stay identical).
 3. `python -m nycemis paper`: macros (the paper's forecast paragraph, `\ForecastVerdictR`, the abstract's last
@@ -67,8 +70,9 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
    forecast line; limit 450), project page, PDF. Read the PDF end to end (new Discussion and RQ5 sections).
 4. `python -m nycemis verify-all` (retry `doctor`'s Overpass check too); tick the Definition of Done (docs/SPECIFICATION.md
    section 11) here with evidence; commit (M7/M9) and close G7 (every PC reported; claims ledger complete).
-5. Open item: the sensitivity experiment (Flushing rebuilt with posted speed limits and stop control, PC2/PC3
-   repeated; `docs/RESEARCH_AGENDA.md` question 1) is new scope and was not started. Then tag v1.0.
+5. Sensitivity experiment (user approved 2026-11-19): when `sensitivity_posted` is DONE, `experiment verify
+   --exp sensitivity_posted`, `python -m nycemis sensitivity`, a sensitivity section in `paper/main.tex`
+   (`\input{macros_sensitivity.tex}`), summary and agenda updates, then `verify-all` and tag v1.0.
 6. `RESEARCH_BREAKDOWN.md` (repository root; personal notes written by another session) is kept out of git by
    `.gitignore`, as decided on 2026-11-18.
 7. Any further change to `src/nycemis/analysis/*.py` or `configs/base.yaml` changes the hash again: record the new
