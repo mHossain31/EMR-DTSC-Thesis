@@ -38,6 +38,13 @@
       "scenario": "flushing",
       "sumo_version": "1.28.0"
     },
+    "scenarios/flushing_posted/flushing_posted.net.xml.gz": {
+      "sha256": "54b700bf42eb3977c9ae4eba9f3780185ae9a1a36ed955a8cc5a028315d3b78d",
+      "bytes": 971124,
+      "kind": "network",
+      "scenario": "flushing_posted",
+      "sumo_version": "1.28.0"
+    },
     "scenarios/midtown/midtown.net.xml.gz": {
       "sha256": "693bf065b494421c26d347a18d1f7f77f2ae1f06edee0da5e3ab914782fae9bb",
       "bytes": 838061,

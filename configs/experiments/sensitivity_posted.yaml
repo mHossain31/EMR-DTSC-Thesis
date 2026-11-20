@@ -1,0 +1,16 @@
+# Street-coding sensitivity experiment (docs/SENSITIVITY_PLAN.md, docs/DEVIATIONS.md #21). Exploratory, specified and
+# tagged (`sensitivity-v1`) before any of these runs. Flushing patched with New York City's default 25 mph limit
+# where OSM has no speed tag and a two-way stop at unsignalised junctions entered by a minor street
+# (configs/scenarios/flushing_posted.yaml); demand recalibrated on pilot seeds to the same congestion targets.
+# eco_reactive keeps the main study's alpha*_reactive; eco_ml is not run (its forecaster was trained on the original
+# network's features, which include the speed limits).
+name: sensitivity_posted
+scenario: flushing_posted
+levels: [light, moderate, heavy]
+seed_role: test
+test_n: 60
+reconcile_sample_frac: 0.05
+conditions:
+  - {controller: static}
+  - {controller: tt_adaptive}
+  - {controller: eco_reactive, params: {alpha: 0.75, tau_avg_s: 180, router: traveltime_weights}}

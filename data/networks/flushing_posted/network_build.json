@@ -1,0 +1,61 @@
+{
+  "scenario": "flushing_posted",
+  "command": [
+    "${SUMO_HOME}/bin/netconvert.exe",
+    "--sumo-net-file",
+    "scenarios/flushing/flushing.net.xml.gz",
+    "--edge-files",
+    "data/networks/flushing_posted/speed_patch.edg.xml",
+    "--node-files",
+    "data/networks/flushing_posted/stop_control.nod.xml",
+    "--output-file",
+    "scenarios/flushing_posted/flushing_posted.net.xml.gz"
+  ],
+  "sumo_version": "1.28.0",
+  "seconds": 0.98,
+  "net_file": "scenarios/flushing_posted/flushing_posted.net.xml.gz",
+  "net_sha256": "54b700bf42eb3977c9ae4eba9f3780185ae9a1a36ed955a8cc5a028315d3b78d",
+  "warnings_count": 21,
+  "warnings_sample": [
+    "Warning: Ambiguity in turnarounds computation at junction '13059489947'.",
+    "Warning: Ambiguity in turnarounds computation at junction '2797896023'.",
+    "Warning: Ambiguity in turnarounds computation at junction '8081762080'.",
+    "Warning: Ambiguity in turnarounds computation at junction '8096312556'.",
+    "Warning: Ambiguity in turnarounds computation at junction 'cluster_42806548_42806553_8075325914'.",
+    "Warning: Found sharp turn with radius 8.24 at the start of edge '-833865103#0'.",
+    "Warning: Found sharp turn with radius 8.47 at the end of edge '-833865103#0'.",
+    "Warning: Found sharp turn with radius 8.26 at the start of edge '-833865103#1'.",
+    "Warning: Found sharp turn with radius 8.14 at the end of edge '-833865103#1'.",
+    "Warning: Found sharp turn with radius 1.18 at the end of edge '-868589710#1'.",
+    "Warning: Shape for junction '274188126' has distance 90.35 to its given position.",
+    "Warning: Shape for junction '4207936803' has distance 24.08 to its given position.",
+    "Warning: Shape for junction '7761773580' has distance 21.58 to its given position.",
+    "Warning: Speed of straight connection '5700471#0_0->5700471#1-AddedOnRampEdge_0' reduced by 11.64 due to turning radius of 20.34 (length=2.71, angle=22.96).",
+    "Warning: Speed of straight connection '5700317#0_0->5700317#3_0' reduced by 5.80 due to turning radius of 5.26 (length=1.81, angle=38.21).",
+    "Warning: Speed of straight connection '5705419_0->1225829619_0' reduced by 6.84 due to turning radius of 3.42 (length=1.12, angle=39.50).",
+    "Warning: Speed of straight connection '-5709333#2_0->-5703035#5_0' reduced by 6.89 due to turning radius of 3.35 (length=1.17, angle=41.40).",
+    "Warning: Speed of straight connection '276149550#2_0->5710146_0' reduced by 6.94 due to turning radius of 3.28 (length=1.25, angle=43.85).",
+    "Warning: Intersecting left turns at junction 'cluster_2797375534_42865251_42865255' from lane '662489540#4_0' and lane '-220470253#0_0' (increase junction radius to avoid this).",
+    "Warning: 14 total messages of type: Found sharp turn with radius % at the % of edge '%'."
+  ],
+  "patch_of": "flushing",
+  "base_net_sha256": "1c6a057c9557a8583847fc25e53c179cc2e0e8177dc3ec0e1f3b3b856dbb6f29",
+  "type_speeds_mps": {
+    "highway.primary": 11.176,
+    "highway.primary_link": 11.176,
+    "highway.residential": 11.176,
+    "highway.secondary": 11.176,
+    "highway.secondary_link": 11.176,
+    "highway.tertiary": 11.176,
+    "highway.tertiary_link": 11.176,
+    "highway.unclassified": 11.176
+  },
+  "edges_speed_changed": 2092,
+  "edges_kept_osm_tagged_speed": 173,
+  "minor_road_types": [
+    "highway.residential",
+    "highway.service",
+    "highway.unclassified"
+  ],
+  "junctions_stop_controlled": 558
+}

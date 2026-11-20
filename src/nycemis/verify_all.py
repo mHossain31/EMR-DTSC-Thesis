@@ -77,7 +77,11 @@ def check_paper() -> tuple[bool, str]:
     from nycemis.analysis.paper import PAPER, write_macros
 
     write_macros()
-    defined = set(re.findall(r"\\newcommand\{\\([A-Za-z]+)\}", (PAPER / "macros.tex").read_text(encoding="utf-8")))
+    macro_text = (PAPER / "macros.tex").read_text(encoding="utf-8")
+    extra = PAPER / "macros_sensitivity.tex"  # written by `python -m nycemis sensitivity` (docs/SENSITIVITY_PLAN.md)
+    if extra.is_file():
+        macro_text += extra.read_text(encoding="utf-8")
+    defined = set(re.findall(r"\\newcommand\{\\([A-Za-z]+)\}", macro_text))
     body = _strip_tex((PAPER / "main.tex").read_text(encoding="utf-8"))
     used = set(re.findall(r"\\([A-Z][A-Za-z]*)", body)) - LATEX_UPPER
     missing = sorted(used - defined)

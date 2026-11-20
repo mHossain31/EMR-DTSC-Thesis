@@ -1,0 +1,74 @@
+{
+  "ok": true,
+  "checks": {
+    "bbox_match": {
+      "ok": true,
+      "detail": "net covers the box shrunk by 5%: True; 92.5% of lane-km inside the box (minimum 90%); net lon/lat extent (-73.8509, 40.7399, -73.8023, 40.7889); box (-73.845, 40.745, -73.805, 40.775)"
+    },
+    "edge_count": {
+      "ok": true,
+      "detail": "2316 non-internal edges (allowed 1500-20000)"
+    },
+    "traffic_lights": {
+      "ok": true,
+      "detail": "176 signalised junctions"
+    },
+    "strong_connectivity": {
+      "ok": true,
+      "detail": "largest strongly connected component holds 96.2% of edges (80 components; minimum 90%)"
+    },
+    "dead_end_share": {
+      "ok": true,
+      "detail": "15 edges without a successor (0.6%); reported, not gated"
+    },
+    "no_zero_length_edges": {
+      "ok": true,
+      "detail": "0 edges shorter than 0.1 m"
+    }
+  },
+  "stats": {
+    "lane_km_inside_bbox_share": 0.9249,
+    "edges": 2316,
+    "nodes": 907,
+    "lane_km": 299.73,
+    "traffic_lights": 176,
+    "largest_scc_edges": 2228,
+    "largest_scc_share": 0.962,
+    "scc_count": 80,
+    "weak_components": 1,
+    "dead_end_edges": 15,
+    "dead_end_share": 0.0065,
+    "source_edges": 16,
+    "speed_limits_kmh": {
+      "24": 1,
+      "40": 2222,
+      "48": 42,
+      "64": 1,
+      "80": 47,
+      "142": 3
+    },
+    "road_class_edges": {
+      "primary/secondary": 354,
+      "residential/service": 1531,
+      "tertiary": 380,
+      "motorway/trunk": 51
+    },
+    "road_class_lane_km": {
+      "primary/secondary": 52.79,
+      "residential/service": 170.04,
+      "tertiary": 36.09,
+      "motorway/trunk": 40.81
+    },
+    "edge_types": {
+      "highway.residential": 1436,
+      "highway.tertiary": 380,
+      "highway.secondary": 233,
+      "highway.primary": 110,
+      "highway.unclassified": 95,
+      "highway.motorway": 26,
+      "highway.motorway_link": 25,
+      "highway.secondary_link": 6,
+      "highway.primary_link": 5
+    }
+  }
+}

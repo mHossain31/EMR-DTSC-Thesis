@@ -151,10 +151,19 @@ class ScenarioConfig(Strict):
     bbox: tuple[float, float, float, float] | None = None  # west, south, east, north
     grid: GridSpec | None = None
     keep_largest_scc: bool = False  # second netconvert pass keeping the largest strongly connected component
+    # Network variants (sensitivity experiment, docs/DEVIATIONS.md #21): patch another scenario's built network,
+    # replacing the typemap's default speed of some OSM road types (where OSM had no maxspeed tag) and putting a stop
+    # on the minor approaches of unsignalised junctions that a minor street enters (network/build.py, build_patch).
+    patch_of: str | None = None
+    type_speeds_mps: dict[str, float] = Field(default_factory=dict)
+    minor_road_types: list[str] = Field(default_factory=list)
+    minor_stop_control: bool = False
 
     @model_validator(mode="after")
     def _source(self) -> ScenarioConfig:
-        if self.role not in {"primary", "tier2", "smoke"}:
+        if self.minor_stop_control and not self.minor_road_types:
+            raise ValueError("minor_stop_control needs minor_road_types")
+        if self.role not in {"primary", "tier2", "smoke", "sensitivity"}:
             raise ValueError(f"unknown role {self.role!r}")
         if self.source == "osm":
             if self.bbox is None:

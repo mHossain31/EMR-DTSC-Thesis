@@ -1,0 +1,8 @@
+<viewsettings>
+    <scheme name="nycemis NOx">
+        <edges laneEdgeMode="11"/>
+        <vehicles vehicleMode="8"/>
+        <legend showSizeLegend="1" showColorLegend="1" showVehicleColorLegend="1"/>
+    </scheme>
+    <delay value="20"/>
+</viewsettings>

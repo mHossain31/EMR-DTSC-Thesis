@@ -54,3 +54,56 @@ scenarios:
     - results/calibration/flushing/calibration_by_density.csv
     - results/calibration/flushing/calibration_runs.csv
     - results/calibration/flushing/speed_ratio_vs_density.png
+  flushing_posted:
+    pilot_seeds:
+    - 9000
+    - 9001
+    - 9002
+    - 9003
+    - 9004
+    response: speed_ratio = sum(duration - timeLoss) / sum(duration), finished trips
+      departing in [900, 3600] s, static runs, mean over pilot seeds; relative speed
+      ratio = speed_ratio / speed_ratio at the reference density
+    reference_density_per_h_km: 1.0
+    reference_speed_ratio: 0.6813
+    levels:
+      light:
+        density_per_h_km: 12.0
+        target_relative_speed_ratio: 0.95
+        achieved_relative_speed_ratio: 0.9415
+        target_speed_ratio: 0.6472
+        achieved_speed_ratio_mean: 0.6414
+        achieved_speed_ratio_sd: 0.0073
+        target_reached: true
+        max_teleport_frac: 0.00056
+        min_completion: 1.0
+        mean_vehicles: 3598.0
+        max_last_arrival_s: 4741.0
+      moderate:
+        density_per_h_km: 16.0
+        target_relative_speed_ratio: 0.85
+        achieved_relative_speed_ratio: 0.8451
+        target_speed_ratio: 0.5791
+        achieved_speed_ratio_mean: 0.5758
+        achieved_speed_ratio_sd: 0.0272
+        target_reached: true
+        max_teleport_frac: 0.0025
+        min_completion: 1.0
+        mean_vehicles: 4797.0
+        max_last_arrival_s: 6235.0
+      heavy:
+        density_per_h_km: 18.0
+        target_relative_speed_ratio: 0.72
+        achieved_relative_speed_ratio: 0.805
+        target_speed_ratio: 0.4905
+        achieved_speed_ratio_mean: 0.5485
+        achieved_speed_ratio_sd: 0.0181
+        target_reached: false
+        max_teleport_frac: 0.00482
+        min_completion: 1.0
+        mean_vehicles: 5396.0
+        max_last_arrival_s: 6223.0
+    evidence:
+    - results/calibration/flushing_posted/calibration_by_density.csv
+    - results/calibration/flushing_posted/calibration_runs.csv
+    - results/calibration/flushing_posted/speed_ratio_vs_density.png

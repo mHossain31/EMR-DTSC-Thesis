@@ -1,0 +1,26 @@
+# Flushing with New York City street coding (sensitivity experiment; docs/DEVIATIONS.md #21,
+# docs/SENSITIVITY_PLAN.md). The built `flushing` network patched by netconvert (edges, joins and signals unchanged):
+# - where OSM has no maxspeed tag (the edge still has the typemap default), urban road types get New York City's
+#   default limit of 25 mph (11.176 m/s), which
+#   applies to "all streets which do not have a posted speed limit" since 2014-11-07 (NYC DOT press release
+#   #14-085, 2014-10-15). Motorways and trunks keep the typemap defaults; service roads and living streets already
+#   default below 25 mph.
+# - every unsignalised junction that a residential, unclassified or service street enters gets a stop on its minor
+#   approaches (SUMO junction type priority_stop): a two-way stop.
+id: flushing_posted
+name: Downtown Flushing, Queens, with posted-limit speeds and minor-road stop control
+role: sensitivity
+source: osm
+patch_of: flushing
+bbox: [-73.845, 40.745, -73.805, 40.775]   # identical to flushing
+type_speeds_mps:
+  highway.primary: 11.176
+  highway.primary_link: 11.176
+  highway.secondary: 11.176
+  highway.secondary_link: 11.176
+  highway.tertiary: 11.176
+  highway.tertiary_link: 11.176
+  highway.residential: 11.176
+  highway.unclassified: 11.176
+minor_road_types: [highway.residential, highway.unclassified, highway.service]
+minor_stop_control: true

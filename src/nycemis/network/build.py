@@ -91,6 +91,58 @@ def _relcmd(cmd: list[str]) -> list[str]:
     return out
 
 
+def _typemap_speeds() -> dict[str, float]:
+    """Default speed (m/s) per OSM road type in the Web Wizard's typemap."""
+    import xml.etree.ElementTree as ET
+
+    path = env.sumo_home() / "data" / "typemap" / WIZARD_TYPEMAP
+    return {t.get("id"): float(t.get("speed")) for t in ET.parse(path).getroot().iter("type") if t.get("speed")}
+
+
+def build_patch(cfg: ScenarioConfig) -> dict:
+    """A variant of another scenario's built network (sensitivity experiment, docs/DEVIATIONS.md #21), changed by
+    netconvert patch files only, so edges, junction joins and signals stay identical:
+    - speeds: every edge of a listed road type whose speed is still the typemap default for that type (OSM had no
+      maxspeed tag; New York tags are in mph, so they never equal the km/h-round defaults) gets the configured speed;
+    - stop control: every unsignalised junction (priority or right-before-left) that an edge of a minor road type
+      enters becomes ``priority_stop``: vehicles on its lower-priority approaches stop first (a two-way stop)."""
+    import sumolib
+
+    base = net_path(cfg.patch_of)
+    if not base.is_file():
+        raise FileNotFoundError(f"{rel(base)} missing: build {cfg.patch_of} first")
+    defaults = _typemap_speeds()
+    net = sumolib.net.readNet(str(base), withInternal=False)
+    speed_rows, kept_tagged = [], 0
+    for e in net.getEdges():
+        types = e.getType().split("|")
+        target = [cfg.type_speeds_mps[t] for t in types if t in cfg.type_speeds_mps]
+        if not target:
+            continue
+        if any(abs(e.getSpeed() - defaults.get(t, -1.0)) < 0.01 for t in types):
+            speed_rows.append(f'    <edge id="{e.getID()}" speed="{target[0]:.4f}"/>')
+        else:
+            kept_tagged += 1
+    minor = set(cfg.minor_road_types)
+    stops = sorted(n.getID() for n in net.getNodes()
+                   if cfg.minor_stop_control and n.getType() in ("priority", "right_before_left", "left_before_right")
+                   and any(set(e.getType().split("|")) & minor for e in n.getIncoming()))
+    rdir = report_dir(cfg.id)
+    rdir.mkdir(parents=True, exist_ok=True)
+    edge_patch, node_patch = rdir / "speed_patch.edg.xml", rdir / "stop_control.nod.xml"
+    edge_patch.write_text("\n".join(["<edges>", *speed_rows, "</edges>"]) + "\n", encoding="utf-8")
+    node_patch.write_text("\n".join(["<nodes>", *(f'    <node id="{i}" type="priority_stop"/>' for i in stops),
+                                     "</nodes>"]) + "\n", encoding="utf-8")
+    out = net_path(cfg.id)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    cmd = [str(env.sumo_binary("netconvert")), "--sumo-net-file", str(base), "--edge-files", str(edge_patch),
+           "--node-files", str(node_patch), "--output-file", str(out)]
+    return _finish(cfg, cmd, out, {"patch_of": cfg.patch_of, "base_net_sha256": manifest.sha256_file(base),
+                                   "type_speeds_mps": dict(sorted(cfg.type_speeds_mps.items())),
+                                   "edges_speed_changed": len(speed_rows), "edges_kept_osm_tagged_speed": kept_tagged,
+                                   "minor_road_types": sorted(minor), "junctions_stop_controlled": len(stops)})
+
+
 def build_osm(cfg: ScenarioConfig) -> dict:
     src = osm_path(cfg.id)
     if not manifest.verify(src):
@@ -198,6 +250,8 @@ def _finish(cfg: ScenarioConfig, cmd: list[str], out: Path, extra: dict) -> dict
 
 
 def build(cfg: ScenarioConfig) -> dict:
+    if cfg.patch_of:
+        return build_patch(cfg)
     if cfg.source == "osm":
         return build_osm(cfg)
     if cfg.source == "netgenerate":
