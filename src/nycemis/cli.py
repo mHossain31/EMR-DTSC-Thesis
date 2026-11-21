@@ -312,6 +312,16 @@ def analyze_cmd(exp: str = typer.Option("confirmatory", "--exp"), scenario: str 
         typer.echo(f"wrote {path}")
 
 
+@app.command("report")
+def report_cmd() -> None:
+    """Paper versions: tables, figures and typeset macros from result files, then the journal preprint and the IEEE
+    conference version (paper/journal, paper/ieee). Run after `analyze`, `sensitivity` and `paper`."""
+    from nycemis.report import run_all
+
+    for path in run_all():
+        typer.echo(f"wrote {path}")
+
+
 @app.command("gui")
 def gui_cmd(scenario: str = typer.Option("flushing"), level: str = typer.Option("moderate"),
             seed: int = typer.Option(200), controller: str = typer.Option("static", help=(

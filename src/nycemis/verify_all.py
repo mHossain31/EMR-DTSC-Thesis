@@ -32,7 +32,13 @@ OPEN_ITEM_LABELS = ("out-of-scope-by-design", "environment-limited")
 LATEX_UPPER = {"LaTeX", "TeX"}  # LaTeX commands with an uppercase initial that are not project macros
 # a model version, the confidence level and the power target (built from the constant the sample size used, so a
 # changed target makes the typed number fail): design constants, not results
-ALLOWED_NUMBERS = (r"HBEFA~4\.2", r"95\\% BCa", r"95\\% cluster-bootstrap", rf"{100 * TARGET_POWER:g}\\% power")
+ALLOWED_NUMBERS = (r"HBEFA~4\.2", r"95\\% BCa", r"95\\% cluster-bootstrap", rf"{100 * TARGET_POWER:g}\\% power",
+                   r"95\\% interval", r"90\\% interval",
+                   r"\d+(?:\.\d+)?\\(?:linewidth|textwidth|columnwidth)")  # layout lengths, not results
+# the paper versions checked: the technical report and the journal and IEEE versions (paper/journal, paper/ieee)
+PAPER_DOCUMENTS = ("main.tex", "journal/main.tex", "ieee/main.tex")
+# LaTeX commands with an uppercase initial used by the IEEE class (author and keyword blocks), not project macros
+LATEX_UPPER = LATEX_UPPER | {"IEEEauthorblockN", "IEEEauthorblockA"}
 SPACE_PATH_TESTS = ("tests/integration/test_harness.py::test_reconciliation_within_tolerance",
                     "tests/integration/test_harness.py::test_determinism_same_spec_twice")
 
@@ -82,18 +88,23 @@ def check_paper() -> tuple[bool, str]:
     if extra.is_file():
         macro_text += extra.read_text(encoding="utf-8")
     defined = set(re.findall(r"\\newcommand\{\\([A-Za-z]+)\}", macro_text))
-    body = _strip_tex((PAPER / "main.tex").read_text(encoding="utf-8"))
-    used = set(re.findall(r"\\([A-Z][A-Za-z]*)", body)) - LATEX_UPPER
-    missing = sorted(used - defined)
-    for pat in ALLOWED_NUMBERS:
-        body = re.sub(pat, "", body)
-    typed = sorted(set(re.findall(r"(?<![A-Za-z\\])\d+(?:\.\d+)?\\%|(?<![A-Za-z\\])\d+\.\d+", body)))
-    msg = []
-    if missing:
-        msg.append(f"macros used but not generated (missing results?): {', '.join(missing)}")
-    if typed:
-        msg.append(f"numbers typed in main.tex: {', '.join(typed)}")
-    return not (missing or typed), "\n".join(msg) or f"{len(used)} macros used, all generated; no typed numbers"
+    msg, ok, counts = [], True, []
+    for doc in PAPER_DOCUMENTS:
+        if not (PAPER / doc).is_file():
+            continue
+        body = _strip_tex((PAPER / doc).read_text(encoding="utf-8"))
+        used = set(re.findall(r"\\([A-Z][A-Za-z]*)", body)) - LATEX_UPPER
+        missing = sorted(used - defined)
+        for pat in ALLOWED_NUMBERS:
+            body = re.sub(pat, "", body)
+        typed = sorted(set(re.findall(r"(?<![A-Za-z\\])\d+(?:\.\d+)?\\%|(?<![A-Za-z\\])\d+\.\d+", body)))
+        if missing:
+            msg.append(f"{doc}: macros used but not generated (missing results?): {', '.join(missing)}")
+        if typed:
+            msg.append(f"{doc}: numbers typed: {', '.join(typed)}")
+        ok &= not (missing or typed)
+        counts.append(f"{doc} {len(used)}")
+    return ok, "\n".join(msg) or f"macros used ({', '.join(counts)}), all generated; no typed numbers"
 
 
 def check_open_items() -> tuple[bool, str]:

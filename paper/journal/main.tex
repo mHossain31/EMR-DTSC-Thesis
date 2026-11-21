@@ -1,0 +1,477 @@
+\documentclass[11pt]{article}
+% Journal-style single-column preprint. Every number in this file comes from generated macros
+% (../macros.tex, ../macros_sensitivity.tex) or generated tables (../tables/*.tex), built by
+% `python -m nycemis paper`, `python -m nycemis sensitivity` and `python -m nycemis report`. Do not type results here.
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{caption}
+\usepackage{authblk}
+\usepackage[hidelinks]{hyperref}
+\usepackage{natbib}
+\usepackage{xcolor}
+\captionsetup{font=small,labelfont=bf}
+\graphicspath{{../figures/}}
+\input{../macros.tex}
+\input{../macros_sensitivity.tex}
+\input{../macros_typeset.tex}  % the same values with typographic minus signs
+\setlength{\parskip}{0.3em}
+
+\title{Emission-aware rerouting in a simulated New York City district:\\
+an audit, a preregistered test, and the role of network coding}
+\author{Mohammed Y. Hossain}
+\affil{New York Institute of Technology, New York, NY, USA}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Microscopic simulation is widely used to estimate how much rerouting could lower urban traffic emissions,
+but such estimates are only as good as the protocol and the network behind them. A 2024 student project reported
+that machine-learning-triggered rerouting cut simulated NO$_x$ in Flushing, Queens, by \LegacyNOxDropRF\%. Auditing
+its notebook, we find that the comparison set a run of about \LegacyBaselineHorizon~s against runs stopped after
+\LegacyControlledSteps~s and that its reroute calls returned unchanged routes; replicated under a matched protocol
+on \LegacyTestN\ seeds per demand level, the same rule is equivalent to no rerouting. We then test emission-aware
+rerouting driven by a \HorizonS-second traffic-state forecast in SUMO under a preregistered, paired, multi-seed
+design with travel-time and placebo baselines. On the network as built from OpenStreetMap it changed total NO$_x$
+by \PCTwoLightMean\%, \PCTwoModerateMean\% and \PCTwoHeavyMean\% against no rerouting and by \PCThreeLightMean\%,
+\PCThreeModerateMean\% and \PCThreeHeavyMean\% against travel-time rerouting (light, moderate, heavy demand), at a
+travel-time cost of a few percent. The reduction comes \CompositionWord\ from moving traffic onto residential and
+service streets, whose NO$_x$ changed by \ResidNOxLight\%, \ResidNOxModerate\% and \ResidNOxHeavy\%, and the forecaster
+\ForecastVerdictR\ a per-edge historical average of the emission rate it supplies. In a sensitivity experiment
+specified before its runs, recoding the network with New York City's default 25~mph limit and stop control at
+minor-street junctions reversed the effect of measured-emission rerouting against travel-time rerouting
+(\SensEcoReactiveVsTtAdaptiveTotalNoxGLightPosted\%, \SensEcoReactiveVsTtAdaptiveTotalNoxGModeratePosted\% and
+\SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyPosted\%). Simulated eco-routing benefits can depend more on how the network
+is coded than on the controller; we argue that such evaluations need matched protocols, placebo controls and
+network-coding checks. All quantities are simulated tailpipe emissions, not air quality or exposure.
+\end{abstract}
+
+\noindent\textbf{Keywords:} eco-routing; dynamic rerouting; traffic emissions; NO$_x$; SUMO; preregistration;
+reproducibility; network representation
+
+\section{Introduction}
+Routing vehicles away from congested or high-emitting streets is an attractive lever for lowering urban traffic
+emissions, because it needs no new infrastructure. Its effect is hard to measure on real streets, so it is usually
+estimated in microscopic traffic simulation, where every vehicle's route and emissions can be controlled and
+recorded. Simulation makes such interventions cheap to test, and also easy to mismeasure: a comparison can differ in
+more than the intervention, an intervention can silently do nothing, and a result can rest on modelling choices
+that nobody varied.
+
+This paper starts from a case in point. A 2024 student project at the New York Institute of Technology modelled
+downtown Flushing, Queens, in SUMO and reported that rerouting triggered by a machine-learning NO$_x$ predictor
+reduced simulated NO$_x$ by \LegacyNOxDropRF\% (random forest) and \LegacyNOxDropXGB\% (XGBoost). We audited the
+project's notebook and found that the result could not survive two questions: were the compared runs the same
+length, and did the intervention change anything? We then rebuilt the study to ask the substantive question under a
+protocol that removes those failure modes. Following the preregistration, we address four research questions:
+\begin{itemize}\setlength\itemsep{0pt}
+\item \textbf{RQ1 (measurement validity).} How much of the legacy-style reduction is explained by protocol
+artifacts rather than by an effect of the intervention?
+\item \textbf{RQ2 (forecasting).} Can the next minute's edge-level NO$_x$ rate be forecast from traffic-state
+features better than persistence and historical baselines, on held-out runs?
+\item \textbf{RQ3 (control).} Does emission-aware rerouting driven by such forecasts reduce network NO$_x$ compared
+with no rerouting, travel-time rerouting, a random-rerouting placebo and measurement-driven eco-routing, and at what
+cost in travel time?
+\item \textbf{RQ5 (side effects).} Does it displace emissions onto lower-class streets?\footnote{RQ4 of the
+preregistration (value of prediction under measurement noise) belongs to the optional second tier and was not run.}
+\end{itemize}
+After the preregistered analysis, an adversarial review identified the road network's speed coding as a likely
+driver of the RQ3 result, and we added a sensitivity experiment, specified and tagged before its runs, that recodes
+the network the way New York City regulates its streets.
+
+\paragraph{Contributions.} (i) An audit of a published-style simulation result that identifies an unmatched-horizon
+artifact and a no-op intervention, confirmed by replication. (ii) A preregistered, paired, multi-seed evaluation of
+forecast-driven eco-rerouting with travel-time, placebo and measurement-driven baselines, in which every reported
+number is generated from result files. (iii) A decomposition showing that the simulated reduction is mostly a shift
+of traffic onto residential streets. (iv) A sensitivity experiment showing that the sign of the eco-routing effect
+depends on network coding, with practical recommendations for simulation-based evaluations.
+
+Section~\ref{sec:related} reviews related work, Section~\ref{sec:area} the study area, network and demand,
+Section~\ref{sec:methods} the methods, Section~\ref{sec:results} the results by research question,
+Section~\ref{sec:discussion} the discussion and Section~\ref{sec:threats} threats to validity;
+Section~\ref{sec:conclusion} concludes.
+
+\section{Related work}\label{sec:related}
+\paragraph{Eco-routing.} The route a driver takes, or the fastest one, is not always the one that minimises fuel use
+or emissions. For real trips in Lund, \citet{ericsson2006fuel} found that drivers often did not take the most
+fuel-efficient route and estimated the saving a route-choice support tool could offer; \citet{ahn2008route}
+quantified the effect of route choice on energy use and emissions with microscopic models. At the network level,
+\citet{ahn2013ecorouting} evaluated eco-routing strategies in a large-scale case study.
+\citet{boriboonsomsin2012ecorouting} described an eco-routing navigation system that fuses historical and real-time
+traffic data with emission factors for different vehicles and road conditions.
+
+\paragraph{Learning-based control and forecasting.} Machine learning has been applied to traffic control with
+attention to emissions, for example reinforcement-learning signal control evaluated on air-quality indicators
+\citep{fazzini2022signals,haydari2021signals}, and to dynamic rerouting aimed at travel efficiency
+\citep{du2021rerouting}. These studies optimise or predict; the question we ask is whether the prediction adds
+information beyond simple baselines once it is embedded in a controller.
+
+\paragraph{Simulation tools, network data and evaluation methodology.} We use SUMO \citep{lopez2018sumo}, which
+provides HBEFA-based emission models and PHEMlight \citep{krajzewicz2015emissions}; we use its HBEFA~4.2 classes.
+Networks come from OpenStreetMap, which \citet{zilske2011osm} found a valuable source for traffic simulation while
+noting that attributes such as speeds and junction layout must be derived or assumed, the kind of gap our
+sensitivity experiment probes. Methodologically, we draw on preregistration to separate confirmatory from exploratory
+analysis \citep{nosek2018prereg}, on equivalence testing to support claims of no meaningful effect
+\citep{schuirmann1987tost,lakens2017equivalence}, on the Wilcoxon signed-rank test \citep{wilcoxon1945}, BCa
+bootstrap intervals \citep{efron1987bca} and Holm's procedure \citep{holm1979}. We gradient-boost with LightGBM
+\citep{ke2017lightgbm}.
+
+\section{Study area, network and demand}\label{sec:area}
+\subsection{Study area}
+The study area is downtown Flushing, Queens (Figure~\ref{fig:area}): a dense commercial centre with signalised
+arterials, a grid of residential streets and an expressway along its western edge. It is the area of the 2024
+project, which keeps the audit and the rebuild comparable.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.62\linewidth]{paper_study_area.png}
+\caption{The Flushing study network by road class, with traffic signals.}
+\label{fig:area}
+\end{figure}
+
+\subsection{Network}
+The network is built from an OpenStreetMap extract with the options of SUMO's OSM Web Wizard (car-only network,
+signals from OSM, ramps and junctions guessed), clipped to the study box, with two documented repairs: a
+\JunctionJoinM~m junction-join distance and SUMO's junction-blocker release after \JunctionBlockerS~s, which remove
+deadlocks at one junction cluster. Where OSM has no speed tag, netconvert assigns SUMO's default speed for the road
+type: \SpeedSharePrimSec\% of primary and secondary lane-km is coded at \SpeedPrimSec~km/h and \SpeedShareResid\% of
+residential lane-km at \SpeedResid~km/h, and no junction is stop-controlled (Table~\ref{tab:networks}, ``as
+built''). The second column of the table describes the recoded network of the sensitivity experiment
+(Section~\ref{sec:sensdesign}).
+
+\begin{table}[htbp]
+\centering\small
+\caption{The two network codings. Edges, lanes and signals are identical; speeds are shown as the modal speed of
+each road class with its share of the class's lane-km.}
+\label{tab:networks}
+\input{../tables/tab_networks.tex}
+\end{table}
+
+\subsection{Demand and fleet}
+Trips are generated per vehicle class with the Web Wizard's options of SUMO's \texttt{randomTrips} tool and routed
+explicitly; each vehicle's HBEFA~4.2 emission class is fixed in the route file, so every condition shares the fleet.
+Departures fall within one hour. Three demand levels are calibrated on pilot seeds to target values of the relative
+speed ratio, the ratio of ideal to actual travel time relative to a near-empty network (Table~\ref{tab:demand}).
+
+\begin{table}[htbp]
+\centering\small
+\caption{Calibrated demand levels (density in vehicles per hour per km of road; RSR = relative speed ratio,
+achieved mean over pilot seeds). $^{a}$Target not reached: denser demand made pilot runs fail the validity rule, so
+the most congested valid density is used.}
+\label{tab:demand}
+\input{../tables/tab_demand.tex}
+\end{table}
+
+\section{Methods}\label{sec:methods}
+\subsection{Matched protocol}
+Every condition of a seed shares the network, a byte-identical route file, the fleet, the SUMO seed and the options,
+and every run continues until all vehicles have arrived. A run is valid if at least \ValidCompletionPct\% of its
+vehicles complete their trips and at most \ValidTeleportPct\% are teleported. The primary outcome is total NO$_x$
+from SUMO's per-trip emission output; travel time, its 95th percentile, departure delay, vehicle-kilometres and
+CO$_2$ are secondary.
+
+\subsection{Controllers}
+Table~\ref{tab:controllers} lists the six conditions. The three eco-routing controllers set a routing weight on every
+edge every \ReroutePeriodS~s,
+\begin{equation}
+w_e = (1-\alpha)\,\tau_e + \alpha\,\bar\tau\,\frac{m_e}{\bar m},
+\end{equation}
+where $\tau_e$ is the edge's travel time from its time-mean speed over the last \TauAvgS~s (floored at free-flow
+time, as SUMO's rerouting device averages), $m_e$ the NO$_x$ a vehicle emits traversing the edge, and bars denote
+network means; each vehicle is rerouted every \ReroutePeriodS~s with SUMO's travel-time router on these weights, so
+that at $\alpha = 0$ the controllers reduce to travel-time rerouting. $\alpha^*$ was chosen on validation seeds as the
+value minimising NO$_x$ with mean travel time at most \AlphaTTBudgetPct\% above travel-time rerouting's.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Conditions. All controllers act on all vehicles (full compliance).}
+\label{tab:controllers}
+\begin{tabular}{lp{0.68\linewidth}}
+\toprule
+Condition & Rule \\
+\midrule
+No rerouting & Vehicles keep their free-flow routes. \\
+Travel-time rerouting & SUMO's rerouting device with its default adaptation. \\
+Random placebo & Eco-routing weight with the emission term replaced by noise, scaled ($\eta^* = \EtaStar$) so
+that its route-change rate matches forecast eco-routing's on validation seeds. \\
+Eco-routing (measured) & $m_e$ measured over the last minute and smoothed; $\alpha^* = \AlphaStarReactive$. \\
+Eco-routing (forecast) & $m_e$ forecast for the next \HorizonS~s from traffic-state features;
+$\alpha^* = \AlphaStarML$. \\
+Legacy rule & The 2024 rule: a random forest predicts each vehicle's NO$_x$ from its other pollutants every step;
+above \LegacyThreshold~mg/s the vehicle gets SUMO's default route search. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Forecaster}
+Gradient-boosted trees forecast each edge's NO$_x$ per vehicle-second, mean speed and NO$_x$ density for the next
+minute from sensor-like features only (vehicle counts, speeds, halting, waiting time, their lags and their upstream
+and downstream neighbours, and static attributes), with no emission information. They are trained on runs under a
+mix of controllers, so that the training data contain controller-induced traffic states, and tuned on validation
+seeds. Baselines are persistence, an exponential moving average, the per-edge historical mean of the training data
+and ridge regression.
+
+\subsection{Experimental design and preregistration}
+Seeds are split into disjoint sets for the pilot, training, validation and test (Table~\ref{tab:design}). The
+comparisons, the $\alpha^*$ selection rule, the test seeds, the sample size and the analysis code (by hash) were
+frozen in a tagged commit before any test seed ran. The pilot's spread of paired changes (SD \PilotSD\%) gave
+$n = \ConfirmatoryN$ seeds per condition and level, the cap of the preregistered rule.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Experiments. Seed sets are disjoint across roles; the sensitivity experiment reuses the test seed numbers on
+the recoded network, with demand generated for that network.}
+\label{tab:design}
+\input{../tables/tab_design.tex}
+\end{table}
+
+\subsection{Statistical analysis}
+For each seed we compute the percent change of total NO$_x$ against the reference condition. Four preregistered
+comparisons are tested at each demand level: PC1 (legacy rule vs no rerouting) and PC4 (forecast vs measured
+eco-routing) with two one-sided tests for equivalence within $\pm$\SESOI\%, PC2 (forecast eco-routing vs no
+rerouting) and PC3 (vs travel-time rerouting) with two-sided Wilcoxon signed-rank tests. The \TestsInFamily\ tests
+form one Holm family at \FamilywiseAlpha. Intervals are BCa bootstrap intervals. At $n = \ConfirmatoryN$ the planned
+power was \PowerAtNSup\% for a true change of \SESOI\%; on the test seeds the SDs of paired changes were
+\ObservedSDMin\% to \ObservedSDMax\%, so the realised precision was much higher. Everything beyond PC1--PC4 is
+exploratory.
+
+\subsection{Legacy replication}
+The legacy rule is reproduced as condition ``legacy rule'' (Table~\ref{tab:controllers}), with its random forest
+retrained on the same kind of records and its threshold expressed as the training-NO$_x$ quantile at which the 2024
+run flagged vehicle-steps. Its ``legacy metric'' sums every NO$_x$ record of a full no-rerouting run against the
+rerouting run's first \LegacyControlledSteps~s, as the notebook did; the ``matched metric'' compares complete runs.
+
+\subsection{Network-coding sensitivity experiment}\label{sec:sensdesign}
+Because the RQ3 effect turned out to depend on detours through residential streets, we added an experiment,
+specified and tagged before its runs, on a recoded copy of the network (Table~\ref{tab:networks}, ``NYC-coded''). The
+\SensEdgesSpeedChanged\ edges that carried a road-type default speed get New York City's default limit of 25~mph,
+which applies to streets without a posted limit \citep{nycdot2014speed}; the \SensEdgesTagged\ edges with an OSM
+speed tag keep it; and the \SensJunctionsStop\ unsignalised junctions entered by a residential, unclassified or
+service street get a stop on their minor approaches (a modelling assumption, not the city's sign inventory). Demand
+was recalibrated to the same targets (Table~\ref{tab:demand}). No rerouting, travel-time rerouting and
+measured-emission eco-routing ($\alpha^* = \AlphaStarReactive$) were run on the \ConfirmatoryN\ test seed numbers;
+forecast eco-routing was not, because its forecaster takes the speed limits as inputs. The pre-specified reading:
+the reduction ``persists'' at a level if the 95\% interval of eco-routing (measured) vs travel-time rerouting lies
+below zero.
+
+\section{Results}\label{sec:results}
+\subsection{RQ1: the legacy result is a measurement artifact}
+In the 2024 notebook the rerouting runs covered \LegacyRowRatioRF\% as many vehicle-steps as the baseline, and
+\LegacyRepeatUnchanged\ of \LegacyRepeatCalls\ repeated reroute calls returned the unchanged route. Its predictor is
+near-deterministic ($R^2 = \LegacyRFRTwo$ on a random split, \LegacyRFRunSplitRTwo\ split by run) because NO$_x$ is
+predicted from other outputs of the same emission model at the same instant. Replicated under the matched protocol,
+the legacy metric still reports a large drop while the matched metric shows none (Table~\ref{tab:legacy}), and the
+rule is close to a no-op: \LegacyRecountChanges\ of \LegacyRecountCalls\ reroute calls changed a vehicle's path
+(\LegacyRecountRate\%). The preregistered PC1 confirms equivalence to no rerouting at every level
+(Table~\ref{tab:pc}).
+
+\begin{table}[htbp]
+\centering\small
+\caption{Legacy replication on the test seeds: the legacy metric (full no-rerouting run against the rerouting run's
+first \LegacyControlledSteps~s) and the matched metric (complete runs; negative = lower NO$_x$).}
+\label{tab:legacy}
+\input{../tables/tab_legacy.tex}
+\end{table}
+
+\subsection{RQ3: preregistered comparisons}
+Table~\ref{tab:pc} and Figure~\ref{fig:forest} give the twelve preregistered tests. Forecast eco-routing lowered total
+NO$_x$ against no rerouting and against travel-time rerouting at every level. Equivalence with measured eco-routing
+(PC4) was not shown; its 90\% intervals lie below $-$\SESOI\% at light and moderate demand, so the forecast version
+emitted less by more than the margin there (exploratory reading).
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{Preregistered comparisons (total NO$_x$, mean paired change per seed with BCa intervals; one Holm family of
+\TestsInFamily\ tests). PC1 and PC4 test equivalence within $\pm$\SESOI\% (TOST, 90\% interval); PC2 and PC3 are
+two-sided Wilcoxon tests.}
+\label{tab:pc}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\linewidth}{!}{\input{../tables/tab_pc.tex}}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\linewidth]{paper_forest_pc.png}
+\caption{Preregistered comparisons: mean change in total NO$_x$ with 95\% BCa intervals. Blue: Holm-adjusted test
+rejects (difference, or equivalence for PC1); grey: equivalence not shown. Shaded band: equivalence margin.}
+\label{fig:forest}
+\end{figure}
+
+\paragraph{Cost and controls.} Against travel-time rerouting, forecast eco-routing cost a few percent of mean
+travel time and more at the 95th percentile, and roughly doubled the (small) mean departure delay
+(Table~\ref{tab:cost}). It used fewer vehicle-kilometres and lowered CO$_2$. Against the random-rerouting placebo it
+still lowered NO$_x$ by about a tenth, so rerouting as such does not explain the reduction.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{Cost and controls (exploratory): mean paired change with 95\% BCa interval, and mean departure delay.}
+\label{tab:cost}
+\setlength{\tabcolsep}{4pt}
+\resizebox{\linewidth}{!}{\input{../tables/tab_cost.tex}}
+\end{table}
+
+\subsection{RQ5: the reduction is a shift onto residential streets}
+Per-edge NO$_x$ shows where the reduction comes from (Table~\ref{tab:spatial}, Figure~\ref{fig:roadclass}, top row).
+Forecast eco-routing roughly doubled NO$_x$ and vehicle-hours on residential and service streets and cut NO$_x$ on
+tertiary and arterial roads. Holding each road class's NO$_x$ per vehicle-hour at the paired no-rerouting run's
+value, the change in where vehicles spend their time accounts for \CompositionLight\%, \CompositionModerate\% and
+\CompositionHeavy\% of the edge-NO$_x$ change (a share above 100 means NO$_x$ per vehicle-hour within classes rose).
+Measured eco-routing shifts NO$_x$ the same way. Figure~\ref{fig:map} shows the pattern on the map: reductions on
+the arterial corridors, smaller increases spread over side streets.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{Where the change occurs (exploratory): forecast eco-routing vs no rerouting, per-edge NO$_x$ (junction
+lanes excluded), mean paired change with 95\% BCa interval; composition share with percentile bootstrap interval.}
+\label{tab:spatial}
+\setlength{\tabcolsep}{4pt}
+\input{../tables/tab_spatial.tex}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{paper_road_class.png}
+\caption{Share of edge NO$_x$ by road class, mean over test seeds. Top: network as built; bottom: NYC-coded network
+(sensitivity experiment, three conditions).}
+\label{fig:roadclass}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.6\linewidth]{paper_map_heavy.png}
+\caption{Mean per-edge NO$_x$ difference over valid seed pairs, forecast eco-routing minus no rerouting, heavy demand (red: more NO$_x$; blue: less).}
+\label{fig:map}
+\end{figure}
+
+\subsection{RQ2: the forecast adds little over a per-edge average}
+On \TestRuns\ test-seed runs the forecaster clearly beats persistence, but for NO$_x$ per vehicle-second, the
+quantity the controller's emission cost uses, it \ForecastVerdictR\ the per-edge historical mean
+(Table~\ref{tab:forecast}). It beats the historical mean for speed and NO$_x$ density, and its hotspot ranking is
+better than the baselines'.
+
+\begin{table}[htbp]
+\centering\small
+\caption{Forecast skill on the test seeds (mean absolute error; skill = 1 $-$ MAE ratio, 95\% cluster-bootstrap
+interval over runs).}
+\label{tab:forecast}
+\input{../tables/tab_forecast.tex}
+\end{table}
+
+\subsection{Network-coding sensitivity: the effect reverses}
+On the NYC-coded network, measured eco-routing no longer lowers NO$_x$ against travel-time rerouting: at every
+level its 95\% interval lies above zero (Table~\ref{tab:sens}, Figure~\ref{fig:sens}). Against no rerouting its
+reduction shrinks or vanishes, while travel-time rerouting now lowers NO$_x$ more than on the original network. With
+the default limit on every urban street, free-flow routes already use residential streets heavily
+(Figure~\ref{fig:roadclass}, bottom row), and eco-routing no longer shifts NO$_x$ onto them. Its travel-time cost
+grew. Of the 540 runs, \SensInvalidRuns\ failed the validity rule (pairs excluded). By the pre-specified reading, the
+reduction does not persist at any level. Light and moderate demand, where both networks are equally congested, show
+this as clearly as heavy demand, where the recoded network is less congested.
+
+\begin{table}[htbp]
+\centering\footnotesize
+\caption{Sensitivity experiment: change in total NO$_x$ on the network as built (confirmatory runs) and on the
+NYC-coded network, and their difference (NYC-coded minus as built; independent samples, percentile bootstrap).}
+\label{tab:sens}
+\setlength{\tabcolsep}{4pt}
+\input{../tables/tab_sensitivity.tex}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{paper_sensitivity.png}
+\caption{Change in total NO$_x$ (mean, 95\% BCa interval) on the network as built and on the NYC-coded network.}
+\label{fig:sens}
+\end{figure}
+
+\section{Discussion}\label{sec:discussion}
+\paragraph{Principal findings.} The 2024 reduction was produced by its measurement: a full baseline was compared
+with truncated runs, and the intervention did not change routes. Under a matched, preregistered protocol, forecast
+eco-routing reduced simulated network NO$_x$ on the network as built, at a modest travel-time cost, and beat a
+placebo matched in route-change rate. But the reduction is mostly a relocation of traffic onto residential streets,
+and on a network coded like New York City's streets the same kind of controller increases NO$_x$ relative to plain
+travel-time rerouting.
+
+\paragraph{Why network coding matters.} An eco-router minimises the emission cost of a route. In the OSM-derived
+network, arterials carry SUMO's type-default speeds of \SpeedTertiary--\SpeedPrimSec~km/h and stop at signals, so their per-vehicle
+emission cost is high, while residential streets are coded at \SpeedResid~km/h with no stop control, which makes them cheap.
+The router exploits exactly that contrast. With 25~mph on both arterials and residential streets, and stops on minor
+approaches, the contrast largely disappears: residential streets are already used by free-flow routes, and detours
+add stop-and-go and distance without a lower emission rate. The effect of the controller is therefore inseparable
+from how the network encodes speed and junction control, two attributes that OpenStreetMap often lacks and
+conversion tools fill with defaults.
+
+\paragraph{Implications for evaluating eco-routing.} Simulation studies of eco-routing should (i) compare runs of
+equal scope, (ii) verify that the intervention changes behaviour, (iii) include travel-time and placebo baselines,
+(iv) report where emissions move, not only totals, and (v) test the result against the network attributes it depends
+on, such as speed limits and junction control. A routing objective that counts only total network NO$_x$ rewards
+displacement onto residential streets; any deployment-oriented study needs an exposure-aware objective and dispersion
+modelling, which this study does not have.
+
+\paragraph{The forecast.} The controller's emission cost uses forecast NO$_x$ per vehicle-second, for which the
+forecaster does not beat a per-edge historical average. Forecast eco-routing emitted less than measured eco-routing
+at some levels, but no preregistered condition isolates the forecast, and a learned per-edge prior is a plausible
+source of that difference; we do not attribute it to forecasting.
+
+\section{Threats to validity}\label{sec:threats}
+\paragraph{Construct validity.} The outcome is simulated tailpipe emission mass from European (HBEFA) emission
+models, not concentration, exposure or health. Road-class results cover edges, not junction lanes.
+\paragraph{Internal validity.} Conditions are paired by seed and share route files; the analysis code was frozen
+before the test seeds; post-hoc additions are labelled exploratory and listed in the project's deviation log, among
+them a corrected route-change counter for the legacy replication. Departure delay is reported apart from travel time.
+\paragraph{External validity.} Demand is synthetic and not calibrated to traffic counts; it lasts one hour; drivers
+comply fully; the network comes from OpenStreetMap, and its coding changes the result (Section~\ref{sec:sensdesign}).
+The stop control of the recoded network is an assumption, forecast eco-routing was not tested on it, and neither
+coding was validated against measured speeds. Only one district was studied.
+\paragraph{Statistical conclusion validity.} Intervals are narrow because runs are paired and seeds many; the
+sensitivity experiment is exploratory and uncorrected for multiplicity, and its heavy-demand comparison mixes coding
+and congestion (Table~\ref{tab:demand}).
+
+\section{Conclusion}\label{sec:conclusion}
+An audit and a matched replication showed that reported simulated NO$_x$ reductions of \LegacyNOxDropRF\% and
+\LegacyNOxDropXGB\% from ML-triggered rerouting were a measurement artifact. A preregistered rebuild found that emission-aware rerouting does lower
+simulated NO$_x$ on the network as built, but mostly by moving traffic onto residential streets, with a forecaster
+that adds little over a per-edge average, and a sensitivity experiment showed that the effect reverses when the
+network is coded like New York City's streets. The robust contribution is methodological: simulated eco-routing
+benefits should be reported together with matched protocols, placebo controls, the spatial redistribution of
+emissions and their sensitivity to network coding.
+
+\section*{Data and code availability}
+Code, configurations, frozen inputs with SHA-256 hashes, the preregistration (git tag \texttt{prereg-v1}), the
+sensitivity plan (tag \texttt{sensitivity-v1}), the deviation log and every result file are in the project
+repository. Each stage is one command, and every number in this paper is generated from result files.
+
+\section*{Acknowledgments}
+The original project was co-authored by Mohammed Y.\ Hossain and Billy M.\ Kyaw and supervised by Prof.\ X.\ Huang
+(NYIT). Map data \copyright\ OpenStreetMap contributors, ODbL.
+
+\bibliographystyle{plainnat}
+\bibliography{../refs}
+
+\appendix
+\section{Protocol and analysis parameters}
+\begin{table}[h]
+\centering\small
+\caption{Parameters (from the project configuration and the frozen selection files).}
+\input{../tables/tab_params.tex}
+\end{table}
+
+\section{Deviations from the preregistration}
+The deviation log records every departure with its reason and effect. Those bearing on the reported results:
+the effort controllers use device-equivalent travel times and SUMO's travel-time router on global weights, adopted
+after the $\alpha = 0$ sanity check failed in the pilot (before the freeze); the NO$_x$-rate forecaster is fitted on
+its own scale (before the freeze); after the results, an adversarial review led to reporting additions (side effects,
+forecast skill on test seeds, tail travel time, departure delay, the legacy replication on test seeds) with the
+preregistered tests unchanged, and to a corrected route-change counter for the legacy rule; and the network-coding
+sensitivity experiment was added at the author's request, specified and tagged before its runs.
+
+\section{Legacy audit}
+The audit of the 2024 notebook (eight hypotheses, each with evidence and status) found: an unmatched horizon (the
+baseline file spans about \LegacyBaselineHorizon~s, the rerouting runs stop at \LegacyControlledSteps~steps, and
+summing all records alone reproduces the reported drop); no-op rerouting (all repeated calls returned the unchanged
+route); a circular prediction task (NO$_x$ predicted from the same vehicle's other pollutants at the same instant,
+random row split); a threshold whose units were stated three different ways; claims of averaging over several runs
+without evidence; hard-coded stand-in values left in the notebook; and four references that could not be found. No legacy
+reference is reused here.
+\end{document}

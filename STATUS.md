@@ -20,7 +20,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
   on the test seeds, and the legacy_ml route-change counter bug (fixed; recount `legacy_recount`, 15 runs, NOx
   identical: 136 of 4,443,027 calls changed a path). PC1-PC4 are identical before and after. New analysis-code hash
   3b97c291 is recorded in DEVIATIONS #17; `verify-all --only prereg` passes.
-- **Last updated:** 2026-11-20 22:05.
+- **Last updated:** 2026-11-20 23:30.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -63,6 +63,10 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
+0. Paper layouts (requested 2026-11-20, DEVIATIONS #23): journal preprint `paper/journal/journal_preprint.pdf`
+   (16 pages), IEEE conference version `paper/ieee/ieee_conference.pdf` (4 pages), technical report archived in
+   `paper/archive/technical_report_v1.0/`. Rebuild with `python -m nycemis report` after `analyze`, `sensitivity`
+   and `paper`. Which layout is used is still open; then tag `v1.1`.
 1. Released as `v1.0`. Share the corrected results with Prof. Huang and Billy (co-author) before letters are
    submitted.
 2. Optional, not started: M10 (CARLA; the multi-GB download has not been fetched) and the follow-ups of `docs/RESEARCH_AGENDA.md`.
@@ -91,7 +95,7 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
       `models/flushing/gbm_v1/model_card.md` (tag `model-freeze-v1`); `results/confirmatory/forecast_test.json`
       (test seeds, DEVIATIONS #20).
 - [x] Preregistration tagged before the test seeds; PC1-PC4 reported with CIs; deviations documented: tag `prereg-v1`
-      (`verify-all` prereg check); `docs/CLAIMS.md`; `docs/DEVIATIONS.md` #1-#22.
+      (`verify-all` prereg check); `docs/CLAIMS.md`; `docs/DEVIATIONS.md` #1-#23.
 - [x] Every planned run DONE or documented-failed; invalid-run counts reported: `experiment verify` for pilot,
       dataset, validation, confirmatory, legacy_recount and sensitivity_posted; invalid counts in
       `results/confirmatory/analysis.json` and `results/sensitivity_posted/analysis.json`.
@@ -126,7 +130,7 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Decisions so far
 
-`docs/DEVIATIONS.md` #1-#22. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
+`docs/DEVIATIONS.md` #1-#23. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
 20 m (#7), levels on the relative speed ratio (#8), reconciliation tolerance 0.5% for pilot runs (#9),
 device-equivalent travel time (#12) and the travel-time-weights router (#13) in the effort controllers, r and v
 forecast on their own scale (#14).

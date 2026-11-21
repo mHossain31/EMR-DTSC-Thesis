@@ -11,7 +11,10 @@ of M9 are generated from the results). Where to read the results:
 - `application/research_summary_1page.md`: one page, every number generated from result files.
 - `docs/CLAIMS.md`: every claim with its comparison, interval and result file; preregistered (PC1-PC4) and
   exploratory claims are kept apart.
-- `paper/main.tex`, compiled to `paper/build/main.pdf` by `python -m nycemis paper`.
+- The paper in three layouts: the journal-style preprint `paper/journal/journal_preprint.pdf`, the two-column
+  IEEE conference version `paper/ieee/ieee_conference.pdf` (both built by `python -m nycemis report`), and the
+  technical report `paper/main.tex` (`python -m nycemis paper`; the v1.0 rendering is archived in
+  `paper/archive/technical_report_v1.0/`).
 - `docs/PREREGISTRATION.md` (git tag `prereg-v1`), `docs/DEVIATIONS.md`, `docs/LIMITATIONS.md`,
   `docs/LEGACY_AUDIT.md`, `docs/RESEARCH_AGENDA.md`; the street-coding sensitivity experiment:
   `docs/SENSITIVITY_PLAN.md` (git tag `sensitivity-v1`) and `docs/CLAIMS_SENSITIVITY.md`.
@@ -55,6 +58,7 @@ The full pipeline, in order (each stage is idempotent; `python -m nycemis <stage
 .venv/Scripts/python.exe -m nycemis experiment run --exp sensitivity_posted  # street-coding sensitivity
 .venv/Scripts/python.exe -m nycemis sensitivity                      # its analysis (docs/SENSITIVITY_PLAN.md)
 .venv/Scripts/python.exe -m nycemis paper                            # macros, documents, PDF
+.venv/Scripts/python.exe -m nycemis report                           # journal and IEEE versions
 .venv/Scripts/python.exe -m nycemis verify-all                       # every automated check
 ```
 

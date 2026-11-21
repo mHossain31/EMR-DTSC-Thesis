@@ -49,3 +49,7 @@ models/smoke/
 
 # personal notes kept out of the repository (decision, 2026-11-18)
 RESEARCH_BREAKDOWN.md
+
+# LaTeX build folders of the paper versions (final PDFs are copied next to their sources)
+paper/journal/build/
+paper/ieee/build/
