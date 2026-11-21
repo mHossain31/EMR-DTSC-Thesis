@@ -4,22 +4,23 @@ Follow-up questions, each motivated by a result of this study (docs/SPECIFICATIO
 here: `docs/CLAIMS.md` (section and claim IDs), `paper/main.tex` (section names), `docs/LIMITATIONS.md`. Nothing
 below has been run; each question would need its own preregistered comparison.
 
-## 1. Does the eco-routing reduction survive realistic street coding?
+## 1. Which network coding is right, and does any eco-routing benefit survive it?
 
-**Motivated by:** the RQ5 section of `docs/CLAIMS.md` (NOx on residential and service streets roughly doubles under
-forecast eco-rerouting, and the road-class shift of vehicle-hours explains most of the edge-NOx reduction) together
-with the network's coding (paper, Methods: arterials carry SUMO's type-default speeds and signals, residential
-streets have no stop control; `docs/LIMITATIONS.md` item 14).
+**Motivated by:** the street-coding sensitivity experiment (`docs/CLAIMS_SENSITIVITY.md`, paper section on
+sensitivity to street coding): with New York City's default 25 mph limit and minor-road stops, measured-emission
+rerouting emitted more NOx than travel-time rerouting at every demand level, where on the OpenStreetMap-default
+network it emitted less, and the shift onto residential streets disappeared. Neither coding was checked against
+measured street speeds or the city's junction controls.
 
-**Study:** rebuild Flushing with posted speed limits where OpenStreetMap lacks them and stop control at unsignalised
-residential junctions, recalibrate demand to the same congestion levels, and repeat PC2 and PC3. If the reduction
-shrinks in proportion to the cost of residential detours, the original effect is largely a property of the network
-coding, not of eco-routing.
+**Study:** calibrate the network's free-flow speeds and junction delays against measured street speeds (for example
+New York City's published traffic-speed data) and the city's signal and stop-sign inventory; retrain the forecaster on
+the calibrated network and rerun PC2-PC4, preregistered. If the benefit of eco-routing depends on coding that cannot
+be pinned down, that dependence is the result to report.
 
 ## 2. Can eco-routing keep its benefit without displacing emissions onto residential streets?
 
-**Motivated by:** the same RQ5 result. A routing objective that counts only total network NOx rewards moving
-traffic onto the streets where people live.
+**Motivated by:** the RQ5 result on the network as built. A routing objective that counts only total network NOx
+rewards moving traffic onto the streets where people live.
 
 **Study:** add a road-class or exposure weight to the emission cost (for example, NOx on residential edges counted
 at a multiple of its mass) and trace the Pareto front between total NOx, residential NOx and travel time across that

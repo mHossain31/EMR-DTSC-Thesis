@@ -27,7 +27,7 @@ from pathlib import Path
 from nycemis.experiments.power import TARGET_POWER
 from nycemis.paths import docs_dir, repo_root
 
-FINAL_EXPERIMENTS = ("pilot", "dataset", "validation", "confirmatory")
+FINAL_EXPERIMENTS = ("pilot", "dataset", "validation", "confirmatory", "legacy_recount", "sensitivity_posted")
 OPEN_ITEM_LABELS = ("out-of-scope-by-design", "environment-limited")
 LATEX_UPPER = {"LaTeX", "TeX"}  # LaTeX commands with an uppercase initial that are not project macros
 # a model version, the confidence level and the power target (built from the constant the sample size used, so a

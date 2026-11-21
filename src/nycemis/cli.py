@@ -312,6 +312,25 @@ def analyze_cmd(exp: str = typer.Option("confirmatory", "--exp"), scenario: str 
         typer.echo(f"wrote {path}")
 
 
+@app.command("gui")
+def gui_cmd(scenario: str = typer.Option("flushing"), level: str = typer.Option("moderate"),
+            seed: int = typer.Option(200), controller: str = typer.Option("static", help=(
+                "static, tt_adaptive, random_reroute, eco_reactive, eco_ml or legacy_ml (confirmatory parameters)")),
+            dry_run: bool = typer.Option(False, "--dry-run", help="print the sumo-gui command and parameters only")
+            ) -> None:
+    """Open sumo-gui on a scenario with one level, seed and controller (edges coloured by NOx, vehicles by speed)."""
+    import tempfile
+    from pathlib import Path
+
+    from nycemis.sim.gui import gui_command, launch
+
+    if dry_run:
+        cmd, params = gui_command(scenario, level, seed, controller, Path(tempfile.mkdtemp(prefix="nycemis_gui_")))
+        typer.echo(json.dumps({"command": cmd, "params": params}, indent=2))
+        return
+    launch(scenario, level, seed, controller)
+
+
 @app.command("sensitivity")
 def sensitivity_cmd() -> None:
     """Street-coding sensitivity experiment (docs/SENSITIVITY_PLAN.md): contrasts, side effects, macros, claims."""

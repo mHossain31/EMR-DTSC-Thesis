@@ -233,6 +233,79 @@ def _cost_line(m: dict, res: dict) -> str | None:
             f"departure delay {dd}.")
 
 
+SENSITIVITY = "sensitivity_posted"
+SENS_HEADING = "## Does the reduction hold with New York street coding?"
+
+
+def _sensitivity() -> dict | None:
+    path = results_dir() / SENSITIVITY / "analysis.json"
+    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
+
+
+def _sens_rows(s: dict, cond: str, ref: str, metric: str) -> list[dict] | None:
+    rows = {r["level"]: r for r in s["contrasts"] if (r["condition"], r["reference"], r["metric"]) == (cond, ref, metric)}
+    return [rows[lvl] for lvl in LEVELS] if set(rows) >= set(LEVELS) else None
+
+
+def _sens_resid(s: dict) -> str | None:
+    rows = {x["level"]: x for x in s["spatial"]["posted"]["paired"]
+            if (x["condition"], x["reference"], x["metric"]) == ("eco_reactive", "static", "nox_residential/service_pct")}
+    return ", ".join(f"{rows[lvl]['mean']:+.0f}%" for lvl in LEVELS) if set(rows) >= set(LEVELS) else None
+
+
+def _sensitivity_short() -> str | None:
+    """One compact sentence for the summary (docs/SENSITIVITY_PLAN.md); numbers and signs from the result file."""
+    s = _sensitivity()
+    rows = _sens_rows(s, "eco_reactive", "tt_adaptive", "total_nox_g") if s else None
+    resid = _sens_resid(s) if s else None
+    if not rows or not resid:
+        return None
+    posted = ", ".join(f"{r['posted']['mean_pct']:+.1f}%" for r in rows)
+    orig = ", ".join(f"{r['original']['mean_pct']:+.1f}%" for r in rows)
+    return (f"With NYC's 25 mph default and minor-road stops (exploratory), measured-emission rerouting changed NOx "
+            f"{posted} vs travel-time rerouting (original network {orig}); residential NOx {resid}.")
+
+
+def _sensitivity_section() -> list[str]:
+    """Project page and FAQ: the street-coding sensitivity experiment, in the generated claim sentences."""
+    from nycemis.sensitivity import nox_sentence
+
+    s = _sensitivity()
+    if not s:
+        return []
+    lines = ["The study's main network keeps SUMO's default speed for each OpenStreetMap road type where OSM has no "
+             "speed tag, and has no stop-controlled junction. A follow-up experiment, specified and tagged before its "
+             "runs (`docs/SENSITIVITY_PLAN.md`), recoded the network with New York City's default 25 mph limit and a "
+             "stop on the minor approaches of unsignalised junctions entered by a minor street, and reran no "
+             "rerouting, travel-time rerouting and measured-emission rerouting (forecast-driven rerouting was not run: "
+             "its forecaster takes the speed limits as inputs). Exploratory results:", ""]
+    for cond, ref in (("eco_reactive", "tt_adaptive"), ("eco_reactive", "static")):
+        for r in _sens_rows(s, cond, ref, "total_nox_g") or []:
+            lines.append(f"- {nox_sentence(r)}")
+    resid = _sens_resid(s)
+    if resid:
+        lines.append(f"- NOx on residential/service streets under measured-emission rerouting vs no rerouting, light, "
+                     f"moderate, heavy: {resid} on the recoded network.")
+    lines += ["", "Heavy demand on the recoded network is less congested than on the original (its calibration target "
+              "could not be reached without jams), so heavy-demand comparisons mix coding and congestion; light and "
+              "moderate demand are matched. Details: `docs/CLAIMS_SENSITIVITY.md`.", ""]
+    return lines
+
+
+def append_faq_sensitivity() -> str | None:
+    """Add (or replace) the FAQ's street-coding answer. ``render_faq`` (frozen analysis package) writes the FAQ first."""
+    section = _sensitivity_section()
+    path = repo_root() / "application" / "interview_faq.md"
+    if not section or not path.is_file():
+        return None
+    text = path.read_text(encoding="utf-8")
+    if SENS_HEADING in text:
+        text = text[:text.index(SENS_HEADING)]
+    path.write_text(text.rstrip("\n") + "\n\n" + "\n".join([SENS_HEADING, "", *section]).rstrip("\n") + "\n",
+                    encoding="utf-8")
+    return rel(path)
+
+
 def _summary_extra(m: dict, res: dict) -> list[str]:
     """Compact exploratory lines for the one-page summary (the project page uses the full sentences)."""
     out = []
@@ -241,13 +314,17 @@ def _summary_extra(m: dict, res: dict) -> list[str]:
         nums = sorted(int(c) for c in comp)
         side = (f"Side effect (exploratory): residential-street NOx changed {resid} vs no rerouting; the road-class "
                 f"shift of vehicle-hours explains {nums[0]}-{nums[-1]}% of the edge-NOx change.")
-        if all(k in m for k in ("SpeedPrimSec", "SpeedResid", "JunctionsStop")):
+        sens = _sensitivity_short()
+        if sens:
+            side += f" {sens}"
+        elif all(k in m for k in ("SpeedPrimSec", "SpeedResid", "JunctionsStop")):
             side += (f" SUMO default speeds (arterials {m['SpeedPrimSec']}, residential {m['SpeedResid']} km/h) and "
                      f"{m['JunctionsStop']} stop-controlled junctions make such detours cheap.")
         out.append(side)
     fc = _forecast_line()
     if fc:
-        out.append(fc)
+        out.append(fc.replace("On test seeds the forecaster", "Test seeds: the forecaster")
+                   .replace(" for NOx per vehicle-second", " for NOx per vehicle-s"))
     tt = _tt_values(res)
     p95 = {r["level"]: r for r in res["exploratory"]
            if (r["metric"], r["condition"], r["reference"]) == ("p95_tt_s", "eco_ml", "tt_adaptive")}
@@ -318,6 +395,9 @@ def render_project_page(m: dict, res: dict) -> str:
            "![Change in NOx per edge, forecast eco-rerouting minus no rerouting, heavy demand]"
            "(../paper/figures/map_eco_ml_minus_static_heavy.png)", "",
            "Intervals for every statement are in the claims ledger.", ""]),
+        *([SENS_HEADING, "", *_sensitivity_section(),
+           "![Share of edge NOx by road class on the recoded network](../paper/figures/road_class_shares_posted.png)",
+           ""] if _sensitivity() else []),
         "![NOx and travel time over the eco-routing weight, validation seeds](../paper/figures/pareto_alpha.png)", "",
         "## Limits", "", LIMITS, "",
         "## Reproduce", "",
@@ -350,4 +430,7 @@ def write_application(experiment: str = "confirmatory") -> list[str]:
                        ("project_page.md", render_project_page(m, res))):
         (out / name).write_text(text, encoding="utf-8")
         written.append(rel(out / name))
+    faq = append_faq_sensitivity()
+    if faq:
+        written.append(faq)
     return written

@@ -40,9 +40,12 @@ tailpipe emission mass**, per trip and in total.
     Flushing carry type defaults rather than posted limits; most signals sit at junctions with a tertiary or larger
     road, and no junction is stop-controlled (paper macros `SpeedPrimSec`, `SpeedResid`, `JunctionsSignal`, `JunctionsStop`, computed from the
     network file). Emission-aware rerouting lowers NOx largely by moving vehicle-hours from signalised arterials onto
-    residential and service streets (docs/CLAIMS.md, RQ5 section). How cheap those detours are depends on this coding,
-    so the size of the PC2 and PC3 reductions may not carry over to a network coded with posted limits and stop
-    control (docs/RESEARCH_AGENDA.md, question 1).
+    residential and service streets (docs/CLAIMS.md, RQ5 section). How cheap those detours are depends on this coding.
+    The street-coding sensitivity experiment (docs/SENSITIVITY_PLAN.md, docs/CLAIMS_SENSITIVITY.md) recoded the
+    network with New York City's default 25 mph limit and minor-road stops: there the measured-emission controller
+    emitted more NOx than travel-time rerouting at every level and the residential shift disappeared. The PC2 and PC3
+    reductions therefore describe the network as built, not Flushing; forecast-driven rerouting was not run on the
+    recoded network, and its stop control is an assumption, not the city's sign inventory.
 15. **Displacement is not exposure.** RQ5 measures where tailpipe NOx is emitted, by road class. Residential streets
     are where people live, but without dispersion and population data nothing follows about exposure or health,
     in either direction.

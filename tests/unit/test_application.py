@@ -72,7 +72,8 @@ def test_finding_groups_levels_by_outcome() -> None:
 def test_project_page_has_every_test_sentence(m) -> None:
     res = _res({"PC1": 0.3, "PC2": -5.0, "PC3": -4.0, "PC4": -2.5}, dict.fromkeys(PC_LABEL, [True, False, True]))
     page = render_project_page(m, res)
-    assert page.count("At light demand") == 4 and page.count("At heavy demand") == 4
+    # the four PC sentences per level ("At <level> demand, ..."); the sensitivity sentences continue "on the ..."
+    assert page.count("At light demand,") == 4 and page.count("At heavy demand,") == 4
 
 
 def test_word_count_ignores_table_rules() -> None:

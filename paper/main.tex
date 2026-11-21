@@ -8,6 +8,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{natbib}
 \input{macros.tex}
+\input{macros_sensitivity.tex}
 
 \title{Does forecast-driven eco-rerouting reduce simulated traffic emissions?\\
 \large An audited, preregistered SUMO study of Flushing, Queens}
@@ -31,7 +32,11 @@ rerouting it lowered simulated total NOx at every level (Section~\ref{sec:result
 traffic onto residential and service streets, whose NOx changed by \ResidNOxLight\%, \ResidNOxModerate\% and
 \ResidNOxHeavy\% (light, moderate, heavy demand) in a network whose speed coding favours such detours. On held-out
 seeds the forecaster \ForecastVerdictR\ a per-edge historical average of the emission rate it supplies
-(Section~\ref{sec:forecast}). All
+(Section~\ref{sec:forecast}). On a variant of the network with New York City's default 25~mph limit and stop control
+at minor-street junctions, measured-emission rerouting no longer lowered NOx against travel-time rerouting but raised
+it, by \SensEcoReactiveVsTtAdaptiveTotalNoxGLightPosted\%, \SensEcoReactiveVsTtAdaptiveTotalNoxGModeratePosted\% and
+\SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyPosted\% (Section~\ref{sec:sensitivity}): the simulated benefit depends on
+how the network is coded. All
 quantities are simulated tailpipe emissions, not air quality or exposure.
 \end{abstract}
 
@@ -189,6 +194,57 @@ per-edge historical mean and \TestPersistMAER\ for persistence (skill relative t
 and \TestPersistMAEV\ (skill \TestSkillHistV), and for NOx density \TestModelMAED\ against \TestHistMAED\ and
 \TestPersistMAED\ (skill \TestSkillHistD).
 
+\subsection{Sensitivity to street coding (exploratory)}\label{sec:sensitivity}
+Because the reduction depends on detours through residential streets, we repeated no rerouting, travel-time
+rerouting and measured-emission rerouting on a variant of the network coded the way New York City regulates its
+streets, in an experiment specified and tagged before its runs (\texttt{docs/SENSITIVITY\_PLAN.md}). The
+\SensEdgesSpeedChanged\ edges that carried a road-type default speed get the city's default limit of 25~mph, which
+applies to streets without a posted limit \citep{nycdot2014speed}; the \SensEdgesTagged\ edges with an OpenStreetMap
+speed tag keep it; and the \SensJunctionsStop\ unsignalised junctions that a residential, unclassified or service
+street enters get a stop on their minor approaches. Edges, lanes and signals are unchanged. Demand was recalibrated on
+pilot seeds to the same congestion targets. Light and moderate demand reached them; heavy demand did not, because
+beyond \SensDensityHeavy\ vehicles per hour per km the stop-controlled approaches jam, so heavy demand on this network
+is less congested than on the original and comparisons at that level mix coding and congestion. Forecast
+eco-rerouting was not run, because its forecaster takes the speed limits as inputs. The controller keeps
+$\alpha^* = \AlphaStarReactive$; the same \ConfirmatoryN\ test seeds are used, with demand generated for this network.
+
+On this network measured-emission rerouting no longer lowers NOx against travel-time rerouting. Total NOx changed
+by \SensEcoReactiveVsTtAdaptiveTotalNoxGLightPosted\% (95\% BCa \SensEcoReactiveVsTtAdaptiveTotalNoxGLightPostedCI),
+\SensEcoReactiveVsTtAdaptiveTotalNoxGModeratePosted\% (\SensEcoReactiveVsTtAdaptiveTotalNoxGModeratePostedCI) and
+\SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyPosted\% (\SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyPostedCI) at light,
+moderate and heavy demand, against \SensEcoReactiveVsTtAdaptiveTotalNoxGLightOriginal\%,
+\SensEcoReactiveVsTtAdaptiveTotalNoxGModerateOriginal\% and \SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyOriginal\% on
+the original network (posted-limit minus original: \SensEcoReactiveVsTtAdaptiveTotalNoxGLightDiff,
+\SensEcoReactiveVsTtAdaptiveTotalNoxGModerateDiff\ and \SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyDiff\ points, intervals
+\SensEcoReactiveVsTtAdaptiveTotalNoxGLightDiffCI, \SensEcoReactiveVsTtAdaptiveTotalNoxGModerateDiffCI\ and
+\SensEcoReactiveVsTtAdaptiveTotalNoxGHeavyDiffCI). Against no rerouting it changed NOx by
+\SensEcoReactiveVsStaticTotalNoxGLightPosted\%, \SensEcoReactiveVsStaticTotalNoxGModeratePosted\% and
+\SensEcoReactiveVsStaticTotalNoxGHeavyPosted\% (original: \SensEcoReactiveVsStaticTotalNoxGLightOriginal\%,
+\SensEcoReactiveVsStaticTotalNoxGModerateOriginal\%, \SensEcoReactiveVsStaticTotalNoxGHeavyOriginal\%), while
+travel-time rerouting changed it by \SensTtAdaptiveVsStaticTotalNoxGLightPosted\%,
+\SensTtAdaptiveVsStaticTotalNoxGModeratePosted\% and \SensTtAdaptiveVsStaticTotalNoxGHeavyPosted\%. The shift onto
+residential streets disappears: with the default limit on every urban street, free-flow routes already use them
+(Figure~\ref{fig:roadclassposted}), and measured-emission rerouting changed their NOx by
+\SensPostedEcoReactiveVsStaticNoxResidentialServicePctLight\%, \SensPostedEcoReactiveVsStaticNoxResidentialServicePctModerate\%
+and \SensPostedEcoReactiveVsStaticNoxResidentialServicePctHeavy\% against no rerouting (original:
+\SensOriginalEcoReactiveVsStaticNoxResidentialServicePctLight\%,
+\SensOriginalEcoReactiveVsStaticNoxResidentialServicePctModerate\% and
+\SensOriginalEcoReactiveVsStaticNoxResidentialServicePctHeavy\%). Its travel-time cost against travel-time rerouting
+grew to \SensEcoReactiveVsTtAdaptiveMeanTtSLightPosted\%, \SensEcoReactiveVsTtAdaptiveMeanTtSModeratePosted\% and
+\SensEcoReactiveVsTtAdaptiveMeanTtSHeavyPosted\% in the mean and \SensEcoReactiveVsTtAdaptivePNineFiveTtSLightPosted\%,
+\SensEcoReactiveVsTtAdaptivePNineFiveTtSModeratePosted\% and \SensEcoReactiveVsTtAdaptivePNineFiveTtSHeavyPosted\% at
+the 95th percentile. Of the 540 runs, \SensInvalidRuns\ failed the validity rule; their pairs are excluded. By the reading fixed
+in the plan before the runs, the reduction does not persist at any demand level; light and moderate demand, where
+the two networks are equally congested, show it as clearly as heavy demand.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/road_class_shares_posted.png}
+\caption{Share of edge NOx by road class on the network with New York City's default speed limit and minor-road stop
+control, mean over test seeds (compare Figure~\ref{fig:roadclass}).}
+\label{fig:roadclassposted}
+\end{figure}
+
 \section{Discussion}\label{sec:discussion}
 \paragraph{The original result.} The large reductions of the 2024 project are explained by its measurement: a full
 baseline run was compared with rerouting runs a fraction of its length. Under a matched protocol the same rule is
@@ -202,11 +258,17 @@ percent in travel time that is larger in the tail than in the mean. The reductio
 vehicles drive: the router moves vehicle-hours from tertiary, primary and secondary roads onto residential and
 service streets, where SUMO's emission model produces less NOx per vehicle-hour at the speeds and junction
 controls this network encodes. Measured-emission rerouting does the same. Two consequences follow. First, the
-size of the reduction depends on network coding: in Flushing the arterials carry SUMO's type-default speeds and
-traffic signals, while residential streets have no stop control, which makes residential detours cheap; a network
-coded with posted limits and stop signs could shrink or remove the advantage. Second, the emissions that remain
-are moved onto streets where people live. This study has no dispersion or population model, so it says nothing
-about exposure, but a routing objective that only counts total network NOx rewards exactly this displacement.
+reduction depends on network coding. In the OpenStreetMap-derived network the arterials carry SUMO's type-default
+speeds and traffic signals while residential streets have no stop control, which makes residential detours cheap.
+Coded instead with New York City's default limit and stops at minor-street junctions (Section~\ref{sec:sensitivity}),
+the same measured-emission controller emitted more NOx than travel-time rerouting at every demand level, and the
+shift onto residential streets vanished. Forecast-driven rerouting was not run on that network (its forecaster
+takes speed limits as inputs), so its result there is unknown; it optimises the same cost as the measured-emission
+controller. The PC2 and PC3 reductions are therefore findings about this simulated network, not about eco-rerouting
+in Flushing. Second, on the original network the emissions
+that remain are moved onto streets where people live. This study has no dispersion or population model, so it says
+nothing about exposure, but a routing objective that only counts total network NOx rewards exactly this
+displacement.
 
 \paragraph{The forecast.} The controller's emission cost uses the forecast NOx per vehicle-second, and on the test
 seeds the forecaster \ForecastVerdictR\ a per-edge historical average of that quantity. Forecast-driven rerouting
@@ -215,16 +277,21 @@ preregistered condition isolates the forecast, and a learned per-edge prior is o
 difference. We therefore do not attribute it to forecasting.
 
 \paragraph{What carries over.} The methodological points do: matched horizons, interventions verified to act,
-placebo and baseline controllers, preregistration of the comparisons and analysis code, and an adversarial review
-before reporting, which here turned a headline reduction into a reduction with a mechanism and a side effect.
+placebo and baseline controllers, preregistration of the comparisons and analysis code, an adversarial review
+before reporting, and a check of the modelling choices a result rests on. Here the review turned a headline
+reduction into a reduction with a mechanism and a side effect, and a sensitivity experiment specified before its runs
+showed that the mechanism depends on how the network is coded.
 
 \section{Limitations}
 Demand is synthetic and not calibrated to New York counts; emission factors are European (HBEFA); there is no
 dispersion, so emissions are not concentrations or exposure; the network and signals come from OpenStreetMap, with
 SUMO's type-default speeds where OpenStreetMap has no speed tag and no stop-controlled junctions; drivers comply
-fully; demand lasts one hour; the simulator is not validated against field measurements. Road-class results cover
-edges only, not junction lanes. Departure delay is reported apart from travel time. No claim here concerns health or
-air quality.
+fully; demand lasts one hour; the simulator is not validated against field measurements. The preregistered results
+hold for the network as built; with New York City's default limit and minor-street stops the measured-emission
+controller's advantage reverses (Section~\ref{sec:sensitivity}), forecast-driven rerouting was not tested on that
+network, and the stop control there is an assumption, not the city's sign inventory. Road-class results cover edges
+only, not junction lanes. Departure delay is reported apart from travel time. No claim here concerns health or air
+quality.
 
 \section{Reproducibility}
 Code, configurations, frozen inputs (with SHA-256 hashes), the preregistration and every result file are in the
