@@ -63,6 +63,10 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
+0b. Remote (requested 2026-11-21): `origin` = https://github.com/mHossain31/EMR-DTSC-Thesis (private), pushed
+   over HTTPS with GitHub CLI credentials; branch `main` and tags `model-freeze-v1`,
+   `prereg-v1`, `sensitivity-v1`, `v1.0`. GitHub's initial commit (a CC0 LICENSE) is merged; the project keeps
+   MIT (decision). Push further commits with `git push`; Further publication is a separate step.
 0a. arXiv package of the journal preprint (requested 2026-11-21): `paper/journal/arxiv/journal_preprint_arxiv.tar.gz`
    (flattened source, figures, tables, macros, compiled main.bbl; compiles from an empty folder) and
    `paper/journal/arxiv/arxiv_metadata.md` (plain-text title, authors, abstract, comments). Not submitted: the

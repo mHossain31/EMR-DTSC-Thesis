@@ -5,4 +5,4 @@ environment-limited). Each item names its milestone.
 
 | # | Item | Milestone | Label |
 |---|---|---|---|
-| 3 | No CI: the repository has no remote, so the smoke profile runs locally inside `verify-all` | - | out-of-scope-by-design |
+| 3 | No CI: the GitHub repository (private) runs no workflow; the smoke profile runs locally inside `verify-all` | - | out-of-scope-by-design |
