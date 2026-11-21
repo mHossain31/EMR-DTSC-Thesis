@@ -5,6 +5,9 @@ A reproducible SUMO + machine-learning study of whether forecast-driven, emissio
 preregistered, paired, multi-seed protocol. It rebuilds and audits an earlier student project; see
 `docs/LEGACY_AUDIT.md` for what was wrong with that version and how this one addresses it.
 
+**Authors:** Mohammed Y. Hossain and Billy M. Kyaw (New York Institute of Technology). To cite this work, see
+`CITATION.cff`.
+
 Status: the confirmatory study has run and been analysed (milestones M0-M7; the paper and application materials
 of M9 are generated from the results). Where to read the results:
 
@@ -81,7 +84,8 @@ were run. The paper needs a TeX engine: tectonic at `tools/tectonic.exe` or on P
 
 The original project, "Air Pollution Prediction and Reduction Strategies in Urban Areas using SUMO and Machine
 Learning" (NYIT DTSC 870 Project I), was co-authored by **Mohammed Y. Hossain** (team leader) and
-**Billy M. Kyaw**, supervised by **Prof. X. Huang** (NYIT).
+**Billy M. Kyaw**, supervised by **Prof. X. Huang** (NYIT). This rebuild, its paper versions and the application
+materials are the joint work of Mohammed Y. Hossain and Billy M. Kyaw.
 
 Map data: Contains data © OpenStreetMap contributors, ODbL. See `NOTICE.md`.
 
