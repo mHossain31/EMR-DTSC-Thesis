@@ -63,6 +63,10 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
+0a. arXiv package of the journal preprint (requested 2026-11-21): `paper/journal/arxiv/journal_preprint_arxiv.tar.gz`
+   (flattened source, figures, tables, macros, compiled main.bbl; compiles from an empty folder) and
+   `paper/journal/arxiv/arxiv_metadata.md` (plain-text title, authors, abstract, comments). Not submitted: the
+   authors choose category, license and timing, and may need an arXiv endorsement.
 0. Paper layouts (requested 2026-11-20, DEVIATIONS #23): journal preprint `paper/journal/journal_preprint.pdf`
    (16 pages), IEEE conference version `paper/ieee/ieee_conference.pdf` (4 pages), technical report archived in
    `paper/archive/technical_report_v1.0/`. Rebuild with `python -m nycemis report` after `analyze`, `sensitivity`

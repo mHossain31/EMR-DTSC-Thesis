@@ -59,6 +59,7 @@ The full pipeline, in order (each stage is idempotent; `python -m nycemis <stage
 .venv/Scripts/python.exe -m nycemis sensitivity                      # its analysis (docs/SENSITIVITY_PLAN.md)
 .venv/Scripts/python.exe -m nycemis paper                            # macros, documents, PDF
 .venv/Scripts/python.exe -m nycemis report                           # journal and IEEE versions
+.venv/Scripts/python.exe scripts/make_arxiv_bundle.py --variant journal  # arXiv package of the preprint
 .venv/Scripts/python.exe -m nycemis verify-all                       # every automated check
 ```
 
