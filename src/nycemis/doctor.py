@@ -2,7 +2,8 @@
 
 Each check is marked required or informational. Required failures make ``doctor`` exit non-zero. Informational
 items (TeX engine, CARLA readiness) are reported but do not fail the gate: TeX is needed only at M9 and CARLA only
-for the optional M10.
+for the optional M10. Overpass reachability is informational while every OSM extract is frozen and verified
+(docs/DEVIATIONS.md #22) and required otherwise.
 """
 
 from __future__ import annotations
@@ -98,17 +99,36 @@ def _tex() -> Check:
     return Check("tex_engine", bool(found), detail, required=False)
 
 
+def frozen_osm_extracts() -> tuple[bool, str]:
+    """Whether every OSM scenario's frozen extract exists and matches its hash in ``data/MANIFEST.json`` (variants
+    built by patching another scenario's network have no extract of their own)."""
+    from nycemis import manifest
+    from nycemis.config import scenario_config
+    from nycemis.network.osm_fetch import osm_path
+    from nycemis.paths import configs_dir
+
+    ids = [p.stem for p in sorted((configs_dir() / "scenarios").glob("*.yaml"))]
+    osm = [s for s in ids if scenario_config(s).source == "osm" and not scenario_config(s).patch_of]
+    bad = [s for s in osm if not manifest.verify(osm_path(s))]
+    return not bad, (f"frozen OSM extracts verified for {', '.join(osm)}" if not bad
+                     else f"frozen OSM extract missing or changed: {', '.join(bad)}")
+
+
 def _overpass() -> Check:
+    """Overpass is needed only to download OSM extracts (`net fetch`). While every extract is frozen and verified, the
+    check is informational (docs/DEVIATIONS.md #22): its result is reported, but no stage needs the service."""
+    frozen, why = frozen_osm_extracts()
     errors = []
     for url in OVERPASS_STATUS_URLS:
         req = urllib.request.Request(url, headers={"User-Agent": "nycemis-doctor/0.1"})
         try:
             with urllib.request.urlopen(req, timeout=15) as resp:
                 first = resp.read(200).decode("utf-8", "replace").splitlines()[:2]
-                return Check("overpass", True, f"{url} reachable: {' | '.join(first)}")
+                return Check("overpass", True, f"{url} reachable: {' | '.join(first)}", required=not frozen)
         except (urllib.error.URLError, TimeoutError, OSError) as exc:
             errors.append(f"{url}: {exc}")
-    return Check("overpass", False, "; ".join(errors))
+    note = f" ({why}: informational)" if frozen else f" ({why}: required)"
+    return Check("overpass", False, "; ".join(errors) + note, required=not frozen)
 
 
 def _git() -> Check:

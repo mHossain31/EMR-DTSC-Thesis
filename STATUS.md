@@ -3,8 +3,9 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** M9 complete except the v1.0 tag, held for one decision (doctor's Overpass check,
-  Definition of Done item 1). The street-coding sensitivity experiment ran (540/540, verified; plan tagged
+- **Current milestone:** done: M0-M9 and the street-coding sensitivity experiment; tag `v1.0`. Decided on
+  2026-11-20 that doctor's Overpass check is informational while the OSM extracts are frozen (DEVIATIONS #22).
+  The street-coding sensitivity experiment ran (540/540, verified; plan tagged
   `sensitivity-v1` before the runs): with NYC's default 25 mph limit and minor-road stops, measured-emission rerouting
   emitted more NOx than travel-time rerouting at every level (docs/CLAIMS_SENSITIVITY.md); the paper, summary,
   project page, FAQ, LIMITATIONS 14 and RESEARCH_AGENDA question 1 report it. `verify-all` passes. Nothing running.
@@ -19,7 +20,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
   on the test seeds, and the legacy_ml route-change counter bug (fixed; recount `legacy_recount`, 15 runs, NOx
   identical: 136 of 4,443,027 calls changed a path). PC1-PC4 are identical before and after. New analysis-code hash
   3b97c291 is recorded in DEVIATIONS #17; `verify-all --only prereg` passes.
-- **Last updated:** 2026-11-20 21:55.
+- **Last updated:** 2026-11-20 22:05.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -62,7 +63,8 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
-1. Decision on `doctor`'s Overpass check (see the Definition of Done below); then tag `v1.0`.
+1. Released as `v1.0`. Share the corrected results with Prof. Huang and Billy (co-author) before letters are
+   submitted.
 2. Optional, not started: M10 (CARLA; the multi-GB download has not been fetched) and the follow-ups of `docs/RESEARCH_AGENDA.md`.
 3. Any change to `src/nycemis/analysis/*.py` or `configs/base.yaml` changes the frozen hash (record it in
    `docs/DEVIATIONS.md`); any change to `src/nycemis/sensitivity.py` goes in `docs/SENSITIVITY_PLAN.md` as a dated
@@ -70,13 +72,11 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Definition of Done (docs/SPECIFICATION.md section 11), ticked with evidence
 
-- [ ] `doctor` and `verify-all` pass on a clean clone using only the README commands. `verify-all` passes (2026-11-20
+- [x] `doctor` and `verify-all` pass on a clean clone using only the README commands. `verify-all` passes (2026-11-20
       21:46, `results/logs/verify_all.log`: pytest 89 passed, ruff, six experiments 2,784 runs verified, prereg,
-      paper, open items, space path). `doctor` passes every required check except Overpass reachability: the
-      overpass-api.de status endpoint answers some User-Agents at once with HTTP 406 or 502 and does not answer
-      `doctor`'s (`nycemis-doctor/0.1`) within 15 s, on 2026-11-19 and 2026-11-20; no stage needs Overpass, since the
-      OSM extracts are frozen in `data/osm/` with hashes in `data/MANIFEST.json`. Open decision: keep the
-      check failing, or make it informational while every frozen extract verifies (would be DEVIATIONS #22).
+      paper, open items, space path). `doctor` is GREEN (2026-11-20): every required check passes; Overpass
+      reachability is reported as a warning and is informational while every frozen OSM extract verifies (user
+      decision, DEVIATIONS #22; the status endpoint did not answer `doctor` on 2026-11-19 and 2026-11-20).
       `verify-all` check 6 clones the committed tree into a path with a space and runs the smoke reconciliation
       and determinism tests there. A full clean-clone rebuild repeats every experiment (the run folders under
       `results/runs/` are not in git) and was not repeated.
@@ -91,7 +91,7 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
       `models/flushing/gbm_v1/model_card.md` (tag `model-freeze-v1`); `results/confirmatory/forecast_test.json`
       (test seeds, DEVIATIONS #20).
 - [x] Preregistration tagged before the test seeds; PC1-PC4 reported with CIs; deviations documented: tag `prereg-v1`
-      (`verify-all` prereg check); `docs/CLAIMS.md`; `docs/DEVIATIONS.md` #1-#21.
+      (`verify-all` prereg check); `docs/CLAIMS.md`; `docs/DEVIATIONS.md` #1-#22.
 - [x] Every planned run DONE or documented-failed; invalid-run counts reported: `experiment verify` for pilot,
       dataset, validation, confirmatory, legacy_recount and sensitivity_posted; invalid counts in
       `results/confirmatory/analysis.json` and `results/sensitivity_posted/analysis.json`.
@@ -122,11 +122,11 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 | G6 | done | `experiment verify --exp confirmatory`: 1,080/1,080, 0 problems; tag `prereg-v1` predates every run |
 | G7 | done: every PC reported with its CI; claims ledger complete; adversarial review answered (DEVIATIONS #17-#20) | `docs/CLAIMS.md`, `results/confirmatory/` |
 | M8 (sensitivity) | done: plan tagged `sensitivity-v1` before the runs; 540/540 verified; analysed | `docs/SENSITIVITY_PLAN.md`, `docs/CLAIMS_SENSITIVITY.md` |
-| M9 | done except the v1.0 tag (one decision) | `paper/build/main.pdf` (9 pages), `application/`, `verify-all` |
+| M9 | done; tag `v1.0` | `paper/build/main.pdf` (9 pages), `application/`, `verify-all` |
 
 ## Decisions so far
 
-`docs/DEVIATIONS.md` #1-#20. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
+`docs/DEVIATIONS.md` #1-#22. Most important: `--ignore-junction-blocker 30` in the protocol (#6), junction join
 20 m (#7), levels on the relative speed ratio (#8), reconciliation tolerance 0.5% for pilot runs (#9),
 device-equivalent travel time (#12) and the travel-time-weights router (#13) in the effort controllers, r and v
 forecast on their own scale (#14).

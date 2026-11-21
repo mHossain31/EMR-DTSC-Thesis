@@ -7,7 +7,7 @@ import re
 import pytest
 
 from nycemis import env
-from nycemis.doctor import run_checks
+from nycemis.doctor import frozen_osm_extracts, run_checks
 
 pytestmark = pytest.mark.sumo
 
@@ -49,3 +49,9 @@ def test_unknown_backend_rejected() -> None:
 def test_doctor_required_checks_pass_offline() -> None:
     failed = [c for c in run_checks(include_network=False) if c.required and not c.ok]
     assert not failed, failed
+
+
+def test_frozen_osm_extracts_verify() -> None:
+    # Overpass is informational only while this holds (docs/DEVIATIONS.md #22)
+    ok, detail = frozen_osm_extracts()
+    assert ok, detail
