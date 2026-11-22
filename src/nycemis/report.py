@@ -305,6 +305,111 @@ def table_params() -> str:
     return _write("tab_params", "ll", ["Parameter", "Value"], rows)
 
 
+# ---- single-column variants for two-column layouts (paper/ieee)
+
+def table_demand_compact() -> str:
+    from nycemis.config import load_yaml
+
+    doc = load_yaml(configs_dir() / "demand_levels.yaml")["scenarios"]
+    rows = []
+    for lvl in LEVELS:
+        a, b = doc["flushing"]["levels"][lvl], doc["flushing_posted"]["levels"][lvl]
+        rows.append([lvl.capitalize(), f"{a['target_relative_speed_ratio']:.2f}", f"{a['density_per_h_km']:g}",
+                     f"{a['achieved_relative_speed_ratio']:.3f}", f"{b['density_per_h_km']:g}",
+                     f"{b['achieved_relative_speed_ratio']:.3f}" + ("" if b["target_reached"] else "$^{a}$")])
+    pre = [r" & & \multicolumn{2}{c}{As built} & \multicolumn{2}{c}{NYC-coded} \\",
+           r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}"]
+    return _write("tab_demand_compact", "lrrrrr", ["Level", "Target", "Density", "RSR", "Density", "RSR"], rows,
+                  pre=pre)
+
+
+EXP_NAMES = {"pilot": "Pilot", "dataset": "Training data", "validation": "Validation", "confirmatory": "Confirmatory",
+             "legacy_recount": "Legacy recount", "sensitivity_posted": "Sensitivity"}
+
+
+def table_design_compact() -> str:
+    from nycemis.experiments.plan import exp_dir
+
+    rows = []
+    for exp, name in EXP_NAMES.items():
+        plan = _load(exp_dir(exp) / "plan.json")
+        if not plan:
+            continue
+        seeds = sorted({r["spec"]["seed"] for r in plan["runs"]})
+        parts, start = [], seeds[0]
+        for a, b in zip(seeds, [*seeds[1:], None], strict=True):
+            if b != a + 1:
+                parts.append(f"{start}--{a}" if a != start else f"{a}")
+                start = b
+        rows.append([name, ", ".join(parts), str(len({r["label"] for r in plan["runs"]})), _num(len(plan["runs"]))])
+    return _write("tab_design_compact", "llrr", ["Experiment", "Seeds", "Cond.", "Runs"], rows)
+
+
+def table_spatial_compact() -> str:
+    s = _load(results_dir() / "confirmatory" / "spatial_summary.json")
+    tab = pd.read_csv(results_dir() / "confirmatory" / "spatial.csv")
+    share = tab.groupby(["label", "level"])[f"share_{RESID}"].mean()
+    p = {(r["reference"], r["level"], r["metric"]): r for r in s["paired"] if r["condition"] == "eco_ml"}
+    comp = {(c["reference"], c["level"]): c for c in s["composition"]}
+
+    def cell(lvl, metric):
+        return _pct(p[("static", lvl, metric)]["mean"], 0)
+
+    rows = [["Resid./service NO$_x$, \\%", *[cell(lvl, f"nox_{RESID}_pct") for lvl in LEVELS]],
+            ["Resid./service veh-h, \\%", *[cell(lvl, f"veh_h_{RESID}_pct") for lvl in LEVELS]],
+            ["Resid. share of NO$_x$, \\%",
+             *[f"{100 * share[('static', lvl)]:.0f}$\\to${100 * share[('eco_ml', lvl)]:.0f}" for lvl in LEVELS]],
+            ["Tertiary NO$_x$, \\%", *[cell(lvl, "nox_tertiary_pct") for lvl in LEVELS]],
+            ["Primary/secondary NO$_x$, \\%", *[cell(lvl, "nox_primary/secondary_pct") for lvl in LEVELS]],
+            ["Edge NO$_x$, \\%", *[_pct(p[("static", lvl, "edge_nox_pct")]["mean"]) for lvl in LEVELS]],
+            ["Explained by class mix, \\%",
+             *[f"{100 * comp[('static', lvl)]['explained_share']:.0f}" for lvl in LEVELS]]]
+    return _write("tab_spatial_compact", "lrrr", ["vs no rerouting", "Light", "Mod.", "Heavy"], rows)
+
+
+def table_networks_compact() -> str:
+    a, b = _network_facts("flushing"), _network_facts("flushing_posted")
+    rows = [["Edges / lane-km", f"{a['edges']} / {a['lane_km']}", f"{b['edges']} / {b['lane_km']}"],
+            ["Signal programs", a["signals"], b["signals"]],
+            ["Priority junctions", a["priority"], b["priority"]],
+            ["Stop-controlled junctions", a["stop"], b["stop"]],
+            ["Prim./sec. speed, km/h", a["primsec"], b["primsec"]],
+            ["Tertiary speed, km/h", a["tertiary"], b["tertiary"]],
+            ["Resid./service speed, km/h", a["resid"], b["resid"]]]
+    return _write("tab_networks_compact", "lrr", ["", "As built", "NYC-coded"], rows)
+
+
+def table_legacy_compact() -> str:
+    rep = _load(results_dir() / "legacy_audit" / "replication_confirmatory.json")
+    rows = []
+    for lvl in LEVELS:
+        v = rep["summary"][f"legacy_ml/{lvl}"]
+        rows.append([lvl.capitalize(), str(v["n"]), f"{v['legacy_metric_drop_pct_mean']:.1f}",
+                     f"{v['legacy_metric_drop_pct_min']:.1f}--{v['legacy_metric_drop_pct_max']:.1f}",
+                     _pct(-v["matched_drop_pct_mean"], 2),
+                     f"{_pct(-v['matched_drop_pct_max'], 1)} to {_pct(-v['matched_drop_pct_min'], 1)}"])
+    pre = [r" & & \multicolumn{2}{c}{Legacy metric: drop, \%} & \multicolumn{2}{c}{Matched: change, \%} \\",
+           r"\cmidrule(lr){3-4}\cmidrule(lr){5-6}"]
+    return _write("tab_legacy_compact", "lrrlrl", ["Level", "$n$", "Mean", "Range", "Mean", "Range"], rows, pre=pre)
+
+
+def table_forecast_compact() -> str:
+    f = _load(results_dir() / "confirmatory" / "forecast_test.json")
+    names = [("model", "Boosted trees (ours)"), ("historical_mean", "Per-edge hist. mean"),
+             ("persistence", "Persistence"), ("ema", "Moving average"), ("ridge", "Ridge")]
+    targets = ("r", "v", "d")
+    rows = [[label, *[f"{f['regression'][k][t]['mae']:.3f}" for t in targets], f"{f['hotspot'][k]['pr_auc']:.3f}"]
+            for k, label in names]
+    boot = {t: f["bootstrap"][t + "_mae_skill_vs_historical_mean"] for t in targets}
+    rows.append([r"\multicolumn{5}{@{}l}{\emph{Skill vs per-edge historical mean, 95\% interval}}"])
+    rows.append([r"\quad Lower bound", *[_pct(boot[t]["ci95_low"], 3) for t in targets], ""])
+    rows.append([r"\quad Upper bound", *[_pct(boot[t]["ci95_high"], 3) for t in targets], ""])
+    return _write("tab_forecast_compact", "@{}lrrrr@{}", ["Model", "NO$_x$/veh-s", "Speed", "NO$_x$ dens.", "PR-AUC"],
+                  rows, groups=[len(names)],
+                  pre=[r" & \multicolumn{3}{c}{MAE, test seeds} & Hotspot \\",
+                       r"\cmidrule(lr){2-4}\cmidrule(l){5-5}"])
+
+
 def write_typeset_macros() -> str:
     """``paper/macros_typeset.tex``: every generated macro whose value holds a negative number, redefined with a
     typographic minus ($-$) instead of a hyphen. Derived mechanically from the two generated macro files, so no value
@@ -326,7 +431,9 @@ def write_typeset_macros() -> str:
 
 def write_tables() -> list[str]:
     return [table_networks(), table_demand(), table_design(), table_legacy(), table_pc(), table_cost(),
-            table_spatial(), table_forecast(), table_sensitivity(), table_params()]
+            table_spatial(), table_forecast(), table_sensitivity(), table_params(),
+            table_demand_compact(), table_design_compact(), table_spatial_compact(), table_networks_compact(),
+            table_legacy_compact(), table_forecast_compact()]
 
 
 # ---------------------------------------------------------------- figures
@@ -342,61 +449,94 @@ def _style():
     return plt
 
 
-def figure_study_area() -> str:
+def _flushing_net():
     import sumolib
 
     from nycemis.network.build import net_path
+
+    return sumolib.net.readNet(str(net_path("flushing")), withInternal=False)
+
+
+def _draw_study_area(ax, net, scale: float = 1.0, legend_loc: str = "lower right") -> None:
     from nycemis.sim.netinfo import road_class
 
-    plt = _style()
-    net = sumolib.net.readNet(str(net_path("flushing")), withInternal=False)
     colors = {"motorway/trunk": "#b2182b", "primary/secondary": "#ef8a62", "tertiary": "#67a9cf",
               RESID: "#999999", "other": "#cccccc"}
     widths = {"motorway/trunk": 1.6, "primary/secondary": 1.3, "tertiary": 1.0, RESID: 0.5, "other": 0.4}
-    fig, ax = plt.subplots(figsize=(5.0, 5.6))
     for cls in ("other", RESID, "tertiary", "primary/secondary", "motorway/trunk"):
         for e in net.getEdges():
             if road_class(e.getType()) == cls:
                 xs, ys = zip(*e.getShape(), strict=True)
-                ax.plot(np.array(xs) / 1000, np.array(ys) / 1000, color=colors[cls], lw=widths[cls])
-    tls = [net.getNode(n.getID()).getCoord() for n in net.getNodes() if n.getType() == "traffic_light"]
-    ax.scatter([c[0] / 1000 for c in tls], [c[1] / 1000 for c in tls], s=5, color="#1a9850", zorder=5)
+                ax.plot(np.array(xs) / 1000, np.array(ys) / 1000, color=colors[cls], lw=widths[cls] * scale)
+    tls = [n.getCoord() for n in net.getNodes() if n.getType() == "traffic_light"]
+    ax.scatter([c[0] / 1000 for c in tls], [c[1] / 1000 for c in tls], s=5 * scale, color="#1a9850", zorder=5)
     for cls in ("motorway/trunk", "primary/secondary", "tertiary", RESID):
-        ax.plot([], [], color=colors[cls], lw=widths[cls] + 0.6, label=CLASS_LABEL[cls])
-    ax.scatter([], [], s=12, color="#1a9850", label="Traffic signal")
+        ax.plot([], [], color=colors[cls], lw=(widths[cls] + 0.6) * scale, label=CLASS_LABEL[cls])
+    ax.scatter([], [], s=12 * scale, color="#1a9850", label="Traffic signal")
     ax.set_aspect("equal")
     ax.set_xlabel("x (km)")
     ax.set_ylabel("y (km)")
-    ax.legend(loc="lower right", fontsize=7, frameon=True)
+    ax.legend(loc=legend_loc, fontsize=7 * max(scale, 0.85), frameon=True)
+
+
+def figure_study_area() -> str:
+    plt = _style()
+    fig, ax = plt.subplots(figsize=(5.0, 5.6))
+    _draw_study_area(ax, _flushing_net())
     out = FIGURES / "paper_study_area.png"
     fig.savefig(out)
     plt.close(fig)
     return rel(out)
 
 
+def figure_area_and_map(level: str = "heavy") -> str:
+    """Two-panel figure for two-column layouts: (a) the network by road class, (b) the per-edge NO$_x$ change."""
+    plt = _style()
+    net = _flushing_net()
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(7.0, 3.7))
+    _draw_study_area(ax1, net, scale=0.8, legend_loc="upper left")
+    ax1.set_title("(a) Study network", fontsize=8)
+    _draw_edge_change(fig, ax2, net, _edge_change(level), shrink=0.75)
+    ax2.set_title(f"(b) Eco (forecast) minus no rerouting, {level} demand", fontsize=8)
+    fig.tight_layout()
+    out = FIGURES / f"paper_area_map_{level}.png"
+    fig.savefig(out)
+    plt.close(fig)
+    return rel(out)
+
+
 def figure_forest_compact() -> str:
-    """Single-column variant (two-column layouts): one row per comparison, levels as marker shapes."""
+    """Single-column variant (two-column layouts), drawn at print size (3.4 in wide, 8 pt text): each comparison's
+    label sits above its three level rows inside the axes, so the figure is not shrunk to fit the column."""
     plt = _style()
     rows = _load(results_dir() / "confirmatory" / "analysis.json")["confirmatory"]
     markers = {"light": "o", "moderate": "s", "heavy": "^"}
-    fig, ax = plt.subplots(figsize=(3.45, 2.3))
+    fig, ax = plt.subplots(figsize=(3.4, 2.9))
+    lo = min(x["ci95_low"] for x in rows)
     for i, pc in enumerate(("PC1", "PC2", "PC3", "PC4")):
         for j, lvl in enumerate(LEVELS):
             r = next(x for x in rows if x["pc"] == pc and x["level"] == lvl)
-            y = -i - (j - 1) * 0.22
+            y = -i * 1.25 - j * 0.24
             ax.errorbar(r["mean_pct"], y, xerr=[[r["mean_pct"] - r["ci95_low"]], [r["ci95_high"] - r["mean_pct"]]],
-                        fmt=markers[lvl], color="#2166ac" if r["reject_holm"] else "#999999", ms=3.5, capsize=1.5,
-                        label=lvl.capitalize() if i == 0 else None)
+                        fmt=markers[lvl], color="#2166ac" if r["reject_holm"] else "#999999", ms=4, capsize=1.5,
+                        lw=1, label=lvl.capitalize() if i == 0 else None)
+        ax.text(0.01, -i * 1.25 + 0.2, f"{pc}: {PC_TEXT[pc]}", transform=ax.get_yaxis_transform(), fontsize=8,
+                va="bottom", ha="left")
     margin = rows[0]["margin_pct"] or 2.0
-    ax.axvspan(-margin, margin, color="#f0f0f0", zorder=0)
+    ax.axvspan(-margin, margin, color="#ececec", zorder=0, lw=0)
     ax.axvline(0, color="black", lw=0.6)
-    ax.set_yticks([0, -1, -2, -3])
-    ax.set_yticklabels([f"{pc}: {PC_TEXT[pc]}" for pc in ("PC1", "PC2", "PC3", "PC4")], fontsize=6)
-    ax.set_xlabel("Change in total NO$_x$, % (95% BCa CI)", fontsize=7)
-    ax.tick_params(axis="x", labelsize=7)
-    ax.legend(fontsize=6, frameon=False, loc="lower left")
+    ax.set_xlim(lo - 1.0, 3.0)
+    ax.xaxis.set_major_locator(plt.MultipleLocator(5))
+    ax.set_ylim(-3 * 1.25 - 0.75, 0.62)
+    ax.set_yticks([])
+    ax.spines["left"].set_visible(False)
+    ax.set_xlabel("Change in total NO$_x$, % (mean, 95% BCa CI)", fontsize=8)
+    ax.tick_params(axis="x", labelsize=8)
+    fig.legend(fontsize=8, frameon=False, loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.0), handletextpad=0.3,
+               columnspacing=1.2)
+    fig.subplots_adjust(left=0.03, right=0.97, bottom=0.15, top=0.9)
     out = FIGURES / "paper_forest_pc_compact.png"
-    fig.savefig(out)
+    fig.savefig(out, bbox_inches=None)
     plt.close(fig)
     return rel(out)
 
@@ -491,16 +631,42 @@ def figure_sensitivity() -> str:
     return rel(out)
 
 
-def figure_map(level: str = "heavy") -> str:
-    """Mean per-edge NO$_x$ difference, forecast eco-routing minus no rerouting (valid pairs), g per lane-km."""
-    import matplotlib.colors as mcolors
-    import sumolib
+def figure_sensitivity_compact() -> str:
+    """Single-column variant: the two eco-routing contrasts on both networks (the third is in the table)."""
+    plt = _style()
+    s = _load(results_dir() / "sensitivity_posted" / "analysis.json")
+    c = {(r["condition"], r["reference"], r["metric"], r["level"]): r for r in s["contrasts"]}
+    panels = [("eco_reactive", "tt_adaptive", "vs travel time"), ("eco_reactive", "static", "vs no rerouting")]
+    fig, axes = plt.subplots(1, 2, figsize=(3.45, 2.15), sharey=True)
+    for ax, (cond, ref, title) in zip(axes, panels, strict=True):
+        for j, lvl in enumerate(LEVELS):
+            r = c[(cond, ref, "total_nox_g", lvl)]
+            for k, (net, color, marker) in enumerate((("original", "#999999", "o"), ("posted", "#2166ac", "s"))):
+                v = r[net]
+                ax.errorbar(j + (k - 0.5) * 0.3, v["mean_pct"], yerr=[[v["mean_pct"] - v["ci95_low"]],
+                                                                      [v["ci95_high"] - v["mean_pct"]]],
+                            fmt=marker, color=color, ms=3.5, capsize=1.5,
+                            label=("As built" if net == "original" else "NYC-coded") if j == 0 else None)
+        ax.axhline(0, color="black", lw=0.6)
+        ax.set_xticks(range(len(LEVELS)))
+        ax.set_xticklabels(["Light", "Mod.", "Heavy"], fontsize=7)
+        ax.tick_params(axis="y", labelsize=7)
+        ax.set_title("Eco (measured)" + chr(10) + title, fontsize=7)
+    axes[0].set_ylabel("Change in total NO$_x$, %", fontsize=7)
+    axes[0].legend(fontsize=6, frameon=False, loc="lower left")
+    fig.tight_layout()
+    out = FIGURES / "paper_sensitivity_compact.png"
+    fig.savefig(out)
+    plt.close(fig)
+    return rel(out)
 
+
+def _edge_change(level: str) -> pd.Series:
+    """Mean per-edge NO$_x$ difference over valid seed pairs, forecast eco-routing minus no rerouting, g per
+    lane-km."""
     from nycemis.analysis.pilot import load_runs
     from nycemis.experiments.plan import exp_dir
-    from nycemis.network.build import net_path
 
-    plt = _style()
     runs = load_runs("confirmatory")
     runs = runs[runs.level == level]
     a, b = runs[runs.label == "eco_ml"].set_index("seed"), runs[runs.label == "static"].set_index("seed")
@@ -512,22 +678,33 @@ def figure_map(level: str = "heavy") -> str:
         j = ea.set_index("edge_id")[["nox_mg", "lane_m"]].join(eb.set_index("edge_id")[["nox_mg"]], rsuffix="_ref",
                                                                 how="outer").fillna(0.0)
         diffs.append((j.nox_mg - j.nox_mg_ref) / 1000.0 / (j.lane_m.replace(0, np.nan) / 1000.0))
-    d = pd.concat(diffs, axis=1).mean(axis=1).dropna()
+    return pd.concat(diffs, axis=1).mean(axis=1).dropna()
+
+
+def _draw_edge_change(fig, ax, net, d: pd.Series, shrink: float = 0.7) -> None:
+    import matplotlib.colors as mcolors
+    import matplotlib.pyplot as plt
+
     lim = float(np.percentile(np.abs(d), 99))
     norm = mcolors.TwoSlopeNorm(vmin=-lim, vcenter=0, vmax=lim)
     cmap = plt.get_cmap("RdBu_r")
-    net = sumolib.net.readNet(str(net_path("flushing")), withInternal=False)
-    fig, ax = plt.subplots(figsize=(5.0, 5.4))
     for e in net.getEdges():
         xs, ys = zip(*e.getShape(), strict=True)
         v = d.get(e.getID(), 0.0)
         ax.plot(np.array(xs) / 1000, np.array(ys) / 1000, color=cmap(norm(v)), lw=0.6 + 1.4 * min(abs(v) / lim, 1))
     sm = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
-    cb = fig.colorbar(sm, ax=ax, shrink=0.7)
+    cb = fig.colorbar(sm, ax=ax, shrink=shrink)
     cb.set_label("NO$_x$ difference, g per lane-km", fontsize=8)
     ax.set_aspect("equal")
     ax.set_xlabel("x (km)")
     ax.set_ylabel("y (km)")
+
+
+def figure_map(level: str = "heavy") -> str:
+    """Mean per-edge NO$_x$ difference, forecast eco-routing minus no rerouting (valid pairs), g per lane-km."""
+    plt = _style()
+    fig, ax = plt.subplots(figsize=(5.0, 5.4))
+    _draw_edge_change(fig, ax, _flushing_net(), _edge_change(level))
     out = FIGURES / f"paper_map_{level}.png"
     fig.savefig(out)
     plt.close(fig)
@@ -537,7 +714,8 @@ def figure_map(level: str = "heavy") -> str:
 def write_figures() -> list[str]:
     FIGURES.mkdir(parents=True, exist_ok=True)
     return [figure_study_area(), figure_forest(), figure_forest_compact(), figure_road_class(),
-            figure_sensitivity(), figure_map("heavy")]
+            figure_sensitivity(), figure_sensitivity_compact(), figure_map("heavy"),
+            figure_area_and_map("heavy")]
 
 
 # ---------------------------------------------------------------- build

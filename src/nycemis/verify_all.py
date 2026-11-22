@@ -76,6 +76,7 @@ def check_experiments() -> tuple[bool, str]:
 def _strip_tex(text: str) -> str:
     text = re.sub(r"(?<!\\)%.*", "", text)  # comments
     body = text.split(r"\begin{document}", 1)[-1]
+    body = body.replace("\\\\", " ")  # line breaks: in "Technology\\New York", \New is not a macro
     return re.sub(r"\[[^\]]*\]", "", body)  # optional arguments such as [width=0.9\linewidth]
 
 
@@ -95,8 +96,8 @@ def check_paper() -> tuple[bool, str]:
         body = _strip_tex((PAPER / doc).read_text(encoding="utf-8"))
         used = set(re.findall(r"\\([A-Z][A-Za-z]*)", body)) - LATEX_UPPER
         missing = sorted(used - defined)
-        for pat in ALLOWED_NUMBERS:
-            body = re.sub(pat, "", body)
+        for pat in ALLOWED_NUMBERS:  # case-insensitive: title-case captions write "95\% Cluster-Bootstrap"
+            body = re.sub(pat, "", body, flags=re.IGNORECASE)
         typed = sorted(set(re.findall(r"(?<![A-Za-z\\])\d+(?:\.\d+)?\\%|(?<![A-Za-z\\])\d+\.\d+", body)))
         if missing:
             msg.append(f"{doc}: macros used but not generated (missing results?): {', '.join(missing)}")
