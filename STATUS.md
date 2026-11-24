@@ -3,8 +3,8 @@
 Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and the sections of
 `docs/SPECIFICATION.md` for the current milestone.
 
-- **Current milestone:** done: M0-M9 and the street-coding sensitivity experiment; tag `v1.0`. Decided on
-  2026-11-20 that doctor's Overpass check is informational while the OSM extracts are frozen (DEVIATIONS #22).
+- **Current milestone:** done: M0-M9 and the street-coding sensitivity experiment; tag `v1.0`. On
+  2026-11-20 it was decided that doctor's Overpass check is informational while the OSM extracts are frozen (DEVIATIONS #22).
   The street-coding sensitivity experiment ran (540/540, verified; plan tagged
   `sensitivity-v1` before the runs): with NYC's default 25 mph limit and minor-road stops, measured-emission rerouting
   emitted more NOx than travel-time rerouting at every level (docs/CLAIMS_SENSITIVITY.md); the paper, summary,
@@ -63,17 +63,17 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
-0b. Remote (requested 2026-11-21): `origin` = https://github.com/mHossain31/EMR-DTSC-Thesis (public), pushed
+0b. Remote (2026-11-21): `origin` = https://github.com/mHossain31/EMR-DTSC-Thesis (public), pushed
    over HTTPS with GitHub CLI credentials; branch `main` and tags `model-freeze-v1`,
    `prereg-v1`, `sensitivity-v1`, `v1.0`. GitHub's initial commit (a CC0 LICENSE) is merged; the project keeps
-   MIT (decision). On 2026-11-23 the history was rewritten and the GitHub repository recreated (
-   DEVIATIONS #25, old to new hashes in `docs/COMMIT_MAP.md`); collaborator `bybkyaw` (write) re-invited. Push
-   further commits with `git push`; Further publication is a separate step.
-0a. arXiv package of the journal preprint (requested 2026-11-21): `paper/journal/arxiv/journal_preprint_arxiv.tar.gz`
+   MIT. On 2026-11-23 the history was rewritten and the GitHub repository recreated
+   (DEVIATIONS #25; `docs/COMMIT_MAP.md`); collaborator `bybkyaw` (write) re-invited. A second rewrite the same
+   day is DEVIATIONS #26. The repository has not been published again yet.
+0a. arXiv package of the journal preprint (2026-11-21): `paper/journal/arxiv/journal_preprint_arxiv.tar.gz`
    (flattened source, figures, tables, macros, compiled main.bbl; compiles from an empty folder) and
    `paper/journal/arxiv/arxiv_metadata.md` (plain-text title, authors, abstract, comments). Not submitted: the
    authors choose category, license and timing, and may need an arXiv endorsement.
-0. Paper layouts (requested 2026-11-20, DEVIATIONS #23): journal preprint `paper/journal/journal_preprint.pdf`
+0. Paper layouts (2026-11-20, DEVIATIONS #23): journal preprint `paper/journal/journal_preprint.pdf`
    (16 pages), IEEE conference version `paper/ieee/ieee_conference.pdf` (4 pages), technical report archived in
    `paper/archive/technical_report_v1.0/`. Rebuild with `python -m nycemis report` after `analyze`, `sensitivity`
    and `paper`. Which layout is used is still open; then tag `v1.1`.
