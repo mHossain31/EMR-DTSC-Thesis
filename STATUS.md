@@ -20,7 +20,7 @@ Status of the study. Read this with `docs/PLAN.md`, `docs/DEVIATIONS.md`, and th
   on the test seeds, and the legacy_ml route-change counter bug (fixed; recount `legacy_recount`, 15 runs, NOx
   identical: 136 of 4,443,027 calls changed a path). PC1-PC4 are identical before and after. New analysis-code hash
   3b97c291 is recorded in DEVIATIONS #17; `verify-all --only prereg` passes.
-- **Last updated:** 2026-11-20 23:30.
+- **Last updated:** 2026-11-23.
 
 ## Running jobs (detached; they survive a session restart)
 
@@ -63,10 +63,12 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 
 ## Next steps (in order)
 
-0b. Remote (requested 2026-11-21): `origin` = https://github.com/mHossain31/EMR-DTSC-Thesis (private), pushed
+0b. Remote (requested 2026-11-21): `origin` = https://github.com/mHossain31/EMR-DTSC-Thesis (public), pushed
    over HTTPS with GitHub CLI credentials; branch `main` and tags `model-freeze-v1`,
    `prereg-v1`, `sensitivity-v1`, `v1.0`. GitHub's initial commit (a CC0 LICENSE) is merged; the project keeps
-   MIT (decision). Push further commits with `git push`; Further publication is a separate step.
+   MIT (decision). On 2026-11-23 the history was rewritten and the GitHub repository recreated (
+   DEVIATIONS #25, old to new hashes in `docs/COMMIT_MAP.md`); collaborator `bybkyaw` (write) re-invited. Push
+   further commits with `git push`; Further publication is a separate step.
 0a. arXiv package of the journal preprint (requested 2026-11-21): `paper/journal/arxiv/journal_preprint_arxiv.tar.gz`
    (flattened source, figures, tables, macros, compiled main.bbl; compiles from an empty folder) and
    `paper/journal/arxiv/arxiv_metadata.md` (plain-text title, authors, abstract, comments). Not submitted: the
