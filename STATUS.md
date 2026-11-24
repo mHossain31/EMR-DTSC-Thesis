@@ -66,9 +66,8 @@ rerun. Progress: `python -m nycemis experiment status --exp <EXP>`.
 0b. Remote (2026-11-21): `origin` = https://github.com/mHossain31/EMR-DTSC-Thesis (public), pushed
    over HTTPS with GitHub CLI credentials; branch `main` and tags `model-freeze-v1`,
    `prereg-v1`, `sensitivity-v1`, `v1.0`. GitHub's initial commit (a CC0 LICENSE) is merged; the project keeps
-   MIT. On 2026-11-23 the history was rewritten and the GitHub repository recreated
-   (DEVIATIONS #25; `docs/COMMIT_MAP.md`); collaborator `bybkyaw` (write) re-invited. A second rewrite the same
-   day is DEVIATIONS #26. The repository has not been published again yet.
+   MIT. On 2026-11-23 the history was rewritten (`docs/DEVIATIONS.md` #25 and #26; `docs/COMMIT_MAP.md`).
+   The repository has not been published again yet.
 0a. arXiv package of the journal preprint (2026-11-21): `paper/journal/arxiv/journal_preprint_arxiv.tar.gz`
    (flattened source, figures, tables, macros, compiled main.bbl; compiles from an empty folder) and
    `paper/journal/arxiv/arxiv_metadata.md` (plain-text title, authors, abstract, comments). Not submitted: the
