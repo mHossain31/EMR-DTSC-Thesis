@@ -24,6 +24,32 @@ of M9 are generated from the results). Where to read the results:
 
 All quantities are simulated tailpipe emissions in SUMO. Nothing here is a claim about health or air quality.
 
+## Project history
+
+- **2024: the original course project.** "Air Pollution Prediction and Reduction Strategies in Urban Areas using
+  SUMO and Machine Learning" (NYIT DTSC 870 Project I), by Mohammed Y. Hossain and Billy M. Kyaw, supervised by
+  Prof. X. Huang. A machine-learning model triggered rerouting in a SUMO model of Flushing, Queens, and the project
+  reported a large cut in emissions. Its report, slides and notebook are kept unchanged in `legacy/` (the notebook
+  archive is dated October 2024).
+- **November 2026: the audit.** Re-reading the notebook showed that the reported reduction came from how it was
+  measured, not from the rerouting: the baseline and the controlled runs covered different lengths of simulated
+  time, and most reroute calls returned the route the vehicle already had. Replicating the old rule under a matched
+  protocol confirmed this (`docs/LEGACY_AUDIT.md`).
+- **November 2026: the rebuild.** The study was redone as a preregistered experiment with a matched protocol,
+  baselines and a random-rerouting placebo. Networks of three New York City areas were built and validated; the
+  experiments use Flushing. The forecaster (tag `model-freeze-v1`) and the analysis plan (tag `prereg-v1`) were
+  frozen before any test-seed run. The confirmatory runs, the frozen analysis and an adversarial review of the code,
+  protocol and results followed (`docs/PREREGISTRATION.md`, `docs/CLAIMS.md`, `docs/DEVIATIONS.md`).
+- **November 2026: the network-coding check.** The analysis showed that the reduction depends on moving traffic
+  onto residential streets. A follow-up experiment, fixed before its runs (tag `sensitivity-v1`), recoded Flushing
+  with the city's default speed limit and stop signs where minor streets meet unsignalised junctions. On that
+  network, measured-emission rerouting emitted more NOx than travel-time rerouting at every demand level
+  (`docs/CLAIMS_SENSITIVITY.md`).
+- **Release.** Tag `v1.0`, then the paper as a journal-style preprint and an IEEE conference version, all generated
+  from the same result files.
+
+The exact date of each step is in the git tags and in `docs/DEVIATIONS.md`.
+
 ## Scenarios
 
 | ID | Area | Role |
