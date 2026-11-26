@@ -9,7 +9,8 @@ preregistered, paired, multi-seed protocol. It rebuilds and audits an earlier st
 
 **Authors:** Mohammed Y. Hossain and Billy M. Kyaw (New York Institute of Technology). To cite this work, use
 the Zenodo DOI [10.5281/zenodo.24570057](https://doi.org/10.5281/zenodo.24570057), which resolves to the latest
-archived version, or see `CITATION.cff`.
+archived version, or see `CITATION.cff`. The paper is archived as a preprint on Zenodo:
+[10.5281/zenodo.24570718](https://doi.org/10.5281/zenodo.24570718).
 
 Status: the confirmatory study has run and been analysed (milestones M0-M7; the paper and the summary documents
 of M9 are generated from the results). Where to read the results:
