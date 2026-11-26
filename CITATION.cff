@@ -17,9 +17,9 @@ license: MIT
 doi: "10.5281/zenodo.24570057"
 abstract: >-
   Code, preregistration, configuration and result files for an audit and preregistered rebuild of a 2024
-  SUMO + machine-learning study of emission-aware rerouting in Flushing, Queens. The code was written with
-  Claude (Anthropic), an AI coding assistant, under the authors' direction (README, "Use of AI tools").
-  OpenStreetMap-derived data are under ODbL 1.0 (NOTICE.md).
+  SUMO + machine-learning study of emission-aware rerouting in Flushing, Queens. The code was developed with the
+  assistance of Claude (Anthropic), an AI coding assistant, under the authors' direction (README, "Use of AI
+  tools"). OpenStreetMap-derived data are under ODbL 1.0 (NOTICE.md).
 repository-code: "https://github.com/mHossain31/EMR-DTSC-Thesis"
 keywords:
   - eco-routing

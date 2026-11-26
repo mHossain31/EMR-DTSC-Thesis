@@ -120,12 +120,13 @@ Map data: Contains data © OpenStreetMap contributors, ODbL. See `NOTICE.md`.
 ## Use of AI tools
 
 The code of this rebuild (everything outside `legacy/`) and the drafts of the paper and summary documents were
-written with Claude (Anthropic), an AI coding assistant used through Claude Code, under the authors' direction. The
-authors set the research questions, approved the preregistered protocol, and defined the checks every result must
-pass (`python -m nycemis verify-all`: the test suite, run verification, the preregistration hash, and a check that
-the paper contains no hand-typed numbers). The assistant is what made a study of this scope practical for two
-people: a full audit of the 2024 project, three demand levels, six controllers, 60 paired seeds per condition and
-level, and a sensitivity experiment. The authors are responsible for all content.
+developed with the assistance of Claude (Anthropic), an AI coding assistant used through Claude Code, under the
+authors' direction. The authors set the research questions, approved the preregistered protocol, and defined the
+checks every result must pass (`python -m nycemis verify-all`: the test suite, run verification, the
+preregistration hash, and a check that the paper contains no hand-typed numbers). The assistant is what made a
+study of this scope practical for two people: a full audit of the 2024 project, three demand levels, six
+controllers, 60 paired seeds per condition and level, and a sensitivity experiment. The authors are responsible for
+all content.
 
 ## License
 
