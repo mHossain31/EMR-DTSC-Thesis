@@ -53,3 +53,14 @@ RESEARCH_BREAKDOWN.md
 # LaTeX build folders of the paper versions (final PDFs are copied next to their sources)
 paper/journal/build/
 paper/ieee/build/
+
+# Summary documents generated locally by `python -m nycemis paper`; not published
+application/
+
+# arXiv upload bundle, a build product of scripts/make_arxiv_bundle.py; not published
+paper/journal/arxiv/
+
+# Local AI assistant configuration
+CLAUDE.md
+.claude/
+

@@ -11,7 +11,6 @@ preregistered, paired, multi-seed protocol. It rebuilds and audits an earlier st
 Status: the confirmatory study has run and been analysed (milestones M0-M7; the paper and the summary documents
 of M9 are generated from the results). Where to read the results:
 
-- `application/research_summary_1page.md`: one page, every number generated from result files.
 - `docs/CLAIMS.md`: every claim with its comparison, interval and result file; preregistered (PC1-PC4) and
   exploratory claims are kept apart.
 - The paper in three layouts: the journal-style preprint `paper/journal/journal_preprint.pdf`, the two-column
@@ -104,7 +103,7 @@ were run. The paper needs a TeX engine: tectonic at `tools/tectonic.exe` or on P
 - `legacy/`: read-only copies of the original report, slides and notebook, plus text extracts.
 - `results/`: result files of every experiment (run folders under `results/runs/` are not in git).
 - `models/`: the frozen forecaster and the legacy random forest, with model cards.
-- `paper/`: `main.tex`, generated `macros.tex`, figures; `application/`: one-page summary, claims ledger, FAQ and project page, generated from the results.
+- `paper/`: `main.tex`, generated `macros.tex`, figures; `application/` (not tracked): summary documents that `python -m nycemis paper` generates locally.
 
 ## Credits
 
