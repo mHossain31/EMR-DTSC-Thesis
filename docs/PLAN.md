@@ -6,8 +6,8 @@ The 2024 DTSC 870 project (Hossain and Kyaw, supervised by Prof. X. Huang) repor
 ML-triggered rerouting in a SUMO model of Flushing. The study specification calls for a
 research-grade rebuild: an audit of the legacy work, three ready-to-run NYC SUMO scenarios, and a preregistered, paired,
 multi-seed experiment on forecast-driven eco-routing with proper baselines and placebos. Also wanted: a paper and
-application materials generated from results, ready in time for the Dec 15 deadline (interim note usable
-for Dec 1). The specification governs the study; this plan covers how it gets executed on this machine, in what order,
+summary documents generated from results, ready by Dec 15 (an interim note by Dec 1).
+The specification governs the study; this plan covers how it gets executed on this machine, in what order,
 and what the inspection has already shown.
 
 ### What the legacy files already show (read-only inspection, Nov 14)
@@ -144,10 +144,11 @@ notebook) and copied to `legacy/`. Details: `docs/LEGACY_AUDIT.md` (generated).
 - An independent adversarial review; every finding is fixed or logged in `DEVIATIONS.md`.
 - **G7:** every PC reported, nulls included.
 
-**M9 Paper and application (Dec 1-5).**
+**M9 Paper and summary documents (Dec 1-5).**
 - `paper/main.tex`, with every number coming from generated `macros.tex`, and `refs.bib` with verified entries only.
 - `make_arxiv_bundle.py`.
-- `application/`: research summary of at most 450 words, claims ledger, FAQ and project page, plus `RESEARCH_AGENDA.md`.
+- `application/` (generated locally, not tracked): research summary of at most 450 words, claims ledger, FAQ and
+  project page, plus `RESEARCH_AGENDA.md`.
 - `verify-all`, then tag `v1.0`.
 
 **M8 (Tier 2) and M10 (CARLA)** run only after G7 and their gates. M10 asks first before the multi-GB CARLA download.

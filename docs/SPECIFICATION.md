@@ -161,7 +161,7 @@ nyc-emissions-sumo/
   results/            (raw per-run outputs gitignored; summary parquet/json committed)
   models/             frozen model artifacts
   paper/              main.tex  refs.bib  figures/ tables/ macros.tex  (all generated from results)
-  application/        interim_note.md  research_summary_1page.md  claims_ledger.md  interview_faq.md  project_page.md  demo/ (optional, M10)
+  application/        summary documents generated from results (not tracked): interim note, one-page summary, claims ledger, FAQ, project page; demo/ (optional, M10)
   scripts/            (thin wrappers only)   notebooks/ (exploration only; never source of truth)
 ```
 
@@ -290,7 +290,7 @@ Commit at each gate; update `STATUS.md` (done / tests / open issues / next); tag
 - **M6 Preregistration freeze and confirmatory runs.** Finalize `PREREGISTRATION.md` (seed lists, α*, model id, analysis code hash); commit and tag `prereg-v1`; then run the test seeds. **G6:** `experiment verify` clean; no code changed since the tag except documented bug fixes (any such fix is logged and the affected analysis re-run).
 - **M7 Analysis and reporting inputs.** Run the frozen analysis; figures/tables; spatial and road-class analysis; `CLAIMS.md` (every claim -> result file -> CI); adversarial review (section 9, item 11). **G7:** every PC reported with its result; claims ledger complete.
 - **M8 Tier 2 (optional, after G7).** Scenarios 2-3, transfer, compliance and horizon sweeps, C6-C8. Same freeze discipline (a separate `prereg-tier2-v1` tag). Label all outputs exploratory unless preregistered.
-- **M9 Paper, application artifacts, release.** `paper/main.tex` (article class, about 8 pages plus appendix: abstract, introduction, related work using only verified citations, methods, results, discussion, limitations, reproducibility statement); compile with `tectonic` or `latexmk` (try to obtain a TeX engine without admin rights; if impossible, deliver `.tex` plus a Markdown rendering and record the environment limitation); also add `scripts/make_arxiv_bundle.py`, which packages the sources for an optional arXiv upload (the author decides whether to post, and with which co-authors). `application/`: `research_summary_1page.md` (<= 450 words, numbers injected from results, hedged exactly as the CIs allow), `claims_ledger.md`, `interview_faq.md` (including "what was wrong with version 1 and how did you find out?"), `project_page.md` for a personal website, and `docs/RESEARCH_AGENDA.md` (3-5 follow-up questions, each motivated by an observed result). Final `verify-all`; tag `v1.0`.
+- **M9 Paper, summary documents, release.** `paper/main.tex` (article class, about 8 pages plus appendix: abstract, introduction, related work using only verified citations, methods, results, discussion, limitations, reproducibility statement); compile with `tectonic` or `latexmk` (try to obtain a TeX engine without admin rights; if impossible, deliver `.tex` plus a Markdown rendering and record the environment limitation); also add `scripts/make_arxiv_bundle.py`, which packages the sources for an optional arXiv upload (the author decides whether to post, and with which co-authors). `application/` (generated locally, not tracked): `research_summary_1page.md` (<= 450 words, numbers injected from results, hedged exactly as the CIs allow), `claims_ledger.md`, a FAQ (including "what was wrong with version 1 and how did you find out?"), `project_page.md` for a personal website, and `docs/RESEARCH_AGENDA.md` (3-5 follow-up questions, each motivated by an observed result). Final `verify-all`; tag `v1.0`.
 - **M10 CARLA live-visualization layer (optional, Tier 3).** Starts only after G7 and the go/no-go in 10.1. Purpose: a 3D live view and exact replays of the same Flushing simulation, for demonstration. It adds no scientific evidence: SUMO remains the only source of traffic dynamics and emissions, and nothing in the paper, the summary or `CLAIMS.md` may cite CARLA output. Read Appendix E first, then:
   1. **Environment.** CARLA 0.9.16 (Unreal Engine 4.26 line), not 0.10.0. Use a separate virtualenv (`.venv-carla`) with the `carla` wheel that matches the installed release (look in its `PythonAPI/carla/dist`); never modify the research environment. Use the same SUMO version as the research environment where possible and record both versions. CARLA needs Windows or Linux and an NVIDIA GPU; if `doctor` finds none, write "M10 skipped: no CARLA-capable machine" in `STATUS.md` and stop. The multi-GB CARLA package is downloaded only after a separate decision.
   2. **Map pipeline (SUMO net to CARLA).** Per scenario: `netconvert -s <net.xml> --opendrive-output <out.xodr> --output.original-names`, then `client.generate_opendrive_world(xodr_text, carla.OpendriveGenerationParameters(...))` (OpenDRIVE standalone mode; expect road meshes without detailed buildings, and check visually). Map size is limited by the engine, so start with a crop of about 1 km x 1 km (`netconvert --keep-edges.in-boundary ...`; verify the option name) and grow it until generation fails; record the largest size that works. If the alignment gate below cannot be met, document it and skip the live layer. Never change the experimental network.
@@ -309,13 +309,13 @@ The application deadlines are fixed (Dec 1 and Dec 15, 2026) and this work start
 |---|---|---|
 | Nov 16-17 | G0-G2 (repo, audit, networks, demand) | `docs/LEGACY_AUDIT.md` |
 | Nov 19 | G3 (harness, controllers, tests green) | |
-| Nov 21 | G4 (pilot, power analysis, n fixed) | `application/interim_note.md`: audit findings and pilot results only, labeled interim and non-confirmatory, usable in the Dec 1 materials |
+| Nov 21 | G4 (pilot, power analysis, n fixed) | `application/interim_note.md`: audit findings and pilot results only, labeled interim and non-confirmatory, available by Dec 1 |
 | Nov 25 | G5 (forecaster and α* frozen) | |
 | Nov 26 | G6 (prereg tag; confirmatory runs launched) | |
 | Nov 30 | confirmatory runs complete; G7 analysis | first full draft of `application/research_summary_1page.md` |
 | Dec 2-4 (optional) | M10 (CARLA layer) | `application/demo/` clips, only if the go/no-go below passes |
-| Dec 5 | M9 (paper and application folder) | final one-page summary, claims ledger, FAQ |
-| Dec 8 | freeze of everything used in the application | |
+| Dec 5 | M9 (paper and summary documents) | final one-page summary, claims ledger, FAQ |
+| Dec 8 | freeze of everything the summary documents use | |
 
 Stop-loss rule: if a gate is more than 2 days late, apply the scope-cut ladder (section 8) immediately, in order, instead of working around the delay. If confirmatory runs cannot finish by Dec 5, report the completed share and label the rest "not run". A smaller, finished, honestly reported study beats a larger unfinished one. Never fabricate or extrapolate missing results.
 
