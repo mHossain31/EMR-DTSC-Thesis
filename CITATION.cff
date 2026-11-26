@@ -14,6 +14,7 @@ authors:
 version: "1.0.1"
 date-released: "2026-11-26"
 license: MIT
+doi: "10.5281/zenodo.24570057"
 abstract: >-
   Code, preregistration, configuration and result files for an audit and preregistered rebuild of a 2024
   SUMO + machine-learning study of emission-aware rerouting in Flushing, Queens. The code was written with

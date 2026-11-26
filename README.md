@@ -1,12 +1,15 @@
 # NYC emissions in SUMO: forecast-driven, emission-aware rerouting
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24570057.svg)](https://doi.org/10.5281/zenodo.24570057)
+
 A reproducible SUMO + machine-learning study of whether forecast-driven, emission-aware dynamic rerouting reduces
 **simulated** tailpipe emissions in New York City, measured against proper baselines and a placebo under a
 preregistered, paired, multi-seed protocol. It rebuilds and audits an earlier student project; see
 `docs/LEGACY_AUDIT.md` for what was wrong with that version and how this one addresses it.
 
-**Authors:** Mohammed Y. Hossain and Billy M. Kyaw (New York Institute of Technology). To cite this work, see
-`CITATION.cff`.
+**Authors:** Mohammed Y. Hossain and Billy M. Kyaw (New York Institute of Technology). To cite this work, use
+the Zenodo DOI [10.5281/zenodo.24570057](https://doi.org/10.5281/zenodo.24570057), which resolves to the latest
+archived version, or see `CITATION.cff`.
 
 Status: the confirmatory study has run and been analysed (milestones M0-M7; the paper and the summary documents
 of M9 are generated from the results). Where to read the results:
