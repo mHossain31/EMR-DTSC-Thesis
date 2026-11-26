@@ -9,8 +9,8 @@ authors:
   - family-names: Kyaw
     given-names: Billy M.
     affiliation: New York Institute of Technology
-version: "1.0"
-date-released: "2026-11-20"
+version: "1.0.1"
+date-released: "2026-11-25"
 license: MIT
 abstract: >-
   Code, preregistration, configuration and result files for an audit and preregistered rebuild of a 2024
