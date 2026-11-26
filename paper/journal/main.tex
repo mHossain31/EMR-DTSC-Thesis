@@ -217,7 +217,9 @@ and ridge regression.
 \subsection{Experimental design and preregistration}
 Seeds are split into disjoint sets for the pilot, training, validation and test (Table~\ref{tab:design}). The
 comparisons, the $\alpha^*$ selection rule, the test seeds, the sample size and the analysis code (by hash) were
-frozen in a tagged commit before any test seed ran. The pilot's spread of paired changes (SD \PilotSD\%) gave
+frozen in a tagged commit before any test seed ran. The tag is in the project's own repository rather than a
+third-party registry, and that repository's history was rewritten after the study (commit hashes changed; dates
+and tags were kept), so the timing of the freeze rests on the repository's record. The pilot's spread of paired changes (SD \PilotSD\%) gave
 $n = \ConfirmatoryN$ seeds per condition and level, the cap of the preregistered rule.
 
 \begin{table}[htbp]
@@ -446,6 +448,14 @@ repository. Each stage is one command, and every number in this paper is generat
 \section*{Acknowledgments}
 The 2024 project audited here was the authors' NYIT DTSC 870 course project, supervised by Prof.\ X.\ Huang
 (NYIT). Map data \copyright\ OpenStreetMap contributors, ODbL.
+
+\paragraph{Use of AI tools.} The study's software (simulation harness, controllers, forecaster pipeline, statistical
+analysis, tests, and the scripts that generate this paper's tables, figures and numbers) was written with Claude
+(Anthropic), an AI coding assistant used through Claude Code, under the authors' direction, and the text of this
+paper was drafted with the same assistant. The authors set the research questions, approved the preregistered
+protocol and the automated checks every result must pass, approved the final text, and take full responsibility
+for the content. The assistant made a study of this scale practical for two authors; every reported number is
+generated from the result files rather than typed.
 
 \bibliographystyle{plainnat}
 \bibliography{../refs}

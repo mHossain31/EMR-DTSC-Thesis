@@ -8,7 +8,7 @@ preregistered, paired, multi-seed protocol. It rebuilds and audits an earlier st
 **Authors:** Mohammed Y. Hossain and Billy M. Kyaw (New York Institute of Technology). To cite this work, see
 `CITATION.cff`.
 
-Status: the confirmatory study has run and been analysed (milestones M0-M7; the paper and application materials
+Status: the confirmatory study has run and been analysed (milestones M0-M7; the paper and the summary documents
 of M9 are generated from the results). Where to read the results:
 
 - `application/research_summary_1page.md`: one page, every number generated from result files.
@@ -104,15 +104,29 @@ were run. The paper needs a TeX engine: tectonic at `tools/tectonic.exe` or on P
 - `legacy/`: read-only copies of the original report, slides and notebook, plus text extracts.
 - `results/`: result files of every experiment (run folders under `results/runs/` are not in git).
 - `models/`: the frozen forecaster and the legacy random forest, with model cards.
-- `paper/`: `main.tex`, generated `macros.tex`, figures; `application/`: summary, claims ledger, FAQ, project page.
+- `paper/`: `main.tex`, generated `macros.tex`, figures; `application/`: one-page summary, claims ledger, FAQ and project page, generated from the results.
 
 ## Credits
 
 The original project, "Air Pollution Prediction and Reduction Strategies in Urban Areas using SUMO and Machine
 Learning" (NYIT DTSC 870 Project I), was co-authored by **Mohammed Y. Hossain** (team leader) and
-**Billy M. Kyaw**, supervised by **Prof. X. Huang** (NYIT). This rebuild, its paper versions and the application
-materials are the joint work of Mohammed Y. Hossain and Billy M. Kyaw.
+**Billy M. Kyaw**, supervised by **Prof. X. Huang** (NYIT). This rebuild, its paper versions and the summary
+documents are the joint work of Mohammed Y. Hossain and Billy M. Kyaw.
 
 Map data: Contains data © OpenStreetMap contributors, ODbL. See `NOTICE.md`.
 
-License: MIT (`LICENSE`).
+## Use of AI tools
+
+The code of this rebuild (everything outside `legacy/`) and the drafts of the paper and summary documents were
+written with Claude (Anthropic), an AI coding assistant used through Claude Code, under the authors' direction. The
+authors set the research questions, approved the preregistered protocol, and defined the checks every result must
+pass (`python -m nycemis verify-all`: the test suite, run verification, the preregistration hash, and a check that
+the paper contains no hand-typed numbers). The assistant is what made a study of this scope practical for two
+people: a full audit of the 2024 project, three demand levels, six controllers, 60 paired seeds per condition and
+level, and a sensitivity experiment. The authors are responsible for all content.
+
+## License
+
+Code, configuration and documentation: MIT (`LICENSE`). The OpenStreetMap extracts in `data/osm/` and the SUMO
+networks built from them in `scenarios/` are distributed under the Open Database License 1.0, the license of the
+data they derive from. See `NOTICE.md`.
