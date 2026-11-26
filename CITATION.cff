@@ -10,6 +10,7 @@ authors:
   - family-names: Kyaw
     given-names: Billy M.
     affiliation: New York Institute of Technology
+    orcid: "https://orcid.org/0009-0001-3692-9706"
 version: "1.0.1"
 date-released: "2026-11-25"
 license: MIT
